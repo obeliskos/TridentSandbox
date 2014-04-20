@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hosting and/or using AppCache</title>
+<link rel="stylesheet" type="text/css" href="docs.css" />
+</head>
+<body>
+Topics : [ <a href="Welcome.htm">Welcome</a> ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ Hosting and AppCache ] [ <a href="MarkupAndScriptUnits.htm">Markup and Script Units</a> ] 
+<h2>Hosting and/or using AppCache</h2>
+
+<h3>Overview</h3>
+<p>TridentSandbox is designed primarily for running off of a local file system without a web server.  There are a few advantages and disadvantages to running web pages in this manner.&nbsp;
+The main advantage of running off of a local filesystem is that you can make requests from websites.&nbsp; Typically if a webpage is served up from website 'A', you cannot make a web request from website 'B'.&nbsp; Since you have no 
+website 'A' when running off a filesystem, it allows it.&nbsp;  (This doesn't affect media such as images and videos... those can be requested in a hosted environment).  But your advantage is that you can write programs to scour the web, 
+scrape pages for data, fetch rss feeds, or call webservices.</p>
+
+<p>The disadvantages of running off your local filesystem are that you cannot use LocalStorage or IndexedDB.  These are simple storage mechanisms that provides storage space to each web domain that wants to use it.  
+  As a result of not having this functionality, your sole method of file I/O is using the File API to manually load and save 
+data as files to your hard drive.  Another minor issue is that you also have no effective way to use hash parameters (this will be useful when used along with localstorage/indexeddb).</p>
+
+<p>A <strong>Hosted</strong> environment means you take the Trident Sandbox 'website' and put it on a real web server.  If your website is accessed via a browser with a numerical ip address or real dns address 
+then you have the ability to use several sandboxed storage mechanisms other than the FileAPI.  For local storage you have about 5 megs you can use without even asking the user for permission or 
+specify locations (your program determines where to save and does not need user to initiate this action). A larger sandboxed storage area can be provided by IndexedDB which defaults to about 10 megs 
+but upon reaching this limit it will ask the user if it is ok to expand this to get more space.  I have yet to fully test this but the max limit is probably about 45megs on Windows RT IE 11 and 250megs on 
+x86 IE11 (IE 10 limits will probably be similar).  Your actual storage may be half of this though as it probably wastes half of this space (due to saving in unicode?).</p>
+
+<p>An <strong>AppCached</strong> environment is a hosted environment that is configured to let the client download all or some of its resources for either performance reasons or for offline use of the website.  This 'caching' 
+is done by configuring a cache manifest file and registering it to your webpage (in it's <html> tag).  Trident Sandbox supports this and provides the cache manifest file along with the 
+distribution (as of version 1.6).  Trident Sandbox knows if you are viewing a AppCached version of itself and it will display events notifying you while it is downloading files and then finally it 
+will indicate that it is 'Idle'.  Idle status means you are fully cached and you can then go offline indefinately and the site will still work.  If you are online it may check for a newer version of the appcache 
+manifest file to see if updates are available.  You can either access my hosted/appcache server at this <a href="http://obeliskos.com/TridentSandbox">Official Trident Sandbox AppCached website</a> or, if you have access to your own 
+web server which you can configure mime types for, you can host it yourself.  If you host it yourself (and want appcache functionality), configure a mime type for extension .mf and set it to 'text/cache-manifest'.</p>
+
+<h3>Note</h3>
+Before discussing LocalStorage and IndexedDB, i will point out that both storage technologies tie the sandbox storage with the domain the webpage is served from.  It is next generation version 
+of 'cookies' although they are much more powerful and provide much more storage.  They can be cleaned out / erased via the 'Delete Browsing History' functionality of Internet Explorer's 'Internet Options/Browsing History/Delete...' feature. 
+The default settings for this 'clean up' is to 'Preserve Favorites website data' for sites that are in your favorites.  If the Trident Sandbox url you are using is not a favorite and if you have 
+selected to clean up the 'Cookies and website data', you will likely lose your local storage and indexed data (along with Trident Save slots).  So make sure to review and possibly back up using file api until your 
+determine your strategy for preserving your data long-term.  You can also pro-actively manage the storage by looking into the 'Internet Options/Settings/Caches and Databases' to monitor,delete, and adjust quota warnings for.</p>
+
+<h3>Local Storage</h3>
+<p>This HTML 5 technology (may be older) allows you to <strong>simply</strong> save settings/data up to around 5-10megs without prompting the user.  This storage is sandboxed based on the domain you are accessing the web page from.  
+So data from one web page's domain cannot access the local storage of another domain.  Trident Sandbox (in fact the whole domain it is served from) has just one common/shared 5-10mb localstorage which all the PRG files share. 
+This local storage is implemented as a simple key/value collection.  As an example <strong>var userName = localStorage["MyApp_Username"];</strong> could retrieve a value if it exists and <strong>localStorage["MyApp_Username"] = "User1";</strong> would set that value in local storage.</p>
+
+<h3>IndexedDB</h3>
+<p>This HTML 5 technology allows for higher performance, indexed databases.  These are actually javascript object store databases and it uses no SQL language.  There is a bit of a learning 
+curve to using this technology so depending on what you want to create a database for you can either use the indexedDB API directly, or if all you want is another (larger) object store similar 
+to Local Storage, then Trident Sandbox provides an interface for (somewhat) easily utilizing a prebuilt generic object store which mostly consists of object with just a App, Key, and Value.
+The 'app' can be anything probably similar to your PRG file name, 'key' is a description of the data (like 'MyLokiJS Database'), and value could be the serialized contents of a javascript object 
+like an entire Loki.JS database (db) object... it serializes the object hierarchy.  You could just use it for simple values but localStorage is easier for that.  If you do populate many separate 
+'keys' for your 'app', then there is an API function to retrieve a cursor for all objects of a given 'app' and you can iterate over them. This generic object store is indexed so queries for your 
+keys should be fast, should the database get filled up with a lot of entries.  This Trident Sandbox 'generic object store' is created automatically and Trident Sandbox uses this itself for storing 
+user save slots as an alternative to saving to file system. 
+
+<h3>Hash Parameters</h3>
+<p>This functionality is nothing new, but currently only useful when running hosted or appcached.  TridentSandbox allows you to 
+specify optional Hash Parameters 'LoadSlot' or 'RunSlot' in the URL which tells Trident Sandbox to automatically load (or load and run) one of the program save slots (from its generic IndexedDB object store).  
+Due to the nature of Internet Explorer and appcache, I have chosen to use hash symbol instead of question mark to denote start of params since the question mark generally forces a visit to the server (instead of using appcache).  
+ So you can create a shortcut such as <strong>'http://some.domain.com/TridentSandbox.htm#RunSlot=1&MyAppMode=SettingsView'</strong>. In this example Trident Sandbox will 
+automatically load and run the program in slot 1, then within your program you can further check for the existence of a 'MyAppMode' url param, and if it exists, perform an action automatically.  Because the hash symbol 
+is usually just a shortcut to an html anchor within a page, sometimes you might need to do a full reload of the page after changing RunSlot or LoadSlot params, otherwise it will just 
+look for a nonexistent anchor tab by that name within the same 'load' of the page.  If the hash param you change is consumed within your program (prg) you should not need to do a full reload of the page.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

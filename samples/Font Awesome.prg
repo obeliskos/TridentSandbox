@@ -1,0 +1,5 @@
+{
+  "progName": "Font Awesome",
+  "htmlText": "<button style=\"height:40px\"><i class=\"fa fa-floppy-o\"></i> Save</button>\n<button style=\"height:40px\"><i class=\"fa fa-file-o\"></i> New</button>\n<button style=\"height:40px\"><i class=\"fa fa-arrow-up\"></i> Import</button>\n<button style=\"height:40px\"><i class=\"fa fa-download\"></i> Export</button>\n<button style=\"height:40px\"><i class=\"fa fa-trash-o\"></i> Delete</button>\n<button style=\"height:40px\"><i class=\"fa fa-key\"></i> Encrypt</button>\n\n<div id='divPassword' style='display:none'>\n<i class=\"fa fa-key\"></i> Enter Password : \n<input type='password'></input>\n</div>\n\n<p><i class=\"fa fa-camera-retro fa-lg\"></i> fa-camera-retro</p>\n<p><i class=\"fa fa-camera-retro fa-2x\"></i> fa-camera-retro</p>\n<p><i class=\"fa fa-camera-retro fa-3x\"></i> fa-camera-retro</p>\n<p><i class=\"fa fa-camera-retro fa-4x\"></i> fa-camera-retro</p>\n<p><i class=\"fa fa-camera-retro fa-5x\"></i> fa-camera-retro</p>\n\n<i class=\"fa fa-spinner fa-spin\"></i>\n<i class=\"fa fa-refresh fa-spin\"></i>\n<i class=\"fa fa-cog fa-spin\"></i>\n\n\n\n",
+  "scriptText": ""
+}

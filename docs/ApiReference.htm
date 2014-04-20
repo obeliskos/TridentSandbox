@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>API Reference</title>
+<link rel="stylesheet" type="text/css" href="docs.css" />
+</head>
+<body>
+Topics : [ <a href="Welcome.htm">Welcome</a> ] [ API Reference ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ][ <a href="MarkupAndScriptUnits.htm">Markup and Script Units</a> ] 
+<h2>API Reference</h2>
+
+<p>Trident Sandbox attempts to make coding programs easier.  You don't have to use notepad... you've got syntax highlighting editors, several powerful libraries already registered and ready to use, and 
+you dont have to worry too much about File I/O since we already provide mechanism for loading and saving your programs within the webpage.  Aside from the third party libraries 
+which are ready and available for you to code against, Trident Sandbox provides its own methods and variables for allowing you to perform some sandbox specific functionality.  This functionality 
+includes logging, controlling screen layout to collapse code or caption areas, summoning a user area file loader to load or quickly save a file, setting main output tab color, bring up an 
+object inspector programmatically to display the contents of your own variable, and several variables to determine Trident Sandbox version, hosting type, etc.</p>
+
+<h3>API Flags</h3>
+<table>
+	<tbody>
+		<tr>
+			<th>Flag Name</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>FLAG_StartPrgFullscreen</td>
+			<td>If this text exists (put it in a comment) within the first 250 chars of your program script, the Trident Sandbox will automatically fullscreen your app when it runs it.  Provide your own exit fs functionality or use the ESC key to go back to normal view.</td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>API Variables</h3>
+
+<table style="width:100%">
+	<tbody>
+		<tr>
+			<th>Variable Name</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>VAR_TRIDENT_VERSION</td>
+			<td>A value such as 1.6 indicating the version of Trident Sandbox you are running under.  Can be used for ensuring program features are available.  This variable was introduced in version 1.6 so it will be undefined/null on prior versions.</td>
+		</tr>
+		<tr>
+			<td>VAR_TRIDENT_HOSTED</td>
+			<td>A boolean value indicating whether you are running in a hosted environment.  Local Filesystem yields false, hosted and AppCache return true. Introduced in version 1.6.</td>
+		</tr>
+		<tr>
+			<td>VAR_TRIDENT_APPCACHED</td>
+			<td>Boolean value indicating whether you are running under Trident Sandbox in an appcached environment.</td>
+		</tr>
+		<tr>
+			<td>VAR_TRIDENT_ENV_TYPE</td>
+			<td>String value containing 'IDE' when running under Trident Sandbox IDE, or 'STANDALONE' when running a generated Standalone App. (Value set within template) Introduced in version 1.6.</td>
+		</tr>
+		<tr>
+			<td>VAR_TRIDENT_ONLINE</td>
+			<td>Simple alias for html5 standard 'navigator.onLine'.  Boolean value indicating whether internet connectivity exists.</td>
+		</tr>
+		<tr>
+			<td>VAR_TRIDENT_DB</td>
+			<td>A reference to the Trident Database (uses indexedDB).  You should probably only use this to see if it is available by testing it for null... such as if (!VAR_TRIDENT_DB) alertify.log("Trident Database not available");</td>
+		</tr>
+		<tr>
+			<td>VAR_UserFileValue</td>
+			<td>The non-preferred method of 'receiving' text from a file loaded using API_ShowLoad() below.  It is up to you to check the contents of this variable if you do not implement a EVT_UserLoadCallback as described in Events/Callback section.</td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>API Functions</h3>
+<table style="width:100%">
+	<tbody>
+		<tr>
+			<th>General Functions</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>API_SetBackgroundColor(colorCode)</td>
+			<td>Sets the background color for Main Output tab. Color Code is string such as &quot;#cca&quot;</td>
+		</tr>
+		<tr>
+			<td>API_SetActiveTab(tabId)</td>
+			<td>allows you to switch active tab programmatically. tabId is zero-based... 0 is Main, 1 is Log (HTML), or 2 is Log (Text)</td>
+		</tr>
+		<tr>
+			<td>API_SetWindowMode(mode)</td>
+			<td>pass in 1 for Code only view, 2 for 50/50 split, or 3 for Output Only view</td>
+		</tr>
+		<tr>
+			<td>API_SetToolbarMode(showCaption, showLoader, showDevToolbar)</td>
+			<td>programmatically show/hide the three areas at the top of the screen. If you hide the dev toolbar you should save any pending changes your program first, and provide a means within your program of getting them back!</td>
+		</tr>
+		<tr>
+			<td>API_ClearOutput()</td>
+			<td>This clears out the contents of all output tabs, hides the user filepicker, and sets the active tab to Main Output.</td>
+		</tr>
+		<tr>
+			<td>API_ClearMain()</td>
+			<td>this clears out the contents of just the Main Output tab</td>
+		</tr>
+		<tr>
+			<td>API_ClearHtmlLog()</td>
+			<td>clears the contents of the Log (HTML) tab</td>
+		</tr>
+		<tr>
+			<td>API_ClearLog()</td>
+			<td>clear contents of the Log (Text) tab</td>
+		</tr>
+		<tr>
+			<td>API_LogMain(msg)</td>
+			<td>Easy way to log html text to the Main Output</td>
+		</tr>
+		<tr>
+			<td>API_LogHtml(msg)</td>
+			<td>easy way to log html text to the HTML Log</td>
+		</tr>
+		<tr>
+			<td>API_LogMessage(msg)</td>
+			<td>log text to the Log (Text) tab</td>
+		</tr>
+		<tr>
+			<td>API_MetalFullscreen()</td>
+			<td>equivalent to pressing the &#39;Fullscreen Dev&#39; button</td>
+		</tr>
+		<tr>
+			<td>API_UserFullscreen()</td>
+			<td>this command zooms the users Output tabs fullscreen.</td>
+		</tr>
+		<tr>
+			<td>API_UserFullscreenExit()</td>
+			<td>this command un-zooms an active fullscreen.</td>
+		</tr>
+		<tr>
+			<td>API_Inspect(object)</td>
+			<td>Call this method within your own program or as a Text Log Console command, passing it a javascript object to inspect, and it will bring up a dialog containing a Trident Sandbox object inspector.  This utilizes the prettyprint.js library to display</td>
+		</tr>
+		<tr>
+			<td>API_PlaySound(soundFilename)</td>
+			<td>This method plays the sound indicated by soundFilename. It assumes the file is in the 'sounds' subfolder.</td>
+		</tr>
+		<tr>
+			<td>API_PlaySoundURI(soundURI)</td>
+			<td>This method plays the sound indicated by soundFilename.  This can be any valid URI such as an http:// web address of file:/// address.</td>
+		</tr>
+		<tr>
+			<td>API_GetURLParameter(sParam)</td>
+			<td>When used in a hosted or appcached environment you can utilize this API function to retrieve a url hash param.  (Such as http://obeliskos.com/TridentSandbox.htm#RunSlot=1&MyParam=MyVal) You could then call API_GetURLParameter("MyParam") to get "MyVal"</td>
+		</tr>
+	</tbody>
+</table>
+<table style="width:100%">
+	<tbody>
+		<tr>
+			<th>File API I/O Functions</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>API_ShowLoad()</td>
+			<td>Displays a file loader control within the user area. See more info below.  You should implement the callback EVT_UserLoadCallback (see events section) to 'receive' a file loaded with this.</td>
+		</tr>
+		<tr>
+			<td>API_ShowDataLoad()</td>
+			<td>Displays a binary file loader control within the user area. Contents will be read into a base64 encoded dataURL string.  You should implement the callback EVT_UserDataLoadCallback (see events section) to 'receive' a file loaded with this.</td>
+		</tr>
+		<tr>
+			<td>API_HideUserLoader()</td>
+			<td>Hides a user loader if it is visible.</td>
+		</tr>
+		<tr>
+			<td>API_HideUserDataLoader()</td>
+			<td>Hides a binary (dataURL) user loader if it is visible.</td>
+		</tr>
+		<tr>
+			<td>API_DataUrlToBlob(dataURL)</td>
+			<td>Allows you to pass a dataURL string (representing a base64 encoded binary object) and recreate the binary object it represents.  Object will be returned as a blob.  This method is used by the API_SaveDataURL() function but can be used within your own programs as well.</td>
+		</tr>
+		<tr>
+			<td>API_SaveTextFile(fileName, saveString)</td>
+			<td>allows the user to easily save some text to a file. This will trigger a download.</td>
+		</tr>
+		<tr>
+			<td>API_SaveDataURL(fileName, dataURL)</td>
+			<td>Allows you to take a base64 encoded dataURL and save it as a binary file.</td>
+		</tr>
+	</tbody>
+</table>
+<table style="width:100%">
+	<tbody>
+		<tr>
+			<th>Trident DB Functions</th>
+			<th>Description (These are only available when used in a hosted or appcached environment.</th>
+		</tr>
+		<tr>
+			<td>API_TransferSlot(slotId)</td>
+			<td>This will Unload your current program and Load and run the program in the TridentDB save slot indicated by slotId.  Use carefully as you will lose unsaved changes if there are any.  You can pass parameters between programs using localStorage and/or TridentDB/IndexedDB.</td>
+		</tr>
+		<tr>
+			<td>API_GetIndexedAppKey(app, key, callback)</td>
+			<td>You can utilize this API function to retrieve an app/key value from the TridentSandbox global IndexedDb store.</td>
+		</tr>
+		<tr>
+			<td>API_GetIndexedAppKeyById(id, callback)</td>
+			<td>This gets a Trident App/Key/Val object by id. If for some reason you keep a collection of id's, you can use this to lookup object.</td>
+		</tr>
+		<tr>
+			<td>API_SetIndexedAppKey(app, key, val)</td>
+			<td>This will add or update (if the app/key combo already exists) a Trident App/Key/Value object</td>
+		</tr>
+		<tr>
+			<td>API_DelIndexedAppKey(id)</td>
+			<td>You can delete an object from the Trident Sandbox global IndexedDb store.  The object can only be deleted by the primary key 'id' which is autoincremented number on object</td>
+		</tr>
+		<tr>
+			<td>API_GetIndexedAppCursor(app, callback)</td>
+			<td>This will retrieve a cursor for all App/Key/Val objects by app. Your callback is called once per record and you must advance cursor (see examples).</td>
+		</tr>
+		<tr>
+			<td>API_Backup_TridentDB(filename)</td>
+			<td>You might call this API function as a Text Log Console command to backup the entire contents of the Trident Database to be restored later.  'filename' param is optional.</td>
+		</tr>
+		<tr>
+			<td>API_Restore_TridentDB()</td>
+			<td>You might call this API function as a Text Log Console command to bring up a file loader for loading a Trident Database backup file.  Upon selecting a file it will restore the database.</td>
+		</tr>
+		<tr>
+			<td>API_LogMarkupUnits()</td>
+			<td>You might call this API function as a Text Log Console command to show a list of all of the markup units in the database.</td>
+		</tr>
+		<tr>
+			<td>API_SaveMarkupUnit(unitName)</td>
+			<td>You might call this API function as a Text Log Console command to save the contents of the Markup codemirror editor as a unit.</td>
+		</tr>
+		<tr>
+			<td>API_LoadMarkupUnit(unitName)</td>
+			<td>You might call this API function as a Text Log Console command to load the unit back into the Markup editor, perhaps to further edit.</td>
+		</tr>
+		<tr>
+			<td>API_GetMarkupUnit(unitName, callback)</td>
+			<td>You might call this API function within a real program to dynamically retrieve the unit as a string which you can then insert into a div such as the HTML output log (UI_HtmlLogPlaceholder)</td>
+		</tr>
+		<tr>
+			<td>API_ImportMarkupUnit(unitName, clearFirst)</td>
+			<td>You might call this API function to automatically load the markup unit into the HTML log tab.  If you pass 'true' for the clearFirst param you will clear out any old html, otherwise you will append to the HTML output.</td>
+		</tr>
+		<tr>
+			<td>API_LogScriptUnits()</td>
+			<td>You might call this API function as a Text Log Console command to show a list of all of the script units in the database.</td>
+		</tr>
+		<tr>
+			<td>API_SaveScriptUnit(unitName)</td>
+			<td>You might call this API function as a Text Log Console command to save the contents of the Script codemirror editor as a unit.</td>
+		</tr>
+		<tr>
+			<td>API_LoadScriptUnit(unitName)</td>
+			<td>You might call this API function as a Text Log Console command to load the unit back into the Script editor, perhaps to further edit.</td>
+		</tr>
+		<tr>
+			<td>API_ImportScriptUnit(unitName)</td>
+			<td>You might call this API function within a real program to import the script into a 'known' area specifically intended for placing these scripts.  Using this mechanism they will also be subsequently 'cleared' when Trident Sandbox does its usual housekeeping / garbage collection. </td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>API Events / Callbacks</h3>
+<table style="width:100%">
+	<tbody>
+		<tr>
+			<th>Event Name</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>EVT_UserLoadCallback(filestring, filename)</td>
+			<td>When calling the API_ShowLoad() method above, you should implement this callback in your program to 'receive' a potentially loaded file.</td>
+		</tr>
+		<tr>
+			<td>EVT_UserDataLoadCallback(dataURL, filename)</td>
+			<td>When calling the API_ShowDataLoad() method above to load a binary file, you should implement this callback in your program to 'receive' a potentially loaded dataURL string.</td>
+		</tr>
+		<tr>
+			<td>EVT_CleanSandbox()</td>
+			<td>If you create global variables which use up alot of memory, reference user interface elements, or utilize timers, etc. then you should probably clean up after you are done to ensure the cleanliness / stability of the sandbox environment.  Implement this method in your app to allow your program to clean up after itself.  Trident Sandbox will call this on subsequent runs or change of programs.  (See DesignGuide for more details).</td>
+		</tr>
+	</tbody>
+</table>
+
+<h3>User Interface (UI) Elements</h3>
+<table style="width:100%">
+	<tbody>
+		<tr>
+			<th>UI Element Name</th>
+			<th>Description</th>
+		</tr>
+		<tr>
+			<td>UI_MainPlaceholder</td>
+			<td>This is a DIV element representing the div your Main Output content goes into.</td>
+		</tr>
+		<tr>
+			<td>UI_HtmlLogPlaceholder</td>
+			<td>This is a DIV element representing the div your Html Log Output content goes into.</td>
+		</tr>
+		<tr>
+			<td>UI_TxtLogConsole</td>
+			<td>This is a DIV element representing the div your Text Log Output content goes into.</td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+
+</body>
+</html>

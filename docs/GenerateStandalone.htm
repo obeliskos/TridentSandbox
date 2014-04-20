@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Generating Standalone Pages</title>
+<link rel="stylesheet" type="text/css" href="docs.css" />
+</head>
+<body>
+Topics : [ <a href="Welcome.htm">Welcome</a> ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ Generating Standalone Page ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ] [ <a href="MarkupAndScriptUnits.htm">Markup and Script Units</a> ] 
+<h2>Generating Standalone Pages</h2>
+
+<p>As of version 1.5, Trident Sandbox includes a feature to generate a standalone web page.&nbsp; You can use this to pick a template to use for generating a standalone web page which is just your program, automatically loaded.&nbsp; You will still need to enable scripts but you will not be cluttered with the ide... the Output Areas are full screen.&nbsp; You will also not have to jump through the hoops of clicking &#39;Load&#39;, browsing for your PRG file, and then clicking Run.&nbsp; If you need to make changes, however, you will need to do that from within the TridentSandbox main page and then re-generate a standalone html.&nbsp;</p>
+
+<p>Templates&nbsp;are minimal htm files with parameters&nbsp;in position for substituting your app&#39;s html and script.&nbsp; The parameters used are @TRIDENT_HTML@ and @TRIDENT_SCRIPT@.&nbsp; All the unneccessary html visual elements and&nbsp;scripts used to support the IDE are removed to allow the Output Area to use the full page.&nbsp;&nbsp;The templates still include scripts and styles for all the libraries/components made available in the ide.&nbsp; I do provide an alternate template that includes everything but the editors, in case you are not creating and using the syntax highlighting code editors in your own PRG files... this reduces the number of &#39;includes&#39; significantly making for a smaller, lighter standalone page.&nbsp;</p>
+
+<p><strong>Note :</strong>&nbsp;Your application will still depend on the folder structure beneath the root folder to get access to the libraries, images, sounds, etc which are needed to make your page work correctly, but it is 'standalone' in the sense that the TridentSandbox.htm page is 'standalone'.&nbsp; Advanced users can determine ways to minimize dependencies if needed.</p>
+
+<p>The process for generating a standalone web page is :</p>
+
+<ul>
+	<li>Load your PRG file from within Trident Sandbox, make sure the Program Name displayed is what you want to use for a file name (we automatically add the .htm extension)</li>
+	<li>Click on the &#39;Generate S/A&#39; button.&nbsp; This will reveal a file picker allowing you to choose a template to use for page generation.</li>
+	<li>Choose the template you want to use from those available in the templates folder.</li>
+	<li>Upon selecting the template a download process will begin, place the constructed htm file into the same parent directory that TridentSandbox.htm is located.</li>
+</ul>
+
+<p>Now you can run your page, enable scripts and bookmark it for quick access.</p>
+
+<p>&nbsp;</p>
+</body>
+</html>

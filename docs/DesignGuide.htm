@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Design Guide</title>
+<link rel="stylesheet" type="text/css" href="docs.css" />
+</head>
+<body>
+Topics : [ <a href="Welcome.htm">Welcome</a> ] [ <a href="ApiReference.htm">API Reference</a> ] [ Design Guide ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ] [ <a href="MarkupAndScriptUnits.htm">Markup and Script Units</a> ] 
+<h2>Trident Sandbox Design Guide</h2>
+
+<p>HTML 5 and Javascript development is well documented so I wont cover gereral language or browser development in this guide.&nbsp; This guide will describe the TridentSandbox environment, how your apps run within it, and how you might want to adapt your code to make sure it doesn&#39;t interfere with the&nbsp;TridentSandbox environment.</p>
+
+<h3><strong>Trident Sandbox Environment</strong></h3>
+
+<p>When you load Trident Sandbox, you will see alot of User Interface elements.&nbsp; The screen is divided into many different regions such as Title bar, Loader Bar, Dev Bar, Code Editor Areas, and Output Area.&nbsp;&nbsp;All of these&nbsp;regions are constructed using&nbsp;HTML&nbsp;Document Object Model (DOM) elements (many elements per region) and they were defined in the TridentSandbox.htm file itself using static HTML.&nbsp; Since the Trident Sandbox web page is loaded from your local filesystem, Internet Explorer treats it a little differently than a web page coming from a real web server.&nbsp; First it warns you about script and you must explicity choose to enable them.&nbsp; The scripts can&#39;t really do anything dangerous since Internet Explorer is sandboxed, but that is something you have to approve.&nbsp;</p>
+
+<h3>Libraries</h3>
+
+<p>With the Trident Sandbox main page, it tells Internet Explorer that it will need to load all of the libraries it wants to use itself or make available for programs to use.&nbsp; Since it has already included these libraries, you don&#39;t have to... those libraries and components are there ready to be used.&nbsp; The current set of libraries include jQuery, jQueryUI, alertify.js, jqPlot, HightChartTable, Crypto.JS, jqGrid,&nbsp;dynatree, FullCalendar, and&nbsp;Loki.JS.&nbsp;</p>
+
+<h3>AJAX Limiations</h3>
+
+<p>Another difference is that your cannot make an AJAX call to yourself... sometimes you might want to automatically load a file, script, an html fragment from a folder location relative to your web page.. you cannot do that in Trident Sandbox.&nbsp; You can make an AJAX call to real web server to get data such as that, but not from your local filesystem.</p>
+
+<h3>Lack of LocalStorage / IndexedDB</h3>
+
+<p>If your files are served up from a local filesystem they are considered to have a null domain.&nbsp; LocalStorage and IndexedDB provide each distinct web domain a sandboxed file system where they can store data without dialogs.&nbsp; Since we have null domain Internet Explorer does not allow us to utilize these features.&nbsp; If you were to serve up the TridentSandbox files from a web server then you would be able to use these features.&nbsp; (Note : you will probably need to use a numerical or dns address not a machine name)</p>
+
+<h3>File API</h3>
+
+<p>This is the only I/O functionality available when served up from a local filesystem.&nbsp; This is an HTML 5 functionality added in Internet Explorer 10 which lets you load files from anywhere in your filesystem.&nbsp; This cannot be done automatically, the user has to manually (for security purposes) pick the file to read/import.&nbsp;&nbsp; You can also save files... this appears to the user as a file download so they will have to make sure the file goes in the correct place.&nbsp; Trident Sandbox uses this File API to load and save your PRG files, and makes a similar functionality available to the user to use in their own programs.&nbsp;&nbsp; Although the File API does support Binary data I/O, Trident Sandbox (at least currently) only works with loading and saving strings.&nbsp; This is usually sufficient since any Javascript object can be converted to a string and then converted back to an object using JSON.parse() and JSON.stringify()... but if you need binary data input and output you will need to establish your own &lt;file&gt; element within your HTML and code your own event handlers.</p>
+
+<h3>Fullscreen API</h3>
+
+<p>This is another HTML 5 standard which Internet Explorer added in IE 11.&nbsp; It does just that, you can make a simple javascript request to make some named visual element go fullscreen.&nbsp; I use this in some places in TridentSandbox.&nbsp; I will just point out that when in this fullscreen mode you cannot scroll the page, if your content overflows and you dont provide your own scrolling within it (like a scrollable div), then that content will not be seen.&nbsp; This is probably best suited for canvas graphics or simple pages.</p>
+
+<h3>Metro IE vs Desktop IE</h3>
+
+<p>The only discernable differences i have found are with the implementation of the File API.&nbsp; The file loaders/pickers work just fine on both and metro does very good here, but the save functionality (unless i am missing something), only saves to your downloads folder and cannot overwrite a file it will append a (1) after your filename to give it unique name.&nbsp; This is kind of a big issue if you are doing active development on a program, so you might want to use metro for running existing programs / samples instead of for active development.&nbsp; For active development the desktop IE seems to work best.</p>
+
+<h3><strong>How your programs run within Trident Sandbox</strong></h3>
+
+<p>When you write a program using the editor controls, and then click on the &#39;Run&#39; button, Trident Sandbox dynamically tears down (clears) the HTML DOM elements that were previously in the Output Area, it will then insert your html into a DIV (container for DOM elements) whose parent is the Main Output tab of the Output Area.&nbsp; After adding your html Trident Sandbox will construct a script element and insert it after your html into that same DIV container.&nbsp; Internet explorer is smart enough to parse the script immediately after it has been inserted so your program magically dynamically runs.&nbsp; The DOM is a hierarchy so your html and javascript have been inserted into this hierarchy at a relatively &#39;deep&#39; level.&nbsp;&nbsp; Traditionally, as good practice, &nbsp;scripts are inserted into the HEAD region of the DOM hierarchy, but Internet Explorer is smart enough to handle this deeper&nbsp;location convention.&nbsp; Keeping these elements localized deep and in one place makes cleaning them out cleaner and easier.</p>
+
+<h3><strong>Design Considerations (How to be a good Trident Sandbox citizen)</strong></h3>
+
+<p>Trident Sandbox is run from your own computer/device so this is more of a possible concern for you than me.&nbsp; Trident Sandbox supports loading and saving many programs without reloading the main page.&nbsp; Whenever you change programs or even re-run your program, it cleans out your old html and script and puts new code in its place.&nbsp; This swapping in and out of dynamic html is a clean process right? Well... sort of but there is a big catch.&nbsp; Internet explorer (any many other browsers) don&#39;t like to get rid of global variables even if they were declared in javascript that has been completely removed, those variables will still exist.&nbsp; This can cause conflicts between programs if they do not take steps to avoid this. If you dont mind hitting refresh on your browser whenever a conflict arises you dont need to worry about this, reloading the page completely removes everything... but its not that hard to make sure your variables and memory are cleaned up when we unload your program.</p>
+
+<p>I have created a sample program (Proper Cleanup Method.PRG) which details this process with example code, but here is a summary :</p>
+
+<p>Variables created outside of a function (global variables) are not removed after the sandbox is cleared out. They are attached to the global window object... so they linger until you reload the Trident Sandbox webpage. This became very apparent with variables such as &#39;canvas&#39; and &#39;ctx&#39;. Possibly the html canvas they were referencing was not being unloaded. Either way a bunch of global variables were just accumulating and depending on much memory a program puts into global variables, this could cause memory leaks, reference conflicts, etc.</p>
+
+<p>The simplest conflict resolution solution would be to make sure all global variables are named uniquely. This is good enough at first but not ideal for preventing memory leaks.</p>
+
+<p>Here is how I will support the ability for your programs to mitigate these issues :</p>
+
+<p>Create a stub global variable... this format is JSON/javascript object notation (see Proper Cleanup Method.prg). You can uniquely name this, or use a common &#39;sandboxVars&#39; or &#39;sbv&#39; name. That object can&#39;t be deleted either but its contents can. So within that stub variable you can create your variables/object references etc. To fulfill the cleanup process you will implement a callback function EVT_CleanSandbox() where you will delete the variables within that stub variable (or at least the ones which may conflict or consume alot of memory). You might also release timers, stop animation loops, etc. Trident Sandbox will then call your cleanup function between each program &#39;Run&#39;, before it unloads your program (for instance if you press the &#39;New&#39; toolbar button or open another program).</p>
+
+<p>Functions also exhibit this same behavior.&nbsp;&nbsp;If your programs grow large and contain many functions you may want to null them out 
+as well in your EVT_CleanSandbox() callback.&nbsp;&nbsp;Ideally you would place your functions inside the stub object as one big global application object with only a few bootstrap lines of global code to 
+call into that global app object's functions.&nbsp;&nbsp;Then, in your cleanup function, you can actually delete them as well.&nbsp;&nbsp;I have not run into a situation where one program has adversely affected 
+another program due to lingering functions since a new program with a function by the same name will just overwrite the old function... but the memory used up by them will just accumulate if 
+you go in and out of many programs.</p>
+</body>
+</html>

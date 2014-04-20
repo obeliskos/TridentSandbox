@@ -1,0 +1,20 @@
+BODY
+   {
+	font-family:"Segoe UI", sans;
+	background-color:#fcfcf0;
+   }
+
+H2
+{
+	color:#116;
+}
+
+H3
+{
+	color:#151;
+}
+
+th 
+{
+	text-align:left;
+}

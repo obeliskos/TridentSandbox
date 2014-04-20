@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to Trident Sandbox</title>
+<link rel="stylesheet" type="text/css" href="docs.css" />
+</head>
+<body>
+Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ] [ <a href="MarkupAndScriptUnits.htm">Markup and Script Units</a> ] [ Contact email : <a href="mailto:admin@obeliskos.com">admin@obeliskos.com</a> ]
+<h2>Welcome to Trident Sandbox</h2>
+
+<p></p>
+
+<p>Trident Sandbox was developed to turn Internet Explorer into a scripting IDE. It is named after the <a href="http://en.wikipedia.org/wiki/Trident_(layout_engine)" target="_blank">Trident</a> rendering engine within Internet Explorer browsers. Internet Explorer 11 uses Trident engine version 7 (IE 10 uses Trident 6). Trident 6 added the HTML 5 <a href="http://www.html5rocks.com/en/tutorials/file/dndfiles/" target="_blank">File API</a> which allows loading and saving files to local filesystem. Trident 7 added HTML 5 Fullscreen API and WebGL (among other changes). These capabilities along with a myriad of open source third-party javascript libraries allow the interactive creation of HTML 5 based applications. Although it was inspired by similar online web tools like <a href="http://jsfiddle.net/" target="_blank">jsfiddle</a>, Trident Sandbox is intended to be primarily run from the local filesystem.</p>
+
+<p>There is a pattern of web development called <a href="http://en.wikipedia.org/wiki/Single-page_application" target="_blank">Single Page Application (SPA)</a> in which you attempt to create a web page that changes dynamically vs going from page to page to page. This pattern most closely resembles what goes on in a Trident Sandbox app... you are still on the same page when you run different programs, you are just dynamically building up and tearing down DOM elements from the hierarchical Document Object Model. Your applications are not sandboxed because of the Trident Sandbox main page, they are sandboxed because of Internet Explorer. You can&#39;t accidentally change the main page&#39;s contents on disk but you can change how it looks/act in the current load of that page. Because of this you may and probably will accidentally mess up the main page from time to time, in which case a reload of the main page will restore to a fresh slate.</p>
+
+<p>The User Area where the (currently) three tabs : Main Output, Log (HTML), and Log (Text) are located is an attempt to create a flexible enough environment to handle simple programs as well as more complicated ones. In theory the main output would be used for mostly static HTML closely resembling what is defined in your Markup area. The Log (HTML) can be used either as a log screen (supporting HTML styling) or you can use it for your own dynamically rendered web pages. You can dynamically create textboxes, list boxes, buttons, canvas objects, media object, dump a large chart there, etc. The Log (Text) tab is where you might log pure text messages... it contains a scrollable textarea and has easy API interface.</p>
+
+<p>To help simplify your ability to manipulate the sandbox, i have provided a set of API functions, user elements, and variables which can help you control the environment.</p>
+
+<p>A simple object inspector is provided which will allow you to examine variables in your program.  If you need more debugging capabilities, you can use the Internet Explorer script debugger to debug your scripts.  Since your code is dynamic you need to place a javascript command &#39;debugger;&#39; (no quotes) into a line of code in your script and then pressing F12 to open the Internet Explorer tools and find the tab with a bug icon picture on it to enable the script debugger... leaving the script debugger window open attempt your run your program and when it hits that line of code you can inspect variables, set other breakpoints, or access the javascript console.</p>
+
+<p>Trident Sandbox comes with a number of open source third-party javascript libraries which you can use within your programs. These libraries (as of Trident Sandbox version 1.75) include :</p>
+
+<ul>
+	<li><a href="http://jquery.com/" target="_blank">jQuery</a> : like a query language for the html DOM. It is also needed by most of the other libraries.</li>
+	<li><a href="https://jqueryui.com/" target="_blank">jQuery UI</a> : provides some common controls like datepickers, dialog boxes, etc and supports themes.</li>
+	<li><a href="http://www.trirand.com/blog/" target="_blank">jqGrid</a> : a popular versatile grid control</li>
+	<li><a href="http://www.jqplot.com/" target="_blank">jqPlot</a> : awesome charting library</li>
+	<li><a href="http://fabien-d.github.io/alertify.js/" target="_blank">Alertify.JS</a> : Simple way of dispaying message boxes or notifications.</li>
+	<li><a href="https://code.google.com/p/crypto-js/" target="_blank">Crypto.JS</a> : Simple encryption capabilities</li>
+	<li><a href="http://code.google.com/p/dynatree/" target="_blank">Dynatree</a> : a hierarchical tree control</li>
+	<li><a href="http://arshaw.com/fullcalendar/" target="_blank">FullCalendar</a> : in case you need an advanced calendar control (for simple calendar just use jQuery UI datepicker)</li>
+	<li><a href="http://highcharttable.org/" target="_blank">HighchartTable</a> : Easy way to convert html table into chart.</li>
+	<li><a href="http://threejs.org/" target="_blank">Three.JS</a> : Bare minimum distribution included, download the full zip file from their website. Allows higher level use of WebGL.</li>
+	<li><a href="http://lokijs.org/" target="_blank">Loki.JS</a> : A lightweight javascript document oriented database</li>
+	<li><a href="http://www.drewgreenwell.com/projects/metrojs" target="_blank">Metro.JS</a> : Lets you create Metro-like live tiles within your programs.</li>
+	<li><a href="http://fortawesome.github.io/Font-Awesome/cheatsheet/" target="_blank">Font Awesome</a> : Font based vector icon library... these will scale well.</li>
+	<li><a href="http://www.createjs.com" target="_blank">EaselJS</a> : A Javascript library that makes working with the HTML5 Canvas element easy</li>
+	<li><a href="http://www.pixijs.com/" target="_blank">Pixi.js</a> : 2D webGL renderer with canvas fallback</li>
+	<li><a href="http://getspringy.com/" target="_blank">Springy</a> : A force directed graph layout algorithm in JavaScript</li>
+	<li><a href="http://mathjs.org/" target="_blank">Math.js</a> : An extensive math library for JavaScript</li>
+	<li><a href="https://github.com/mauriciosantos/buckets" target="_blank">Buckets.js</a> : A complete, fully tested and documented data structure library written in JavaScript</li>
+	<li><a href="https://github.com/nosir/obelisk.js/" target="_blank">Obelisk.js</a> : Obelisk.js is a JavaScript Engine for building isometric pixel objects</li>
+</ul>
+
+<p>If you need to add other javascript libraries you can put them alongside the others... in the libraries subfolder. Then edit the TridentSandbox.htm file and add script include tags (or stylesheet links) similar to the other libraries.</p>
+</body>
+</html>

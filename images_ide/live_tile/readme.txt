@@ -1,0 +1,2 @@
+Live tiles seem to only work for hosted/appcache sites.  For hosted/appcache sites there are meta tags in the htm file so if you view the site in 
+metro IE, you should be able to pin to start.  Current implementation is just a graphic, no dynamic content.

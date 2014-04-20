@@ -1,0 +1,2040 @@
+<!DOCTYPE html>
+<!--html-->
+<html manifest="appcache.mf"> 
+<head>
+<title>Trident Sandbox</title>
+<!-- 
+<meta name="application-name" content="Trident Sandbox v1.6"/>
+<meta name="msapplication-TileColor" content="#1F96CF"/>
+<meta name="msapplication-square70x70logo" content="/images_ide/live_tile/Poseidon-Small70.png"/>
+<meta name="msapplication-square150x150logo" content="/images_ide/live_tile/Poseidon-Normal150.png"/>
+<meta name="msapplication-wide310x150logo" content="/images_ide/live_tile/Poseidon-Wide310.png"/>
+<meta name="msapplication-square310x310logo" content="/images_ide/live_tile/Poseidon-Square310.jpg"/>
+-->
+
+<!--	TRIDENT SANDBOX : A 'jsfiddle-like' sandbox for Internet Explorer 10/11
+
+		Developed by user nazoraios on XDA Developers
+
+		This original intent of this is for use on Windows RT tablets, but it can be used on any
+		computer running Internet Explorer 10/11.
+		
+		It makes use of the FILE API which still seems to be somewhat browser specific, so to work 
+		on other browsers you might need to change the I/O interface functions to work.  
+		
+-->
+
+<!-- 
+SCRIPT and STYLESHEET includes section
+If you want to integrate other third party (or your own) javascript libraries to be
+available for use by the sandbox app, add them here.  
+-->
+
+<script src="libraries/jquery/jquery-2.1.0.js"></script>
+<script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
+<link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
+<script src="libraries/alertify.js-0.3.11/lib/alertify.js"></script>
+<script src="libraries/cryptojs/components/core.js"></script>
+<script src="libraries/cryptojs/rollups/sha1.js"></script>
+<script src="libraries/cryptojs/rollups/aes.js"></script>
+<script src="libraries/cryptojs/rollups/md5.js"></script>
+<script src="libraries/cryptojs/components/enc-base64-min.js"></script>
+<script src="libraries/cryptojs/components/enc-utf16-min.js"></script>
+<script src="libraries/highcharttable/highcharts.js"></script>
+<script src="libraries/highcharttable/jquery.highchartTable.js"></script>
+<script src="libraries/localStorageDB/localstoragedb.min.js"></script>
+<script src="libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js"></script>
+<script src="libraries/jqGrid-4.5.4/js/i18n/grid.locale-en.js"></script>
+<script src="libraries/three.min.js"></script>
+<script src="libraries/dynatree/jquery.dynatree.min.js"></script>
+<script src="libraries/fullcalendar-1.6.4/fullcalendar/fullcalendar.min.js"></script>
+<script src="libraries/jqplot/jquery.jqplot.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.barRenderer.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.categoryAxisRenderer.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.pointLabels.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.pieRenderer.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.donutRenderer.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.json2.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.meterGaugeRenderer.min.js"></script>
+<script src="libraries/loki-js/lokijs.js"></script>
+<script src="libraries/codemirror-4.0/lib/codemirror.js"></script>
+<script src="libraries/codemirror-4.0/mode/xml/xml.js"></script>
+<script src="libraries/codemirror-4.0/mode/javascript/javascript.js"></script>
+<script src="libraries/codemirror-4.0/mode/htmlmixed/htmlmixed.js"></script>
+<script src="libraries/codemirror-4.0/addon/display/fullscreen.js"></script>
+<script src="libraries/codemirror-4.0/addon/fold/foldcode.js"></script>
+<script src="libraries/codemirror-4.0/addon/fold/foldgutter.js"></script>
+<script src="libraries/codemirror-4.0/addon/fold/brace-fold.js"></script>
+<script src="libraries/codemirror-4.0/addon/fold/xml-fold.js"></script>
+<script src="libraries/codemirror-4.0/addon/fold/markdown-fold.js"></script>
+<script src="libraries/codemirror-4.0/addon/fold/comment-fold.js"></script>
+<link rel="stylesheet" href="libraries/codemirror-4.0/addon/fold/foldgutter.css" />
+<script src="libraries/nicEdit/nicEdit.js"></script>
+<script src="libraries/prettyprint/prettyprint.js"></script>
+<script src="libraries/shortcut.js"></script>
+<script src="libraries/MetroJs.Full.0.9.74/MetroJs.js"></script>
+<script src="libraries/math.min.js"></script>
+<script src="libraries/parsley.js"></script>
+<script src="libraries/easeljs/easeljs-0.7.1.min.js"></script>
+<script src="libraries/pixi.js/pixi.js"></script>
+<script src="libraries/springy/springy.js"></script>
+<script src="libraries/springy/springyui.js"></script>
+<script src="libraries/nedb/nedb.min.js"></script>
+<script src="libraries/obeliskjs/obelisk.js"></script>
+<script src="libraries/buckets/buckets-minified.js"></script>
+<script src="libraries/textillate/jquery.fittext.js"></script>
+<script src="libraries/textillate/jquery.lettering.js"></script>
+<script src="libraries/textillate/jquery.textillate.js"></script>
+<script src="libraries/filesaver/FileSaver.js"></script>
+<link rel="stylesheet" href="libraries/textillate/animate.css">
+<link rel="stylesheet" href="libraries/MetroJs.Full.0.9.74/MetroJs.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/lib/codemirror.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/addon/display/fullscreen.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/night.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/3024-day.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/3024-night.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/ambiance.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/ambiance-mobile.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/base16-dark.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/base16-light.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/blackboard.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/cobalt.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/eclipse.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/elegant.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/erlang-dark.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/lesser-dark.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/mbo.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/midnight.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/monokai.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/neat.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/night.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/paraiso-dark.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/paraiso-light.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/pastel-on-dark.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/rubyblue.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/solarized.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/the-matrix.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/tomorrow-night-eighties.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/twilight.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/vibrant-ink.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/xq-dark.css">
+<link rel="stylesheet" href="libraries/codemirror-4.0/theme/xq-light.css">
+<link rel="stylesheet" type="text/css" href="libraries/jqplot/jquery.jqplot.css" />
+<link rel="stylesheet" type="text/css" href="libraries/dynatree/skin/ui.dynatree.css" />
+<link rel="stylesheet" type="text/css" href="libraries/fullcalendar-1.6.4/fullcalendar/fullcalendar.css" />
+<link rel="stylesheet" type="text/css" href="libraries/jqGrid-4.5.4/css/ui.jqgrid.css" />
+<link rel="stylesheet" type="text/css" href="libraries/alertify.js-0.3.11/themes/alertify.core.css" />
+<link rel="stylesheet" type="text/css" href="libraries/alertify.js-0.3.11/themes/alertify.bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="libraries/font-awesome/css/font-awesome.css"/>
+
+<style>
+@font-face{
+	font-family: "heorot";
+	src: url('fonts/heorot.ttf'),
+	url('fonts/heorot.ttf');
+}
+
+body {
+	margin: 0;
+}
+
+a.TridentLink:link
+{
+    color: #FFFF99;
+    text-decoration: none;
+	font-size: 20pt;
+}
+
+a.TridentLink:hover
+{
+    text-decoration: underline;
+    color: #FFFF99;
+}
+
+a.TridentLink:visited
+{
+    color: #FFFF99;
+}
+
+img.TridentImageButton:hover
+{
+	style.opacity:0.6;
+}
+
+#sddm
+{	margin: 0;
+	padding: 0;
+	z-index: 30}
+
+#sddm li
+{	margin: 0;
+	padding: 0;
+	list-style: none;
+	float: left;
+	font: bold 11px arial}
+
+#sddm li a
+{	display: block;
+	margin: 0 1px 0 0;
+	padding: 4px 10px;
+	width: 60px;
+	background: #5970B2;
+	color: #FFF;
+	text-align: center;
+	text-decoration: none}
+
+#sddm li a:hover
+{	background: #49A3FF}
+
+#sddm div
+{	position: absolute;
+	visibility: hidden;
+	margin: 0;
+	padding: 0;
+	background: #EAEBD8;
+	border: 1px solid #5970B2}
+
+	#sddm div a
+	{	position: relative;
+		display: block;
+		margin: 0;
+		padding: 5px 10px;
+		width: auto;
+		white-space: nowrap;
+		text-align: left;
+		text-decoration: none;
+		background: #EAEBD8;
+		color: #2875DE;
+		font: 11px arial}
+
+	#sddm div a:hover
+	{	background: #49A3FF;
+		color: #FFF}
+		
+      input.parsley-success, textarea.parsley-success {
+        color: #468847 !important;
+        background-color: #DFF0D8 !important;
+        border: 1px solid #D6E9C6 !important;
+      }
+      input.parsley-error, textarea.parsley-error {
+        color: #B94A48 !important;
+        background-color: #F2DEDE !important;
+        border: 1px solid #EED3D7 !important;
+      }
+      ul.parsley-error-list {
+          font-size: 11px;
+          margin: 2px;
+          list-style-type:none;
+      }
+      ul.parsley-error-list li {
+          line-height: 11px;
+      }
+</style>
+
+<script>
+	var showMarkup = true;
+	var showScript = true;
+	var sb_split_mode = 0; // Determines if split mode for editors is side-by-side (0) or top-bottom (1)
+	
+	var sb_flashtabtext = false;
+	var sb_lastconsolecmd = "";
+	
+	// Set up pseudo enum to indicate the editor mode
+	var EditorModeEnum = Object.freeze({"Markup":1, "Split":2, "Script":3 });
+	var editorMode = EditorModeEnum.Split;
+	
+	// retain global references to codemirror objects set later
+	var editorMarkup, editorScript;
+
+//	API VARIABLES 
+	var VAR_UserFileValue = "";
+	var VAR_TRIDENT_VERSION = 1.75;
+	var VAR_TRIDENT_HOSTED = false;
+	var VAR_TRIDENT_APPCACHED = false;
+	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
+	var VAR_TRIDENT_ENV_TYPE = 'IDE'; // IDE, Gen S/A Templates should set to STANDALONE
+	var VAR_TRIDENT_DB = null;
+
+	// possibly hash script and markup to determine if changes have been made 
+	var sb_markup_hash = null;
+	var sb_script_hash = null;
+	
+	$(document).ready(function() {
+		alertify.set({ buttonReverse: true });
+		$("#UI_TabsOutput").tabs();
+		$("#sb_radioset").buttonset();
+		$('.tlt').textillate();
+		//$('.tlt').textillate({ in: { effect: 'rollIn' } });
+		
+		// For some reason IE sometimes 'remembers' this val across loads
+		$("#sb_txt_ProgramName").val("");
+		
+		// Set up some keyboard shortcuts
+		shortcut.add("Alt+R", function() { sb_run(); } );
+		shortcut.add("Alt+S", function() { if (indexedDB) { sb_save_slot(); } else { sb_save(); } } );
+		shortcut.add("Alt+Q", function() { if (editorMode == EditorModeEnum.Markup) sb_toggle_split(); else sb_toggle_markup(); } );
+		shortcut.add("Alt+W", function() { if (editorMode == EditorModeEnum.Script) sb_toggle_split(); else sb_toggle_script(); } );
+		shortcut.add("Alt+I", function() { sb_inspect(); } );
+		shortcut.add("Alt+1", function() { API_SetWindowMode(1); } );
+		shortcut.add("Alt+2", function() { API_SetWindowMode(2); } );
+		shortcut.add("Alt+3", function() { API_SetWindowMode(3); } );
+		
+		// While waiting for user to click the allow scripts button, we hid some ugly UI elements,
+		// so now scripts are enabled un-hide the code elements and clear our warning/notice log message.
+		$("#divCode").css("display", "block");
+		API_ClearLog();
+		
+		document.title = "Trident Sandbox v" + VAR_TRIDENT_VERSION;
+		$("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + VAR_TRIDENT_VERSION + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\n\r\nAlt+R : Run\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\n-->");
+
+		// We are keeping track of whether the user has pending changes via a Crypto.JS hash on the markup and script
+		// This will now calculate the initial value based on our Welcome text above
+		sb_markup_hash = CryptoJS.SHA1($("#sb_txt_Markup").val()).toString();
+		sb_script_hash = CryptoJS.SHA1("").toString();
+		
+		// CHANGE THEME name Here look at the stylesheets above to get the name
+		var themeName = "twilight";
+
+		editorMarkup = CodeMirror.fromTextArea(document.getElementById("sb_txt_Markup"), {
+			smartIndent: false,
+			lineNumbers: true,
+			theme: themeName,
+			mode: "xml",
+			foldGutter: true,
+			gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+			extraKeys: {
+				"Ctrl-Q": function(cm) { 
+					cm.foldCode(cm.getCursor()); 
+				},
+				"F11": function(cm) {
+					cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+				},
+				"Esc": function(cm) {
+					if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+				}
+			}
+		});
+
+		editorScript = CodeMirror.fromTextArea(document.getElementById("sb_txt_Script"), {
+			smartIndent: false,
+			lineNumbers: true,
+			theme: themeName,
+			mode: "javascript",
+			foldGutter: true,
+			gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+			extraKeys: {
+				"Ctrl-Q": function(cm) { 
+					cm.foldCode(cm.getCursor()); 
+				},
+				"F11": function(cm) {
+					cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+				},
+				"Esc": function(cm) {
+					if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+				}
+			}
+		});
+
+		var themeParam = API_GetURLParameter("Theme");
+		if (themeParam != null && themeParam != "") {
+			$("#selTheme option").filter(function() {
+				return $(this).text() == themeParam; 
+			}).prop('selected', true);
+			editorMarkup.setOption("theme", themeParam);
+			editorScript.setOption("theme", themeParam);
+		}
+		
+		if (localStorage) {
+			var theme = localStorage["cmtheme"]; 
+			if (theme != null && theme != "") {
+				$("#selTheme option").filter(function() {
+					return $(this).text() == theme; 
+				}).prop('selected', true);
+				localStorage["cmtheme"] = theme;
+				editorMarkup.setOption("theme", theme);
+				editorScript.setOption("theme", theme);
+			}
+		}
+		
+		sb_fit_log();
+		sb_fit_editors();
+		
+		$(window).resize(function() {
+			sb_fit_log();
+			sb_fit_editors();
+		});
+		
+		// Register Event Handler to warn if leaving page
+		window.onbeforeunload = function(e) {
+			// Get Hash of current editor contents to compare with last 'load' or 'new
+			// If they are different (user made changes) then warm them when they are leaving the page.  
+			var htmlHash = CryptoJS.SHA1(editorMarkup.getValue()).toString();
+			var scriptHash = CryptoJS.SHA1(editorScript.getValue()).toString();
+			
+			if (htmlHash != sb_markup_hash || scriptHash != sb_script_hash) {
+				return 'You have unsaved changes, are you sure you want to leave this page?';
+			}
+		};
+		
+		// Check for indexed db support and set up new TridentSandbox DB with simple app/key/value Object Store (Table) for internal and api use
+		// For good tutorial on indexedDB, see http://code.tutsplus.com/tutorials/working-with-indexeddb--net-34673
+		if (indexedDB) {
+			$("#sb_spn_indexeddb_status").text("Yes");
+
+			var openRequest = indexedDB.open("TridentSandboxDB", 1);
+ 
+			// If database doesnt exist yet or its version is lower than our version specified above (2nd param in line above)
+			openRequest.onupgradeneeded = function(e) {
+				var thisDB = e.target.result;
+								if (thisDB.objectStoreNames.contains("TridentSandboxKVP")) {
+					thisDB.deleteObjectStore("TridentSandboxKVP");
+				}
+				
+				if(!thisDB.objectStoreNames.contains("TridentSandboxKVP")) {
+					var objectStore = thisDB.createObjectStore("TridentSandboxKVP", { keyPath: "id", autoIncrement:true });
+					objectStore.createIndex("app","app", {unique:false});
+					objectStore.createIndex("key","key", {unique:false});
+					// hack to simulate composite key since overhead is low (main size should be in val field)
+					// user (me) required to duplicate the app and key into comma delimited appkey field off object
+					// This will allow retrieving single record with that composite key as well as 
+					// still supporting opening cursors on app or key alone
+					objectStore.createIndex("appkey", "appkey", {unique:true});
+				}
+				
+				API_LogMessage("Upgrading...");
+			}
+ 
+			openRequest.onsuccess = function(e) {
+				API_LogMessage("TridentSandboxDB (indexedDB) opened.");
+				VAR_TRIDENT_DB = e.target.result;
+			}
+ 
+			openRequest.onerror = function(e) {
+				API_LogMessage("Error opening TridentSandboxDB (indexedDB).");
+				API_Inspect(e);
+			}
+		}
+		
+		if (localStorage) {
+			$("#sb_spn_localstorage_status").text("Yes");
+			
+			// Show LocalStorage program save slots
+			$("#sb_div_ls_slots").css("display", "inline-block");
+			
+			// Since Hosted, look for parameter indicating a program slot to load
+			var loadSlot = API_GetURLParameter("LoadSlot");
+			if (loadSlot != null) {
+				sb_clean_sandbox();
+				
+				$("#sb_sel_local_slot").val(loadSlot);
+				
+				// let sandbox finish cleaning then load
+				setTimeout(function() {
+					sb_load_slot();
+				}, 200);
+			}
+			else {
+				var runSlot = API_GetURLParameter("RunSlot");
+				if (runSlot != null) {
+					sb_clean_sandbox();
+				
+					$("#sb_sel_local_slot").val(runSlot);
+
+				// let sandbox finish cleaning then run
+					setTimeout(function() {
+						sb_load_slot(true);
+					}, 200);
+				}
+			}
+
+			$("#btnBrowseSamples").show();
+			
+			VAR_TRIDENT_HOSTED = true;
+		}
+		else {
+			// If local storage is not available then neither is appcache nor indexeddb
+			// so hide the diagnostic info showing their status
+			$("#sb_div_diagnostic").hide();
+		}
+		
+		// If served up from a website then we should bother to monitor possible appcache events
+		// for diagnostics.  If not appcaching the events will just not fire.
+		if (document.URL.indexOf("file://") == -1) {
+
+			// Determine if we are connecting or running from an appcache site
+			var appCache = window.applicationCache;
+			if (window.applicationCache) {
+					appCache.addEventListener('error', logACEvent, false);
+					appCache.addEventListener('checking', logACEvent, false);
+					appCache.addEventListener('noupdate', logACEvent, false);
+					appCache.addEventListener('downloading', logACEvent, false);
+					appCache.addEventListener('progress', logACEvent, false);
+					appCache.addEventListener('updateready', logACEvent, false);
+					appCache.addEventListener('cached', logACEvent, false);
+			}
+		}
+	});
+	
+	// Helper method for appcache diagnostic
+	function logACEvent(e)
+	{
+		VAR_TRIDENT_APPCACHED = true;  // if any of the events fire we will assume it is successful and running in appcached mode
+
+		// Update diagnostic panel
+		var statusString = getACStatus();
+		$("#sb_spn_appcache_status").text(statusString);
+	}
+
+	// Helper method for appcache diagnostics, this event will be fired whenever appcache status changes
+	function getACStatus()
+	{
+		try{
+			var sCacheStatus = "Not supported";
+			if (window.applicationCache) 
+			{
+				var oAppCache = window.applicationCache;
+				switch ( oAppCache.status ) 
+				{
+					case oAppCache.UNCACHED : sCacheStatus = "Not cached"; break;
+					case oAppCache.IDLE : sCacheStatus = "Idle"; break;
+					case oAppCache.CHECKING : sCacheStatus = "Checking"; break;
+					case oAppCache.DOWNLOADING : sCacheStatus = "Downloading"; break;
+					case oAppCache.UPDATEREADY : sCacheStatus = "Update ready"; break;
+					case oAppCache.OBSOLETE : sCacheStatus = "Obsolete"; break;
+					default : sCacheStatus = "Unexpected Status ( " + oAppCache.status.toString() + ")"; break;
+				}
+			}
+			return sCacheStatus;
+		}
+		catch (e)
+		{
+			alertify.log(e);
+			API_LogMessage(e);
+		}
+	}
+
+// Simple Drop Down Menu support for programs to use
+// Copyright 2006-2007 javascript-array.com
+
+	var sb_menu_timeout	= 500;
+	var sb_menu_closetimer	= 0;
+	var sb_menu_ddmenuitem	= 0;
+
+	// open hidden layer
+	function sb_mopen(id) {	
+		// cancel close timer
+		sb_mcancelclosetime();
+
+		// close old layer
+		if(sb_menu_ddmenuitem) sb_menu_ddmenuitem.style.visibility = 'hidden';
+
+		// get new layer and show it
+		sb_menu_ddmenuitem = document.getElementById(id);
+		sb_menu_ddmenuitem.style.visibility = 'visible';
+
+	}
+	// close showed layer
+	function sb_mclose() {
+		if(sb_menu_ddmenuitem) sb_menu_ddmenuitem.style.visibility = 'hidden';
+	}
+
+	// go close timer
+	function sb_mclosetime() {
+		sb_menu_closetimer = window.setTimeout(sb_mclose, sb_menu_timeout);
+	}
+
+	// cancel close timer
+	function sb_mcancelclosetime() {
+		if(sb_menu_closetimer)
+		{
+			window.clearTimeout(sb_menu_closetimer);
+			sb_menu_closetimer = null;
+		}
+	}
+
+	// close layer when click-out
+	document.onclick = sb_mclose; 
+
+// SANDBOX I/O ROUTINES  
+	function sb_loaded(evt) {
+		var filestring = evt.target.result;
+		
+		var sandboxObject = JSON.parse(filestring);
+		
+		$("#sb_txt_ProgramName").val(sandboxObject.progName);
+
+		sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+		sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+		
+		editorMarkup.setValue(sandboxObject.htmlText);
+		editorScript.setValue(sandboxObject.scriptText);
+
+		// IE's HTML 5 file control seems to place a lock on the last loaded file which
+		// was interfering with the saving and overwriting of that same file.
+		// So i will reset it by destroying and recreating, allowing the GC to release
+		// any old file locks.
+		var control = $("#sb_file");
+		control.replaceWith( control = control.clone( true ) );
+		
+	}
+	
+	function errorHandler(evt) {
+		alertify.error('load error');
+	}
+	
+	function sb_load() {
+		// use most thorough method for cleaning sandbox
+		sb_clean_sandbox();
+		
+		var file = document.getElementById('sb_file').files[0];
+		if(file) {
+			var reader = new FileReader();
+
+			reader.readAsText(file, "UTF-8");
+
+			// Handle progress, success, and errors
+			//reader.onprogress = updateProgress;
+			reader.onload = sb_loaded;
+			reader.onerror = errorHandler;
+		}
+	}
+	
+	function sb_save() {
+		var prgName = $("#sb_txt_ProgramName").val();
+		if (prgName == "") {
+			alertify.error("You need to enter a program name first");
+			return;
+		}
+		
+		// The File Loaders seem to place a lock on the file so, in the event they are saving to the same filename,
+		// lets clear out the old file control so that (if they save to the same filename as they last loaded) it will work.
+		// The actual save still waits on user input to handle the save, so no need to setTimeout
+		var control = $("#sb_file");
+		control.replaceWith( control = control.clone( true ) );
+		
+		var progNameString = prgName;
+		var htmlTextString = editorMarkup.getValue();
+		var scriptTextString = editorScript.getValue();
+		
+		sb_markup_hash = CryptoJS.SHA1(htmlTextString).toString();
+		sb_script_hash = CryptoJS.SHA1(scriptTextString).toString();
+
+		var sandboxObject = { progName: progNameString, htmlText: htmlTextString, scriptText: scriptTextString };
+		
+		var json_text = JSON.stringify(sandboxObject, null, 2);
+		
+		// Both IE and polyfill methods seem to rely on blobs
+		if (typeof Blob == "undefined") {
+			alert('no blobs available (incompatible browser?)');
+			return;
+		}
+		
+		// if ms specific (ie) method msSaveBlob is not present then use the polyfill filesaver.js functionality
+		if (window.navigator.msSaveBlob === undefined) {
+			var blob = new Blob([json_text], {type: "application/octet-stream"});
+			saveAs(blob, progNameString + ".prg");
+		}
+		else {
+			var blob1 = new Blob([json_text]);
+			window.navigator.msSaveBlob(blob1, progNameString + ".prg");
+		}
+	}
+
+	function sb_user_hide_load() {
+		$("#sb_div_userfile").hide();
+	}
+	
+	// event handler
+	function sb_user_file_loaded(evt) {
+		var filename = $("#sb_user_file").val().replace(/^.*[\\\/]/, '');
+
+		var filestring = evt.target.result;
+	
+		// store in global API var in case they haven't set up async callback
+		VAR_UserFileValue = filestring;
+		
+		// IE's HTML 5 file control seems to place a lock on the last loaded file which
+		// was interfering with the saving and overwriting of that same file.
+		// So I will reset it by destroying and recreating, allowing the GC to release
+		// any old file locks.
+		var control = $("#sb_user_file");
+		control.replaceWith( control = control.clone( true ) );
+		
+		API_HideUserLoader();
+		
+		// If user has registered a callback function (for when load is completed), call it
+		if (typeof(EVT_UserLoadCallback) == typeof(Function)) {
+			// Give time for the file control replace (done above) to complete
+			// before giving the user a chance to interfere with that process
+			setTimeout(function() {
+				EVT_UserLoadCallback(filestring, filename);
+			}, 250);
+		}
+	}
+	
+	function sb_user_datafile_loaded(evt) {
+		var filename = $("#sb_user_datafile").val().replace(/^.*[\\\/]/, '');
+
+		// IE's HTML 5 file control seems to place a lock on the last loaded file which
+		// was interfering with the saving and overwriting of that same file.
+		// So I will reset it by destroying and recreating, allowing the GC to release
+		// any old file locks.
+		
+		var control = $("#sb_user_datafile");
+		control.replaceWith( control = control.clone( true ) );
+		
+		API_HideUserDataLoader();
+		
+		// If user has registered a callback function (for when load is completed), call it
+		if (typeof(EVT_UserDataLoadCallback) == typeof(Function)) {
+			// Give time for the file control replace (done above) to complete
+			// before giving the user a chance to interfere with that process
+			setTimeout(function() {
+				EVT_UserDataLoadCallback(evt.target.result, filename);
+			}, 250);
+		}
+	}
+	
+	// event handler
+	function sb_user_load()	{
+		var file = document.getElementById('sb_user_file').files[0];
+		if(file) {
+			var reader = new FileReader();
+
+			reader.readAsText(file, "UTF-8");
+
+			// Handle progress, success, and errors
+			//reader.onprogress = updateProgress;
+			reader.onload = sb_user_file_loaded;
+			reader.onerror = errorHandler;
+		}
+	}
+	
+	function sb_restore_load() {
+		var file = document.getElementById('sb_restore_file').files[0];
+		if(file) {
+			var reader = new FileReader();
+
+			reader.readAsText(file, "UTF-8");
+
+			// IE's HTML 5 file control seems to place a lock on the last loaded file which
+			// was interfering with the saving and overwriting of that same file.
+			// So I will reset it by destroying and recreating, allowing the GC to release
+			// any old file locks.
+			var control = $("#sb_restore_file");
+			control.replaceWith( control = control.clone( true ) );
+
+			// Handle progress, success, and errors
+			//reader.onprogress = updateProgress;
+			reader.onload = function(evt) {
+				var loadString = evt.target.result;
+
+				var keyArray = JSON.parse(loadString);
+				for(i=0; i<keyArray.length; i++) {
+					var app = keyArray[i].app;
+					var key = keyArray[i].key;
+					var val = keyArray[i].val;
+
+					API_SetIndexedAppKey(app, key, val);
+				}
+			};
+			reader.onerror = errorHandler;
+		}
+	}
+	
+	function sb_user_dataload() {
+		var file = document.getElementById('sb_user_datafile').files[0];
+		if(file) {
+			var reader = new FileReader();
+
+			reader.readAsDataURL(file, "UTF-8");
+
+			// Handle progress, success, and errors
+			//reader.onprogress = updateProgress;
+			reader.onload = sb_user_datafile_loaded;
+			reader.onerror = errorHandler;
+		}
+	}
+	
+	function sb_loadtemplate() {
+		$("#sb_div_compile_standalone").show();
+	}
+	
+	function sb_template_loaded(evt) {
+		var templateString = evt.target.result;
+		var htmlString = editorMarkup.getValue();
+		var scriptString = editorScript.getValue();
+		
+		templateString = templateString.replace("@TRIDENT_HTML@", htmlString);
+		templateString = templateString.replace("@TRIDENT_SCRIPT@", scriptString);
+	
+		if (typeof Blob == "undefined") {
+			alert('no blobs available (incompatible browser?)');
+		}
+		else {
+			var blob1 = new Blob([templateString]);
+			window.navigator.msSaveBlob(blob1, $("#sb_txt_ProgramName").val() + ".htm");
+		}
+
+		var control = $("#sb_file_template");
+		control.replaceWith( control = control.clone( true ) );
+		
+		setTimeout(function() {
+			$("#sb_div_compile_standalone").hide();
+		}, 200);
+	}
+	
+	function sb_browse_samples() {
+	
+		if (typeof(EVT_CleanSandbox) == typeof(Function)) {
+			try {
+				EVT_CleanSandbox();
+			}
+			catch (err) {
+			}
+		}
+
+		setTimeout(function() {
+			var url = "samples/Hosted Samples Browser.prg";
+
+			jQuery.ajax({
+				type: "GET",
+				url: url,
+				//cache: false,
+				dataType: "json",
+
+				success: function (response) {
+					var sandboxObject = response;
+		
+					$("#sb_txt_ProgramName").val(sandboxObject.progName);
+
+					editorMarkup.setValue(sandboxObject.htmlText);
+					editorScript.setValue(sandboxObject.scriptText);
+					
+					sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+					sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+
+					// IE's HTML 5 file control seems to place a lock on the last loaded file which
+					// was interfering with the saving and overwriting of that same file.
+					// So i will reset it by destroying and recreating, allowing the GC to release
+					// any old file locks.
+					var control = $("#sb_file");
+					control.replaceWith( control = control.clone( true ) );
+                
+					sb_run();
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
+					API_LogMessage(xhr.status + " : " + xhr.statusText);
+					alertify.log(xhr.status + " : " + xhr.statusText);
+					alertify.log("See user log for more info");
+				}
+			});
+		}, 250);
+	}
+	
+	function sb_load_slot(autoRun) { 
+		var selText = $("#sb_sel_local_slot").find(":selected").text();
+		
+		API_GetIndexedAppKey("SandboxSaveSlots", "ProgramSlot" + selText, function(e) {
+			var res = e.target.result;
+			
+			if (res == null) {
+				alertify.error("No save at that slot");
+				return;
+			}
+			
+			var sandboxObject = JSON.parse(res.val);
+		
+			sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+			sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+		
+			$("#sb_txt_ProgramName").val(sandboxObject.progName);
+
+			editorMarkup.setValue(sandboxObject.htmlText);
+			editorScript.setValue(sandboxObject.scriptText);
+		
+			if (autoRun != null && autoRun) sb_run();
+		});
+	}
+	
+	// If local storage is available (Hosted or AppCache)
+	// then this will let you load a program from a save slot
+	function sb_save_slot() { 
+		var selText = $("#sb_sel_local_slot").find(":selected").text();
+
+		var progNameString = $("#sb_txt_ProgramName").val();
+		var htmlTextString = editorMarkup.getValue();
+		var scriptTextString = editorScript.getValue();
+
+		sb_markup_hash = CryptoJS.SHA1(htmlTextString).toString();
+		sb_script_hash = CryptoJS.SHA1(scriptTextString).toString();
+		
+		var sandboxObject = { progName: progNameString, htmlText: htmlTextString, scriptText: scriptTextString };
+		
+		var json_text = JSON.stringify(sandboxObject, null, 2);
+		
+		alertify.confirm("Are you sure you want to save into slot " + selText, function (e) {
+    		if (e) {
+				try {
+					API_SetIndexedAppKey("SandboxSaveSlots", "ProgramSlot" + selText, json_text);
+				}
+				catch(e) {
+					alertify.alert("Error encountered during save to local storage : " + e.message);
+				}
+    		} 
+		});
+	}
+	
+	// If local storage is available (Hosted or AppCache)
+	// then this will let you save a program to a save slot
+	function sb_compile_template() 	{
+		var file = document.getElementById('sb_file_template').files[0];
+		if(file) {
+			var reader = new FileReader();
+
+			reader.readAsText(file, "UTF-8");
+
+			// Handle progress, success, and errors
+			//reader.onprogress = updateProgress;
+			reader.onload = sb_template_loaded;
+			reader.onerror = errorHandler;
+		}
+	}
+	
+// END SANDBOX I/O ROUTINES
+	
+	// Make clicking on the Header Caption toggle its font between Heorot (Greek looking) and normal
+	function sb_toggle_header_font() {
+		var fontName = $('#sb_header_caption').css("font-family");
+		
+		if (fontName.indexOf('Heorot') != -1) {
+			$('#sb_header_caption').css("font-family", "Tahoma");
+		}
+		else {
+			$('#sb_header_caption').css("font-family", "Heorot");
+		}
+	}
+	
+	// Clear Environment  
+	// Ideally this would clear out the sandbox entirely
+	function sb_clean_sandbox()	{
+		// clear source code
+		editorMarkup.setValue("");
+		editorScript.setValue("");
+		
+		sb_markup_hash = CryptoJS.SHA1("").toString();
+		sb_script_hash = CryptoJS.SHA1("").toString();
+		
+		$("#sb_txt_ProgramName").val('New Program');
+
+		// clear out the MainOutput and Log divs and let client do any cleanup if they registered callback
+		API_ClearOutput();
+	}
+	
+	function toggleVisibility(id) {
+       var e = document.getElementById(id);
+       if(e.style.display == 'block')
+          e.style.display = 'none';
+       else
+          e.style.display = 'block';
+	}
+	
+	var hookScripts = function(url, src) {
+		var s = document.createElement("script");
+		s.type = "text/javascript";
+		//s.id = 'scriptDynamic';
+		s.src = url || null;
+		s.innerHTML = src || null;
+		document.getElementsByTagName("head")[0].appendChild(s);
+	};
+	
+	// Trying to code a more elegant solution to this 'run' process
+	// Older method hacked together a string with script first
+	// and added entire string at once, since parsed at same time all ran fine.
+	// This implementation works with DOM to add the script element after 
+	// appending the html
+	function sb_run() {
+		API_ClearOutput();
+		
+		var markupString = editorMarkup.getValue();
+		var scriptString = editorScript.getValue();
+
+		// Kind of a hack, will need to make sure its optimized once program sizes (script) grows.
+		// In order to give the user the option to start their app up in fullscreen mode I am having to implement
+		// this hack.  The msRequestFullscreen is very particular about only working when called from a 'user-initiated' action
+		// like a button press.  This (sb_run) method is called from a button click but the 'user-initiated' seems to get lost
+		// if it runs in a setTimeout or when executing your code (which i will add later in this method).  So the hack is to 'peek' into
+		// the script and if a text string match exists : FLAG_StartPrgFullscreen (even if it is in a comment), i will automatically
+		// fullscreen the UI_MainPlaceholder div.  Esc key will exist or you should provide your own means of 'unfullscreen'-ing it.
+		if (scriptString.substring(0, 250).indexOf("FLAG_StartPrgFullscreen") != -1) document.getElementById("UI_MainPlaceholder").msRequestFullscreen();
+		
+		// The timeouts are probably not necessary but lets give dom 
+		// time between our clearing (above), loading html, and loading scripts
+		// delay also allows API_ClearOutput to wait for user EVT_CleanSandbox to run
+		setTimeout(function() {
+			// HTML needs to go first so script will work if they have code outside functions
+			$("#UI_MainPlaceholder").append(markupString);
+
+			var s = document.createElement("script");
+			s.innerHTML = scriptString;
+		
+			// give dom a chance to clean out by waiting a bit?
+			setTimeout(function() {
+				document.getElementById("UI_MainPlaceholder").appendChild(s);
+			}, 150);
+		}, 250);
+	}
+	
+	function sb_toggle_markup()	{
+		editorMode = EditorModeEnum.Markup;
+
+		sb_fit_editors();
+	}
+	
+	function sb_toggle_script()	{
+		editorMode = EditorModeEnum.Script;
+		
+		sb_fit_editors();
+	}
+	
+	function sb_toggle_split() {
+		if (editorMode == EditorModeEnum.Split) {
+			sb_split_mode = (sb_split_mode == 0)?1:0;
+		}
+		
+		editorMode = EditorModeEnum.Split;
+		
+		sb_fit_editors();
+	}
+	
+	function sb_fit_log() {
+		var used = 180;
+		var isCaptionVisible = $("#sb_div_caption").is(":visible");
+		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
+		var isfullscreen = (!window.screenTop && !window.screenY);
+		
+		if ((isCaptionVisible||isLoaderVisible) && !isfullscreen) {
+			if (isCaptionVisible) used += ($("#sb_div_caption").height()) + 5;
+			if (isLoaderVisible) used += ($("#sb_div_mainloader").height()) + 5;
+		}
+		
+		$("#UI_TxtLogText").height($(window).height() - used);
+	}
+	
+	function sb_fit_editors() {
+		var used = 105;
+		var isCaptionVisible = $("#sb_div_caption").is(":visible");
+		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
+		var isfullscreen = (!window.screenTop && !window.screenY);
+		
+		if ((isCaptionVisible||isLoaderVisible) && !isfullscreen) {
+			if (isCaptionVisible) used += ($("#sb_div_caption").height());
+			if (isLoaderVisible) used += ($("#sb_div_mainloader").height()) + 4;
+		}
+		
+		switch (editorMode) {
+			case EditorModeEnum.Markup :
+				$("#ui_div_markup").css("width", "100%");
+				$("#ui_div_script").css("width", "100%");
+				
+				// this is how we go about hiding and resizing editors
+				editorMarkup.getWrapperElement().style.display = "block";
+				editorScript.getWrapperElement().style.display = "none";
+				editorMarkup.setSize("100%", $(window).height() - used);
+
+				// we have hid the script editor so disable its buttons
+				$("#sb_btn_markup_fs").prop('disabled', '');
+				$("#sb_btn_script_fs").prop('disabled', 'disabled');
+				break;
+			case EditorModeEnum.Split : 
+				// this is how we go about hiding and resizing editors
+				editorMarkup.getWrapperElement().style.display = "block";
+				editorScript.getWrapperElement().style.display = "block";
+
+				var editorSize = ($(window).height() - used)/2;
+
+				if (sb_split_mode == 0) {
+					$("#ui_div_markup").css("width", "100%");
+					$("#ui_div_script").css("width", "100%");
+					editorMarkup.setSize("100%", editorSize);
+					editorScript.setSize("100%", editorSize);
+				}
+				else {
+					$("#ui_div_markup").css("width", "50%");
+					$("#ui_div_script").css("width", "50%");
+					editorMarkup.setSize("100%", $(window).height() - used);
+					editorScript.setSize("100%", $(window).height() - used);
+				}
+		
+			
+				$("#sb_btn_markup_fs").prop('disabled', '');
+				$("#sb_btn_script_fs").prop('disabled', '');
+				break;
+			case EditorModeEnum.Script : 
+				$("#ui_div_markup").css("width", "100%");
+				$("#ui_div_script").css("width", "100%");
+				
+				// this is how we go about hiding and resizing editors
+				editorMarkup.getWrapperElement().style.display = "none";
+				editorScript.getWrapperElement().style.display = "block";
+				editorScript.setSize("100%", $(window).height() - used);
+
+				$("#sb_btn_markup_fs").prop('disabled', 'disabled');
+				$("#sb_btn_script_fs").prop('disabled', '');
+				break;
+		}
+	}
+	
+	function sb_console_eval() {
+		sb_lastconsolecmd = $("#UI_TxtLogConsole").val();
+		API_LogMessage("=> " + sb_lastconsolecmd);
+
+		// For some reason API_Inspect calls were not invoking the jquery dialog
+		// Not really sure why but adding small delay allows this to work
+		setTimeout(function() {
+			try {
+				var res = eval(sb_lastconsolecmd);
+			
+				if (res != null) API_LogMessage("result: " + res);
+			}
+			catch (err) {
+				API_LogMessage("Error : " + err.message);
+			}
+		}, 100);
+
+		$("#UI_TxtLogConsole").val("");
+	}
+	
+	function fsMarkup()	{
+		editorMarkup.setOption("fullScreen", !editorMarkup.getOption("fullScreen"));
+	}
+	
+	function fsScript()	{
+		editorScript.setOption("fullScreen", !editorScript.getOption("fullScreen"));
+	}
+	
+	// function to inspect a variable/expression highlighted in a script or markup editor
+	function sb_inspect()
+	{
+		var strSelection;
+		var scriptSelection = editorScript.getSelection();
+		var markupSelection = editorMarkup.getSelection();
+		
+		if (scriptSelection != "" && markupSelection != "") alertify.error("Ambiguous selection; Highlighted code exists in both editors; using Script selection", "", 0);
+		
+		if (scriptSelection == "" && markupSelection == "") {
+				alertify.alert("This feature requires you to select a variable or object in the script editor before clicking 'Inspect'.");
+				return;
+		}
+		
+		if (scriptSelection != "") strSelection = scriptSelection;
+		else strSelection = markupSelection;
+		
+		var objResult;
+		try {
+			objResult = eval(strSelection);
+		}
+		catch (exc) {
+			alertify.error("malformed inspection selection");
+			return;
+		}
+
+		var tbl = prettyPrint( objResult, { /* options such as maxDepth, etc. */ });
+		$(tbl).dialog({ title: 'Trident Object/Variable Inspector', width: 'auto', maxHeight: ($(window).height() - 50) });
+	}
+	
+//
+// TRIDENTSANDBOX APP/KEY/VALUE OBJECT STORE INTERFACE API - IMPLEMENTED USING INDEXEDDB
+// This is an attempt to provide as simple (as possible?) interface for using indexedDb to increase storage capabilities when running Hosted or AppCached
+// If you run out of the ~5MB of local storage, you can expand into this relatively easily.
+// I intend to use this for storing AppSave slots for your programs as well as for In-Memory databases using Loki.js and serialized as json for the value.
+// You may use it for whatever string 'value' you want to save (serialized objects/text/settings) but the app is for your convenience/organization, every app can in theory read 
+// any other app's key/values.
+//
+	
+// Get a Trident App/Key/Val object by app/key
+function API_GetIndexedAppKey(app, key, callback) {
+	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"],"readonly");
+	var store = transaction.objectStore("TridentSandboxKVP");
+	var index = store.index("appkey");
+  	var appkey = app + "," + key;
+  	var request = index.get(appkey);
+
+  	request.onsuccess = callback;
+}
+
+// Get a Trident App/Key/Val object by id (if for some reason you keep a collection of id's, you can get the object back with this)
+function API_GetIndexedAppKeyById(id, callback) {
+	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"],"readonly");
+	var store = transaction.objectStore("TridentSandboxKVP");
+  	var request = store.get(id);
+
+  	request.onsuccess = callback;
+}
+
+// Will add or update (if that app/key combo already exists) a Trident App/Key/Value object
+function API_SetIndexedAppKey(app, key, val) {
+	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"],"readwrite");
+    var store = transaction.objectStore("TridentSandboxKVP");
+	var index = store.index("appkey");
+  	var appkey = app + "," + key;
+  	var request = index.get(appkey);
+
+	// first try to retrieve an existing object by that key
+	// need to do this because to update an object you need to have id in object, otherwise it will append id with new autocounter and clash the unique index appkey
+	request.onsuccess = function(e) {
+		var res = e.target.result;
+		
+		if (res == null) {
+			res = {
+				app:app,
+				key:key,
+				appkey: app + ',' + key,
+				val:val
+			}
+		}
+		else {
+			res.val = val;
+		}
+		
+		var requestPut = store.put(res);
+ 
+		requestPut.onerror = function(e) {
+			alertify.error("set error: " + e.target.error.name);
+		}
+ 
+		requestPut.onsuccess = function(e) {
+			alertify.success("saved");
+		}
+	};
+	
+	request.onerror = function(e) {
+		alertify.error("get error: " + e.target.error.name);
+	}
+}
+	
+// The object can only be deleted by the primary key 'id' which is autoincremented number on object
+function API_DelIndexedAppKey(id) {
+	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"],"readwrite");
+	var store = transaction.objectStore("TridentSandboxKVP");
+	
+	var request = store.delete(id);
+	request.onsuccess = function(evt) {
+		alertify.success("deleted");
+	};
+	request.onerror = function(evt) {
+		alertify.error("failed to delete id: " + id);
+	}
+}
+
+// Retrieve a cursor for all App/Key/Val objects by app
+// Your callback is called once per record and you must advance cursor (see examples)
+function API_GetIndexedAppCursor(app, callback) {
+	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
+	var store = transaction.objectStore("TridentSandboxKVP");
+	var index = store.index("app");
+ 
+	// We want cursor to all values matching our (single) app param
+	var singleKeyRange = IDBKeyRange.only(app);
+
+	// Match anything past "Bill", including "Bill"
+	//var lowerBoundKeyRange = IDBKeyRange.lowerBound("Bill");
+
+	// Match anything past "Bill", but don't include "Bill"
+	//var lowerBoundOpenKeyRange = IDBKeyRange.lowerBound("Bill", true);
+
+	// Match anything up to, but not including, "Donna"
+	//var upperBoundOpenKeyRange = IDBKeyRange.upperBound("Donna", true);
+
+	// Match anything between "Bill" and "Donna", but not including "Donna"
+	//var boundKeyRange = IDBKeyRange.bound("Bill", "Donna", false, true);
+
+	// To use one of the key ranges, pass it in as the first argument of openCursor()/openKeyCursor()
+	var cursor = index.openCursor(singleKeyRange);
+ 
+	cursor.onsuccess = callback;
+}
+
+// This can allow end user running in hosted or appcached environment to use the TridentDB save slots as 'modules'
+// They can switch between programs using this API Call to stop the existing program and switch to (and run) a different save slot program
+// Since hosted, you can pass params between the two programs using local storage or TridentDB/indexed db.
+function API_TransferSlot(slotId) {
+	API_GetIndexedAppKey("SandboxSaveSlots", "ProgramSlot" + slotId, function(e) {
+		var res = e.target.result;
+		
+		if (res == null) {
+			alertify.error("No save at that slot");
+			return;
+		}
+		
+		var sandboxObject = JSON.parse(res.val);
+	
+		sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+		sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+	
+		$("#sb_txt_ProgramName").val(sandboxObject.progName);
+
+		editorMarkup.setValue(sandboxObject.htmlText);
+		editorScript.setValue(sandboxObject.scriptText);
+	
+		sb_run();
+	});
+}
+
+function API_Backup_TridentDB(filename) {
+	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
+	var store = transaction.objectStore("TridentSandboxKVP");
+
+	var cursor = store.openCursor();
+ 
+	var keyArray = [];
+ 
+	cursor.onsuccess = function(e) {
+	  	var cursor = e.target.result;
+      
+		if(cursor) {
+          	var currObject = cursor.value;
+          
+			$('#selObjects').append($('<option>', {
+    			value: currObject.id,
+    			text: currObject.key
+			}));  
+
+			keyArray.push(currObject);
+          
+            cursor.continue();
+		}
+		else {
+			if (keyArray.length == 0) {
+				alertify.log("Nothing to backup, TridentDB is empty");
+				return;
+			}
+			
+			if (filename == null) filename = "TridentDB.backup";
+			
+			API_SaveTextFile(filename, JSON.stringify(keyArray));
+		}
+	};
+
+}
+
+function API_Restore_TridentDB() {
+	$("#sb_div_restorefile").show();
+}
+
+// END TRIDENT DB
+
+// LIBRARY UNIT I/O
+// This collection of functions support the ability for you to modularize your code into 
+// Markup and/or Script fragments called 'Units'.  With this functionality you can move fragments of html or
+// javascript into a unit to be called up from other programs.  So you might fine tune your units
+// in the editors and run them to test them, and then use console commands to save them with a name to be 
+// recalled programmatically within a real prg.
+// Initial Implementation will be invoking these functions via the Text Console calling these commands : 
+	function API_LogMarkupUnits() {
+		
+		var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
+		var store = transaction.objectStore("TridentSandboxKVP");
+		var index = store.index("app");
+ 
+		// We want cursor to all values matching our (single) app param
+		var singleKeyRange = IDBKeyRange.only("SandboxMarkupUnits");
+
+		// To use one of the key ranges, pass it in as the first argument of openCursor()/openKeyCursor()
+		var cursor = index.openCursor(singleKeyRange);
+ 
+		cursor.onsuccess = function(e) {
+			var cursor = e.target.result;
+
+			if(cursor) {
+				var currObject = cursor.value;
+				API_LogMessage(currObject.key);
+          
+				cursor.continue();
+			}
+		};
+	}
+	
+	function API_SaveMarkupUnit(unitName) {
+		var htmlTextString = editorMarkup.getValue();
+		try {
+			API_SetIndexedAppKey("SandboxMarkupUnits", unitName, htmlTextString);
+			
+			return true;
+		}
+		catch(e) {
+			alertify.alert("Error encountered during save to local storage : " + e.message);
+
+			return false;
+		}
+	}
+	
+	function API_LoadMarkupUnit(unitName) {
+		API_GetIndexedAppKey("SandboxMarkupUnits", unitName, function(e) {
+			var res = e.target.result;
+			
+			if (res == null) {
+				alertify.error("No markup unit by that name");
+			}
+			
+			sb_markup_hash = CryptoJS.SHA1(res.val).toString();
+			editorMarkup.setValue(res.val);
+		});
+	}
+	
+	function API_GetMarkupUnit(unitName, callback) {
+		API_GetIndexedAppKey("SandboxMarkupUnits", unitName, function(e) {
+			var res = e.target.result;
+			
+			callback(res.val);
+		});
+	}
+	
+	// Import
+	function API_ImportMarkupUnit(unitName, clearFirst) {
+		if (clearFirst) API_ClearHtmlLog();
+		
+		API_GetMarkupUnit("first", function(unitString) {
+			API_LogHtml(unitString);
+		});
+	}
+	
+	function API_LogScriptUnits() {
+		
+		var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
+		var store = transaction.objectStore("TridentSandboxKVP");
+		var index = store.index("app");
+ 
+		// We want cursor to all values matching our (single) app param
+		var singleKeyRange = IDBKeyRange.only("SandboxScriptUnits");
+
+		// To use one of the key ranges, pass it in as the first argument of openCursor()/openKeyCursor()
+		var cursor = index.openCursor(singleKeyRange);
+ 
+		cursor.onsuccess = function(e) {
+			var cursor = e.target.result;
+
+			if(cursor) {
+				var currObject = cursor.value;
+				API_LogMessage(currObject.key);
+          
+				cursor.continue();
+			}
+		};
+		
+	}
+	
+	function API_SaveScriptUnit(unitName) {
+		var scriptTextString = editorScript.getValue();
+		try {
+			API_SetIndexedAppKey("SandboxScriptUnits", unitName, scriptTextString);
+			
+			return true;
+		}
+		catch(e) {
+			alertify.alert("Error encountered during save to local storage : " + e.message);
+			return false;
+		}
+	}
+	
+	function API_LoadScriptUnit(unitName) {
+		API_GetIndexedAppKey("SandboxScriptUnits", unitName, function(e) {
+			var res = e.target.result;
+			
+			if (res == null) {
+				alertify.error("No script unit by that name");
+				return;
+			}
+			
+			sb_script_hash = CryptoJS.SHA1(res.val).toString();
+			editorScript.setValue(res.val);
+		});
+	}
+	
+	function API_ImportScriptUnit(unitName) {
+		API_GetIndexedAppKey("SandboxScriptUnits", unitName, function(e) {
+			var res = e.target.result;
+			
+			if (res == null) {
+				alertify.error("No script unit by that name");
+				return;
+			}
+			
+			API_AppendUnitScript(res.val);
+		});
+	}
+	
+// API/HELPER ROUTINES 
+	// Helper method to support hosted or appcache url params
+	function API_GetURLParameter(sParam) {
+		var sPageURL = window.location.hash.substring(1);
+		var sURLVariables = sPageURL.split('&');
+		for (var i = 0; i < sURLVariables.length; i++)
+		{
+			var sParameterName = sURLVariables[i].split('=');
+			if (sParameterName[0] == sParam)
+			{
+				return sParameterName[1];
+			}
+		}
+	}
+	
+	function API_ClearOutput() {
+		// allow user to do any cleanup they might want to do
+		if (typeof(EVT_CleanSandbox) == typeof(Function)) {
+			try {
+				EVT_CleanSandbox();
+			}
+			catch (err) {
+			}
+		}
+		
+		document.title = "Trident Sandbox v" + VAR_TRIDENT_VERSION;
+	
+		// Clear out old file names from file loader
+		//var control = $("#sb_user_file");
+		//control.replaceWith( control = control.clone( true ) );
+		
+		$("#sb_div_restorefile").hide();
+		
+		API_SetBackgroundColor("#fff");
+		API_HideUserLoader();
+		API_ClearLog();
+		API_ClearHtmlLog();
+		API_ClearUnitScripts();
+
+		// main includes div with script so hopefully EVT_CleanSandbox has completed
+		setTimeout(function() {
+			API_ClearMain();
+		}, 100);
+		
+		API_SetActiveTab(0);
+	}
+	
+	function API_LogMain(msg) {
+		$("#UI_MainPlaceholder").append(msg + "<br/>");
+	}
+	
+	function API_ClearMain() {
+		$("#UI_MainPlaceholder").empty();
+	}
+	
+	function API_LogHtml(msg) {
+		$("#UI_HtmlLogPlaceholder").append(msg + "<br/>");
+	}
+	
+	function API_ClearHtmlLog() {
+		$("#UI_HtmlLogPlaceholder").empty();
+	}
+	
+	function API_LogMessage(msg) {
+		$("#UI_TxtLogText").val($("#UI_TxtLogText").val() + msg + "\r\n");
+		
+		// Using flag variable to prevent multiple consecutive logmessage calls from overloading the flash effect
+		// Will only flash once every 4 seconds
+		if (!sb_flashtabtext) {
+			sb_flashtabtext = true;
+
+			// not sure if there is a more elegant jquery selector but this will flash the text log tab header to indicate activity on that tab
+			$($($("#UI_TabsOutput").find("ul")[0]).find("li")[2]).find("a").effect("pulsate", {}, 1000);
+			
+			setTimeout(function() { sb_flashtabtext = false; }, 4000);
+		}
+	}
+	
+	function API_LogObject(objToLog, objName) {
+		if (objName != null && (typeof(objName) == "string"))
+			API_LogMessage(objName + " = ");
+		
+		API_LogMessage(JSON.stringify(objToLog, null, '\t'));
+	}
+	
+	function API_ClearLog()	{
+		$("#UI_TxtLogText").val("");
+	}
+	
+	function API_AppendUnitScript(scriptText) {
+		var s = document.createElement("script");
+		s.innerHTML = scriptText;
+		
+		document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
+	}
+	
+	function API_ClearUnitScripts() {
+		$("#UI_LibUnitPlaceholder").empty();
+	}
+	
+	function API_SetActiveTab(tabId) {
+		$( "#UI_TabsOutput" ).tabs( "option", "active", tabId );	
+	}
+	
+	// Make Developer area fullscreen (Editors, output, and run bar)
+	function API_MetalFullscreen() {
+		var elem = sb_div_metalFullscreen;
+		if (elem.requestFullscreen) {
+			elem.requestFullscreen();			
+		} else if (elem.msRequestFullscreen) {
+			elem.msRequestFullscreen();
+		} else if (elem.mozRequestFullScreen) {
+			elem.mozRequestFullScreen();
+		} 
+	}
+	
+	function API_UserFullscreen() {
+		var elem = UI_TabsOutput;
+		if (elem.requestFullscreen) {
+			elem.requestFullscreen();
+		} else if (elem.msRequestFullscreen) {
+			elem.msRequestFullscreen();
+		} else if (elem.mozRequestFullScreen) {
+			elem.mozRequestFullScreen();
+		} 
+	}
+	
+	function API_UserFullscreenExit() {
+		if (document.exitFullscreen) { document.exitFullscreen(); } 
+		else if (document.msExitFullscreen) { document.msExitFullscreen(); } 
+		else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); } 
+		else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+	}
+	
+	function API_UserFullToggle() {
+		var inFullScreenMode = document.fullscreenElement || 
+		document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+
+		if (inFullScreenMode) {
+			if (document.exitFullscreen) { document.exitFullscreen(); } 
+			else if (document.msExitFullscreen) { document.msExitFullscreen(); } 
+			else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); } 
+			else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+		} 
+		else {
+			var docElm = document.documentElement;
+			if (docElm.requestFullscreen) {
+				docElm.requestFullscreen();
+			} else if (docElm.msRequestFullscreen) {
+				docElm.msRequestFullscreen();
+			} else if (docElm.mozRequestFullScreen) {
+				docElm.mozRequestFullScreen();
+			} 
+		}    
+	}
+	
+	function API_PlaySound(soundFilename) {
+		var aud = new Audio();
+		aud.src = 'sounds/' + soundFilename;
+		aud.load();
+		aud.play();
+	}
+	
+	function API_PlaySoundURI(soundURI) {
+		var aud = new Audio();
+		aud.src = soundURI;
+		aud.load();
+		aud.play();
+	}
+	
+	// Display the User Area file loader
+	function API_ShowLoad() {
+		$("#sb_div_userfile").show();
+	}
+	
+	function API_ShowDataLoad() {
+		$("#sb_div_userdatafile").show();
+	}
+	
+	function API_HideUserLoader() {
+		$('#sb_div_userfile').hide();   // hide user file picker if visible
+	}
+	
+	function API_HideUserDataLoader() {
+		$("#sb_div_userdatafile").hide();
+	}
+	
+	// Handling Blobs is very browser specific 
+	// As such this seems to work on IE 11 and firefox
+	function API_DataUrlToBlob(dataURL) {
+		// convert base64 to raw binary data held in a string
+		var byteString = atob(dataURL.split(',')[1]);
+ 
+		// separate out the mime component
+		var mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+ 
+		// write the bytes of the string to an ArrayBuffer
+		var arrayBuffer = new ArrayBuffer(byteString.length);
+		//var _ia = new Uint8Array(arrayBuffer);
+		var _ia = new Int8Array(arrayBuffer);
+		for (var i = 0; i < byteString.length; i++) {
+			_ia[i] = byteString.charCodeAt(i) & 0xff;
+		}
+
+		//var dataView = new DataView(arrayBuffer);
+		//var blobResult = new Blob([dataView], { type: mimeString });
+		var blobResult = new Blob([_ia], { type: mimeString });
+		return blobResult;
+	}
+
+	// Pass in a filename and some text to save and this will 'serve' up that text as a download
+	function API_SaveTextFile(fileName, saveString)	{
+		// The File Loaders seem to place a lock on the file so, in the event they are saving to the same filename,
+		// lets clear out the old file control so that (if they save to the same filename as they last loaded) it will work.
+		var control = $("#sb_user_file");
+		control.replaceWith( control = control.clone( true ) );
+		
+		if (typeof Blob == "undefined") {
+			alert('no blobs available (incompatible browser?)');
+		}
+		else {
+			// if not using internet explorer then fallback to filesaver.js polyfill method
+			if (window.navigator.msSaveBlob === undefined) {
+				var blob = new Blob([saveString], {type: "application/octet-stream"});
+				saveAs(blob, fileName);
+			}
+			else {
+				var blob1 = new Blob([saveString]);
+				window.navigator.msSaveBlob(blob1, fileName);
+			}
+		}
+	}
+	
+	// API_SaveDataURL will take a dataURL string (representing a binary object), 
+	// and save it as a binary file
+	function API_SaveDataURL(fileName, dataURL) {
+		var fileBlob = API_DataUrlToBlob(dataURL);
+		
+		// if not using internet explorer then fallback to filesaver.js polyfill method
+		if (window.navigator.msSaveBlob === undefined) {
+			saveAs(fileBlob, fileName);
+		}
+		else {
+			window.navigator.msSaveBlob(fileBlob, fileName);
+		}
+	}
+	
+	// Pass in a filename and some text to save and this will 'serve' up that text as a download
+	function API_SaveOrOpenTextFile(fileName, saveString) {
+		// The File Loaders seem to place a lock on the file so, in the event they are saving to the same filename,
+		// lets clear out the old file control so that (if they save to the same filename as they last loaded) it will work.
+		var control = $("#sb_user_file");
+		control.replaceWith( control = control.clone( true ) );
+		
+		if (typeof Blob == "undefined") {
+			alert('no blobs available (incompatible browser?)');
+		}
+		else {
+			var blob1 = new Blob([saveString]);
+			window.navigator.msSaveOrOpenBlob(blob1, fileName);
+		}
+	}
+	
+	function ToggleMaximize() {
+		var isCaptionVisible = $("#sb_div_caption").is(":visible");
+		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
+		
+		// If mode 3 (dev bar only), then transition to mode 1 (all visible)
+		if (isLoaderVisible == false) {
+			$("#sb_div_caption").show();
+			$("#sb_div_mainloader").show();
+		}
+		else {
+			// if all are visible then switch to mode 2 (hide caption only)
+			if (isCaptionVisible) {
+				$("#sb_div_caption").hide();
+			}
+			// else was in mode 2 (loader+dev bar), switch to mode 3 (dev bar only)
+			else {
+				$("#sb_div_mainloader").hide();
+			}
+		}
+		
+		sb_fit_editors();
+		sb_fit_log();
+	}
+	
+	function API_SetToolbarMode(showCaption, showLoader, showDevToolbar) {
+		if (showCaption) {
+			$("#sb_div_caption").show();
+		}
+		else {
+			$("#sb_div_caption").hide();
+		}
+		
+		if (showLoader) {
+			$("#sb_div_mainloader").show();
+		}
+		else {
+			$("#sb_div_mainloader").hide();
+		}
+		
+		if (showDevToolbar) {
+			$("#sb_div_devtoolbar").show();
+		}
+		else {
+			$("#sb_div_devtoolbar").hide();
+		}
+		
+		sb_fit_log();
+		sb_fit_editors();
+	}
+	
+	// Determines whether the Code or the Output areas get full width or if they split 50/50
+	function API_SetWindowMode(mode) {
+		// Code Only
+		if (mode == 1) {
+			showMarkup = true;
+			showScript = true;
+			$('#tdOutput').attr('width', '0%');
+			$('#tdCode').attr('width', '100%');
+			$('#divCode').show();
+		
+			$("#UI_TabsOutput").hide();
+		}
+		
+		// Show Code and Output areas
+		if (mode == 2) {
+			showMarkup = 2;
+			showScript = true;
+			$('#tdCode').attr('width', '50%');
+			$('#tdOutput').attr('width', '50%');
+			$('#divCode').show();
+		
+			$("#UI_TabsOutput").show();
+		}
+		
+		// Show Output only
+		if (mode == 3) {
+			showMarkup = true;
+			showScript = true;
+			$('#tdCode').attr('width', '0%');
+			$('#tdOutput').attr('width', '100%');
+			$('#divCode').hide();
+			
+			$("#UI_TabsOutput").show();
+		}
+	}
+	
+	function API_RestoreLayout() {
+		API_UserFullscreenExit();
+		API_SetToolbarMode(true, true, true);
+		API_SetWindowMode(2);
+	}
+	
+	function API_SetBackgroundColor(colorCode) {
+		$("#UI_Tab_Main").css("background-color", colorCode);
+		$("#UI_MainPlaceholder").css("background-color", colorCode);
+	}
+	
+	function API_Inspect(objVar) {
+		var tbl = prettyPrint( objVar, { /* options such as maxDepth, etc. */ });
+		$(tbl).dialog({ title: 'Trident Object/Variable Inspector', width: 'auto', maxHeight: ($(window).height() - 50) });
+	}
+
+	function selectTheme() {
+		var theme = $("#selTheme option:selected").val();
+		if (localStorage) {
+			localStorage["cmtheme"] = theme;
+		}
+
+		editorMarkup.setOption("theme", theme);
+		editorScript.setOption("theme", theme);
+	}
+	
+// END API/HELPER ROUTINES
+
+</script>
+</head>
+<!--<body bgcolor="#1F96CF" -->
+<body bgcolor="#1F7DD0">
+
+<div id="sb_div_caption" style="border:0px solid #333; padding:0px 0px; background:#777;align:center;">
+<table width="100%" cellpadding="0" cellspacing="0">
+	<tr>
+		<td valign='center'>
+			<div style="float:left"><img src='images_ide/poseidon.png' /></div>
+			<div style="float:left; padding:2px;" id="sb_div_diagnostic">
+				<table style="border:1px solid; background-color:#ccc;">
+					<tr>
+						<td>Local Storage : <span id="sb_spn_localstorage_status">N/A</span></td>
+					</tr>
+					<tr><td>Indexed Db : <span id="sb_spn_indexeddb_status">N/A</span></td></tr>
+					<tr><td>AppCache : <span id="sb_spn_appcache_status">N/A</span></td></tr>
+				</table>
+			</div>
+		</td>
+		<td>
+			<h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An Internet Explorer 10/11 development sandbox' onclick="sb_toggle_header_font()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : Internet Explorer 10/11 dev sandbox</h1>
+		</td>
+		<td>
+			<div><a class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-family:'heorot'" href="docs/Welcome.htm" target="_blank">HELP</a></div>
+		</td>
+	</tr>
+</table>
+</div>
+
+<div id="sb_div_mainloader" style="background-color:#9c9; border:0px; padding:2px">
+<table width="100%" style="font-family:Tahoma">
+<tr>
+
+<td style="align:'right'">
+Load Filename : 
+<input style='height:30px;width:200px;' id='sb_file' type="file" name="fileloader" onchange="sb_load()" />&nbsp;
+Theme: <select onchange="selectTheme()" id='selTheme' style='font-size:20px;'>
+    <option selected>default</option>
+    <option>3024-day</option>
+    <option>3024-night</option>
+    <option>ambiance</option>
+    <option>base16-dark</option>
+    <option>base16-light</option>
+    <option>blackboard</option>
+    <option>cobalt</option>
+    <option>eclipse</option>
+    <option>elegant</option>
+    <option>erlang-dark</option>
+    <option>lesser-dark</option>
+    <option>mbo</option>
+    <option>mdn-like</option>
+    <option>midnight</option>
+    <option>monokai</option>
+    <option>neat</option>
+    <option>night</option>
+    <option>paraiso-dark</option>
+    <option>paraiso-light</option>
+    <option>pastel-on-dark</option>
+    <option>rubyblue</option>
+    <option>solarized dark</option>
+    <option>solarized light</option>
+    <option>the-matrix</option>
+    <option>tomorrow-night-eighties</option>
+    <option selected='selected'>twilight</option>
+    <option>vibrant-ink</option>
+    <option>xq-dark</option>
+    <option>xq-light</option>
+</select>
+
+
+</td>
+<td style="vertical-align:middle">
+<div style="display:none" id="sb_div_compile_standalone">
+Pick a template to use for page generation : <input style='height:30px;width:180px;' id='sb_file_template' type="file" name="sb_file_template" onchange="sb_compile_template()" />
+<button style='height:30px;' onclick="$('#sb_div_compile_standalone').hide()">Cancel</button>
+</div>
+</td>
+<td align='center'>
+<button style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
+<button id="btnBrowseSamples" onclick="sb_browse_samples()" style='height:40px; display:none' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
+</td>
+<td>
+<button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/> New</button>
+</td>
+</tr>
+</table>
+</div>
+
+<div style="background-color:#1F7DD0; font-family:Tahoma; " id="sb_div_metalFullscreen">
+<div id="sb_div_devtoolbar" style="background-color:#ccc; border-style:solid; border-width:0px; padding: 1px">
+<table width='100%'>
+<tr>
+<td>
+Program Name : 
+<input style='height:24px; width:200px; ' id='sb_txt_ProgramName' type='text' placeholder="Enter program name here" value=''/>
+</td>
+<td>
+<button id="ui_btn_run" style='height:40px; width:80px' onclick="sb_run()" title="Run your Program (Alt+R)"><img src='images_ide/run16.png'/> Run</button>
+<button style='height:40px;' onclick="sb_save()" title="Save your program (Alt+S)"><img src='images_ide/disk.png'/> Save</button>
+</td>
+<td>
+<button style='height:40px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><img src='images_ide/new16.png'/> CLR</button>
+<button style='height:40px;' title="Fullscreen the Dev area" onclick="API_MetalFullscreen()"><img src='images_ide/zoom_in.png'/> Dev FS</button>
+<button style='height:40px;' title="Exit Fullscreen" onclick="API_UserFullscreenExit()"><img src='images_ide/zoom_out.png'/> Exit FS</button>
+</td>
+<td>
+	<div id="sb_radioset">
+		<input type="radio" id="sb_radio1" name="radio" onclick="API_SetWindowMode(1)"><label title="Code Only (Alt-1)"  for="sb_radio1">1</label>
+		<input type="radio" id="sb_radio2" name="radio" checked="checked" onclick="API_SetWindowMode(2)"><label title="Split 50/50 (Alt-2)"  for="sb_radio2">2</label>
+		<input type="radio" id="sb_radio3" name="radio" onclick="API_SetWindowMode(3)"><label title="Output Only (Alt-3)"  for="sb_radio3">3</label>
+	</div>
+</td>
+<td>
+	<button style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
+</td>
+</tr>
+</table>
+</div>
+<table style="width: 100%; table-layout:fixed">
+<tr>
+<td id="tdCode" width="50%" valign='top' style="padding: 0px">
+	<div id='divCode' style="display:none; background-color:#ccc; background: rgba(128, 128, 128, 0.0);">
+	<table style="width:100%; table-layout:fixed" cellpadding=0 cellspacing=0>
+	<tr><td>
+		<button id="sb_btn_markup" style="height:28px" onclick="sb_toggle_markup()" title='Toggle between markup only and split view. (Alt+Q)'>Mkp</button> 
+		<button id="sb_btn_togglesplit" style="height:28px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'>Split</button> 
+		<button id="sb_btn_script" style="height:28px" onclick="sb_toggle_script()" title='Toggle between script only and split view. (Alt+W)'>Script</button>&nbsp;
+		<button id="sb_btn_markup_fs" style="height:28px" onclick="fsMarkup()" title='Zoom the Markup Editor fullscreen'>fS Mkp</button>
+		<button id="sb_btn_script_fs" style="height:28px" onclick="fsScript()" title='Zoom the Script Editor fullscreen'>fS Script</button> 
+		<button id="sb_btn_inpect" style="height:28px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'> Inspect</button>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<div id='sb_div_ls_slots' style='display:none'>
+		<button style="height:28px"  title='Load from selected TridentDB save slot (1-9)' onclick='sb_load_slot()'>Load TDB</button>
+		<button style="height:28px"  title='Save to selected TridentDB save slot (1-9)' onclick='sb_save_slot()'>Save TDB</button>
+		<select style="height:22px"  id='sb_sel_local_slot'><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+		<option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option>
+		</select>
+		</div>
+	</td></tr>
+	<tr><td>
+		<div id="ui_div_markup" style="float:left; width:50%; padding-top:1px">
+		<textarea spellcheck='false' style='font-family="Lucida Console"' id='sb_txt_Markup' rows='24'></textarea>
+		</div>
+		<div id="ui_div_script" style="float:left; width:50%; padding-top:1px">
+		<textarea spellcheck='false' style='font-family="Lucida Console"' id='sb_txt_Script' rows='24'></textarea>
+		</div>
+	</td></tr>
+	</table>
+	</div>
+	
+</td>
+<td id="tdOutput" valign='top' style="padding: 0px">
+	<div id="UI_TabsOutput">
+		<ul>
+			<li><a href="#UI_Tab_Main">Main Output</a></li>
+			<li><a href="#UI_Tab_Html">Log (HTML)</a></li>
+			<li><a href="#UI_Tab_Text">Log (Text)</a></li>
+		</ul>
+		<div id="UI_Tab_Main">
+			<div id='sb_div_userfile' style="display:none">
+				<input style='height:30px;width:400px;' id='sb_user_file' type="file" name="userfileloader" onchange="sb_user_load()" />
+				<button id="sb_btn_user_file_cancel" onclick="$('#sb_div_userfile').hide()">Cancel</button>&nbsp;&nbsp;[Text]
+			</div>
+			<div id='sb_div_userdatafile' style="display:none; background-color:#cdc">
+				<input style='height:30px;width:400px;' id='sb_user_datafile' type="file" name="userdatafileloader" onchange="sb_user_dataload()" />
+				<button id="sb_btn_user_datafile_cancel" onclick="$('#sb_div_userdatafile').hide()">Cancel</button>&nbsp;&nbsp;[Binary]
+			</div>
+			<div id='UI_LibUnitPlaceholder' style="display:none"></div>
+			<div id='UI_MainPlaceholder' style='background-color:white'><br/><br/></div>
+		</div>
+		<div id="UI_Tab_Html">
+			<div id='UI_HtmlLogPlaceholder' style='background-color:white'><br/><br/></div>
+		</div>
+		<div id="UI_Tab_Text" style="background-color:#555">
+			<div id='sb_div_restorefile' style="display:none;color:#ccc">
+				<input style='height:30px;width:400px;' id='sb_restore_file' type="file" name="restorefileloader" onchange="sb_restore_load()" />
+				<button id="sb_btn_restore_file_cancel" onclick="$('#sb_div_restorefile').hide()">Cancel</button>&nbsp;&nbsp;[Pick Restore File]
+			</div>
+			<div id='sb_div_LogPlaceholder' style='background-color:#555;'>
+				<textarea id="UI_TxtLogText" rows='30' style="font-family: Lucida Console; height:100; width:100%; background-color:#333; color:#ccc">You need to allow blocked content for Trident Sandbox to initialize.</textarea><br/>
+				<input type='text' id='UI_TxtLogConsole' style="width:100%;height:30px; background-color:#333; color:#ccc" onKeyDown="{ if (event.keyCode==38) $('#UI_TxtLogConsole').val(sb_lastconsolecmd) }" onKeyPress="{ if (event.keyCode==13) sb_console_eval() }"/>
+			</div>
+		</div>
+	</div>
+</td>
+</tr>
+</table>
+</div>
+</body>
+</html>
+
+
