@@ -8,6 +8,10 @@ This project is scripting environment which runs in browser.  It can run in seve
 2) : Hosted on a webserver
 3) : AppCached - Similar to #2 except the client caches the entire website and can run offline.  For internet explorer, this allows local storage and indexeddb which would not otherwise be available when running from your local filesystem.
 
+To test out this application you can Download the zip to your local filesystem.  If you are on Windows 8/8.1/RT you should right click the downloaded zip file and unblock it before extracting it... then load the TridentSandbox.htm file in your browser of choice.  
+
+If you want to use my AppCache site you can visit http://obeliskos.com/TridentSandbox which will let you download about 6 megs into an 'application cache' so that the site continues to work when run offline.  You will need to pay attention to the AppCache diagnostic messages (top left of page) to see the appcache status... is should say 'downloading' and then 'idle' when completely cached.  If it says idle you should be able to go offline and continue to use (bookmark the page to avoid erasing the appcache when you clean internet files).
+
 This application is similar to jsfiddle and can be somewhat used as such, however this project aims to turn this scripting environment into a framework/ecosystem of its own.  Programs which you create can be exported into a single .PRG file which can be loaded on other TridentSandbox environments (on possibly different operating systems and browsers) to become a somewhat useful application engine.
 
 Currently the environment allows the user to code in single Markup and Script editors... CSS was not included for screen real estate purposes but might be added later.  As a workaround STYLES seem to work when placed into the markup area but this is likely bad practice.
