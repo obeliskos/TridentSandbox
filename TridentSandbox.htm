@@ -229,7 +229,7 @@ img.TridentImageButton:hover
 	// retain global references to codemirror objects set later
 	var editorMarkup, editorScript;
 
-//	API VARIABLES 
+	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_TRIDENT_VERSION = 1.76;
 	var VAR_TRIDENT_HOSTED = false;
@@ -1022,7 +1022,7 @@ img.TridentImageButton:hover
 		// then we are in dev fullscreen and caption and loader should not be
 		// calculated even if they are visible (yet outside fullscreen element)
 		if (isfullscreen) {
-			if (document.fullscreenElement || document.msFullscreenElement) {
+			if (document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement) {
 				isCaptionVisible = false;
 				isLoaderVisible = false;
 			}
