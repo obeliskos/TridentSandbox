@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 172
+#rev 176
 
 CACHE:
 TridentSandbox.htm
@@ -30,14 +30,11 @@ libraries/cryptojs/rollups/aes.js
 libraries/cryptojs/rollups/md5.js
 libraries/cryptojs/components/enc-base64-min.js
 libraries/cryptojs/components/enc-utf16-min.js
-libraries/highcharttable/highcharts.js
-libraries/highcharttable/jquery.highchartTable.js
 libraries/localStorageDB/localstoragedb.min.js
 libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js
 libraries/jqGrid-4.5.4/js/i18n/grid.locale-en.js
 libraries/three.min.js
 libraries/dynatree/jquery.dynatree.min.js
-libraries/fullcalendar-1.6.4/fullcalendar/fullcalendar.min.js
 libraries/jqplot/jquery.jqplot.min.js
 libraries/jqplot/plugins/jqplot.barRenderer.min.js
 libraries/jqplot/plugins/jqplot.categoryAxisRenderer.min.js
@@ -49,7 +46,6 @@ libraries/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js
 libraries/jqplot/plugins/jqplot.dateAxisRenderer.min.js
 libraries/jqplot/plugins/jqplot.json2.min.js
 libraries/jqplot/plugins/jqplot.meterGaugeRenderer.min.js
-libraries/jqplot/examples/index.html
 libraries/loki-js/lokijs.js
 libraries/codemirror-4.0/lib/codemirror.js
 libraries/codemirror-4.0/mode/xml/xml.js
@@ -96,10 +92,14 @@ libraries/codemirror-4.0/theme/xq-dark.css
 libraries/codemirror-4.0/theme/xq-light.css
 libraries/nicEdit/nicEdit.js
 libraries/nicEdit/nicEditorIcons.gif
+libraries/tinymce/tinymce.min.js
+libraries/tinymce/skins/lightgray/skin.min.css
+libraries/tinymce/plugins/moxiemanager/plugin.min.js
+libraries/tinymce/skins/lightgray/skin.min.css
+libraries/tinymce/skins/lightgray/content.min.css
 libraries/prettyprint/prettyprint.js
 libraries/shortcut.js
 libraries/math.min.js
-libraries/parsley.js
 libraries/MetroJs.Full.0.9.74/MetroJs.js
 libraries/MetroJs.Full.0.9.74/MetroJs.css
 libraries/font-awesome/css/font-awesome.css
@@ -209,7 +209,6 @@ libraries/dynatree/skin/icons-rtl.gif
 libraries/dynatree/skin/loading.gif
 libraries/dynatree/skin/vline.gif
 libraries/dynatree/skin/vline-rtl.gif
-libraries/fullcalendar-1.6.4/fullcalendar/fullcalendar.css
 libraries/jqGrid-4.5.4/css/ui.jqgrid.css
 libraries/alertify.js-0.3.11/themes/alertify.core.css
 libraries/alertify.js-0.3.11/themes/alertify.bootstrap.css
@@ -245,7 +244,6 @@ samples/Alertify%20Demo.prg
 samples/Analog%20Clocks%20SVG.prg
 samples/Browser%20UserAgent.prg
 samples/Canvas%20Tiles.prg
-samples/ChartTable.prg
 samples/CryptoJS.prg
 samples/CryptoJS%20Notepad.prg
 samples/CSS%20Transforms.prg
@@ -257,7 +255,6 @@ samples/Dynamic%20Image%20Load.prg
 samples/Dynatree%20Demo.prg
 samples/EaselJS%20Demo.prg
 samples/Font%20Awesome.prg
-samples/FullCalendar%20Demo.prg
 samples/Fullscreen%20API.prg
 samples/Geolocation%20Coordinates.prg
 samples/Geolocation%20GetMap.prg
@@ -276,7 +273,6 @@ samples/LokiJS%20Demo.prg
 samples/Metro%20Web%20Data%20Extraction.prg
 samples/MetroJS%20Demo.prg
 samples/MilesKiloConvert.prg
-samples/nicEdit%20demo.prg
 samples/ObeliskJS%20Demo.prg
 samples/Panorama%20Canvas.prg
 samples/PixiJS%20Morph%20Demo.prg
@@ -285,11 +281,11 @@ samples/Proper%20Cleanup%20Method.prg
 samples/SandboxIO.prg
 samples/Springy%20Demo.prg
 samples/SVG%20Markup.prg
+samples/TinyMCE%20Demo.prg
 samples/Trident%20Binary%20Encryptor.prg
 samples/Trident%20DB%20Usage.prg
 samples/WebGL%20Spinning%20Box.prg
 samples/WebGL%20Spinning%20Crate.prg
-
 libraries/web_worker_demo.js
 
 NETWORK:

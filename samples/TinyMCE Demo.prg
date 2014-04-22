@@ -1,0 +1,5 @@
+{
+  "progName": "TinyMCE Demo",
+  "htmlText": "<textarea id=\"divContent\" name=\"divContent\" style=\"width:100%\"></textarea>\n",
+  "scriptText": "\nfunction EVT_CleanSandbox() {\n    tinymce.remove();\n}\n\ntinymce.init({\n    selector: \"#divContent\",\n    theme: \"modern\",\n    plugins: [\n        \"advlist autolink lists link image charmap print preview hr anchor pagebreak\",\n        \"searchreplace wordcount visualblocks visualchars code fullscreen\",\n        \"insertdatetime media nonbreaking save table contextmenu directionality\",\n        \"emoticons template paste textcolor moxiemanager\"\n    ],\n    toolbar1: \"code searchreplace undo redo | styleselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | print preview | forecolor backcolor emoticons | fullscreen\",\n    image_advtab: true\n\n});\n\n\n\n\n"
+}
