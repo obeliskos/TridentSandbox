@@ -8,7 +8,7 @@ An In-Browser Scripting IDE for HTML5/Javascript
 This project is scripting environment which runs in browser.  It can run in several modes: 
 1) : Offline served up from your local file system
 2) : Hosted on a webserver
-3) : AppCached - Similar to #2 except the client caches the entire website and can run offline.  For internet explorer, this allows local storage and indexeddb which would not otherwise be available when running from your local filesystem.
+3) : AppCached - Similar to #2 except the client caches the entire website and can run offline.  For internet explorer, this allows local storage and indexeddb which would not otherwise be available when running from your local filesystem. 
 
 To test out this application you can Download the zip to your local filesystem.  If you are on Windows 8/8.1/RT you should right click the downloaded zip file and unblock it before extracting it... then load the TridentSandbox.htm file in your browser of choice.  
 
