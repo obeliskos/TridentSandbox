@@ -3,7 +3,7 @@ TridentSandbox
 
 An In-Browser Scripting IDE for HTML5/Javascript
 
-![trident preview](http://obeliskos.com/surface/trident_sandbox.png)
+![trident preview](http://obeliskos.com/surface/trident_sandbox_176.png)
 
 This project is scripting environment which runs in browser.  It can run in several modes: 
 1) : Offline served up from your local file system
