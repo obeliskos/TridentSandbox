@@ -13,11 +13,10 @@
 -->
 
 <!--	TRIDENT SANDBOX : A 'jsfiddle-like' sandbox for Internet Explorer 10/11
-
-		Developed by user nazoraios on XDA Developers
+		GitHub development at : https://github.com/obeliskos/TridentSandbox
 
 		This original intent of this is for use on Windows RT tablets, but it can be used on any
-		computer running Internet Explorer 10/11.
+		computer running Internet Explorer 10/11 and possibly other browsers.
 		
 		It makes use of the FILE API which still seems to be somewhat browser specific, so to work 
 		on other browsers you might need to change the I/O interface functions to work.  
@@ -363,7 +362,8 @@ img.TridentImageButton:hover
 		// For good tutorial on indexedDB, see http://code.tutsplus.com/tutorials/working-with-indexeddb--net-34673
 		if (indexedDB) {
 			$("#sb_spn_indexeddb_status").text("Yes");
-
+			$("#sb_div_ls_slots").css("display", "inline-block");
+			
 			var openRequest = indexedDB.open("TridentSandboxDB", 1);
  
 			// If database doesnt exist yet or its version is lower than our version specified above (2nd param in line above)
@@ -390,53 +390,48 @@ img.TridentImageButton:hover
 			openRequest.onsuccess = function(e) {
 				API_LogMessage("TridentSandboxDB (indexedDB) opened.");
 				VAR_TRIDENT_DB = e.target.result;
+				
+				// Now that not only is indexed db available but the Trident database is opened, handle url LoadSlot/RunSlot hash params
+				$("#btnBrowseSamples").show();
+				var loadSlot = API_GetURLParameter("LoadSlot");
+				if (loadSlot != null) {
+					sb_clean_sandbox();
+					
+					$("#sb_sel_local_slot").val(loadSlot);
+					
+					// let sandbox finish cleaning then load
+					setTimeout(function() {
+						sb_load_slot();
+					}, 200);
+				}
+				else {
+					var runSlot = API_GetURLParameter("RunSlot");
+					if (runSlot != null) {
+						sb_clean_sandbox();
+					
+						$("#sb_sel_local_slot").val(runSlot);
+
+					// let sandbox finish cleaning then run
+						setTimeout(function() {
+							sb_load_slot(true);
+						}, 200);
+					}
+				}
 			}
  
 			openRequest.onerror = function(e) {
 				API_LogMessage("Error opening TridentSandboxDB (indexedDB).");
 				API_Inspect(e);
 			}
+			
 		}
 		
-		if (localStorage) {
+		if (localStorage || indexedDB) {
 			$("#sb_spn_localstorage_status").text("Yes");
-			
-			// Show LocalStorage program save slots
-			$("#sb_div_ls_slots").css("display", "inline-block");
-			
-			// Since Hosted, look for parameter indicating a program slot to load
-			var loadSlot = API_GetURLParameter("LoadSlot");
-			if (loadSlot != null) {
-				sb_clean_sandbox();
-				
-				$("#sb_sel_local_slot").val(loadSlot);
-				
-				// let sandbox finish cleaning then load
-				setTimeout(function() {
-					sb_load_slot();
-				}, 200);
-			}
-			else {
-				var runSlot = API_GetURLParameter("RunSlot");
-				if (runSlot != null) {
-					sb_clean_sandbox();
-				
-					$("#sb_sel_local_slot").val(runSlot);
-
-				// let sandbox finish cleaning then run
-					setTimeout(function() {
-						sb_load_slot(true);
-					}, 200);
-				}
-			}
-
-			$("#btnBrowseSamples").show();
 			
 			VAR_TRIDENT_HOSTED = true;
 		}
 		else {
-			// If local storage is not available then neither is appcache nor indexeddb
-			// so hide the diagnostic info showing their status
 			$("#sb_div_diagnostic").hide();
 		}
 		
@@ -998,7 +993,7 @@ img.TridentImageButton:hover
 		var isfullscreen = (!window.screenTop && !window.screenY);
 		
 		if (isfullscreen) {
-			if (document.fullscreenElement || document.msFullscreenElement) {
+			if (document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement) {
 				isCaptionVisible = false;
 				isLoaderVisible = false;
 			}
@@ -1018,7 +1013,7 @@ img.TridentImageButton:hover
 		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
 		var isfullscreen = (!window.screenTop && !window.screenY);
 		
-		// fix for metro ie fullscreen; if the fullscreen element is not null
+		// fix for metro ie fullscreen or f11 desktop ie fullscreen; if the fullscreen element is not null
 		// then we are in dev fullscreen and caption and loader should not be
 		// calculated even if they are visible (yet outside fullscreen element)
 		if (isfullscreen) {
@@ -1295,11 +1290,6 @@ function API_Backup_TridentDB(filename) {
 		if(cursor) {
           	var currObject = cursor.value;
           
-			$('#selObjects').append($('<option>', {
-    			value: currObject.id,
-    			text: currObject.key
-			}));  
-
 			keyArray.push(currObject);
           
             cursor.continue();
@@ -1464,7 +1454,7 @@ function API_Restore_TridentDB() {
 		});
 	}
 	
-// API/HELPER ROUTINES 
+	// API/HELPER ROUTINES 
 	// Helper method to support hosted or appcache url params
 	function API_GetURLParameter(sParam) {
 		var sPageURL = window.location.hash.substring(1);
@@ -1491,10 +1481,6 @@ function API_Restore_TridentDB() {
 		
 		document.title = "Trident Sandbox v" + VAR_TRIDENT_VERSION;
 	
-		// Clear out old file names from file loader
-		//var control = $("#sb_user_file");
-		//control.replaceWith( control = control.clone( true ) );
-		
 		$("#sb_div_restorefile").hide();
 		
 		API_SetBackgroundColor("#fff");
@@ -1576,7 +1562,7 @@ function API_Restore_TridentDB() {
 	}
 	
 	function API_SetActiveTab(tabId) {
-		$( "#UI_TabsOutput" ).tabs( "option", "active", tabId );	
+		$("#UI_TabsOutput" ).tabs( "option", "active", tabId );	
 	}
 	
 	// Make Developer area fullscreen (Editors, output, and run bar)
@@ -1662,7 +1648,7 @@ function API_Restore_TridentDB() {
 		$("#sb_div_userdatafile").hide();
 	}
 	
-	// Handling Blobs is very browser specific 
+	// Handling Blobs is somewhat browser specific 
 	// As such this seems to work on IE 11 and firefox
 	function API_DataUrlToBlob(dataURL) {
 		// convert base64 to raw binary data held in a string
@@ -1854,7 +1840,6 @@ function API_Restore_TridentDB() {
 
 </script>
 </head>
-<!--<body bgcolor="#1F96CF" -->
 <body bgcolor="#1F7DD0">
 
 <div id="sb_div_caption" style="border:0px solid #333; padding:0px 0px; background:#777;align:center;">
