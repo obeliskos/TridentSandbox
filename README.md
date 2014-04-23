@@ -1,4 +1,4 @@
-TridentSandbox
+Trident Sandbox
 ==============
 
 An In-Browser Scripting IDE for HTML5/Javascript
