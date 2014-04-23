@@ -221,6 +221,8 @@ img.TridentImageButton:hover
 	var sb_flashtabhtml = false;
 	var sb_lastconsolecmd = "";
 	
+	var sb_appcache_progress = 0;
+	
 	// Set up pseudo enum to indicate the editor mode
 	var EditorModeEnum = Object.freeze({"Markup":1, "Split":2, "Script":3 });
 	var editorMode = EditorModeEnum.Split;
@@ -446,12 +448,20 @@ img.TridentImageButton:hover
 					appCache.addEventListener('checking', logACEvent, false);
 					appCache.addEventListener('noupdate', logACEvent, false);
 					appCache.addEventListener('downloading', logACEvent, false);
-					appCache.addEventListener('progress', logACEvent, false);
+					appCache.addEventListener('progress', progressAC, false);
 					appCache.addEventListener('updateready', logACEvent, false);
 					appCache.addEventListener('cached', logACEvent, false);
 			}
 		}
 	});
+	
+	function progressAC(e)
+	{
+		sb_appcache_progress++;
+		
+		// hardcoding 265 total # files
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/265) + "%)");
+	}
 	
 	// Helper method for appcache diagnostic
 	function logACEvent(e)
@@ -461,6 +471,13 @@ img.TridentImageButton:hover
 		// Update diagnostic panel
 		var statusString = getACStatus();
 		$("#sb_spn_appcache_status").text(statusString);
+		
+		if (statusString == "Update ready") {
+			$("#sb_spn_appcache_progress").text(""); 
+			setTimeout(function() {
+				sb_prompt_update();
+			}, 500);
+		}
 	}
 
 	// Helper method for appcache diagnostics, this event will be fired whenever appcache status changes
@@ -474,9 +491,9 @@ img.TridentImageButton:hover
 				switch ( oAppCache.status ) 
 				{
 					case oAppCache.UNCACHED : sCacheStatus = "Not cached"; break;
-					case oAppCache.IDLE : sCacheStatus = "Idle"; break;
+					case oAppCache.IDLE : sCacheStatus = "Idle"; $("#sb_spn_appcache_status").text(""); break;
 					case oAppCache.CHECKING : sCacheStatus = "Checking"; break;
-					case oAppCache.DOWNLOADING : sCacheStatus = "Downloading"; break;
+					case oAppCache.DOWNLOADING : sCacheStatus = "Downloading"; break; 
 					case oAppCache.UPDATEREADY : sCacheStatus = "Update ready"; break;
 					case oAppCache.OBSOLETE : sCacheStatus = "Obsolete"; break;
 					default : sCacheStatus = "Unexpected Status ( " + oAppCache.status.toString() + ")"; break;
@@ -489,6 +506,18 @@ img.TridentImageButton:hover
 			alertify.log(e);
 			API_LogMessage(e);
 		}
+	}
+	
+	function sb_prompt_update() {
+		alertify.confirm("An update exists to your AppCache install.  Do you want to install it and reload this page?", function (e) {
+    		if (e) {
+        		// user clicked "ok"
+              	applicationCache.swapCache();
+				location.reload(); 
+    		} else {
+        		// user clicked "cancel"
+            }
+		});
 	}
 
 // Simple Drop Down Menu support for programs to use
@@ -1853,7 +1882,7 @@ function API_Restore_TridentDB() {
 						<td>Local Storage : <span id="sb_spn_localstorage_status">N/A</span></td>
 					</tr>
 					<tr><td>Indexed Db : <span id="sb_spn_indexeddb_status">N/A</span></td></tr>
-					<tr><td>AppCache : <span id="sb_spn_appcache_status">N/A</span></td></tr>
+					<tr><td>AppCache : <span id="sb_spn_appcache_status">N/A</span>&nbsp;<span id="sb_spn_appcache_progress"></span></td></tr>
 				</table>
 			</div>
 		</td>
