@@ -135,6 +135,7 @@ images_ide/run16.png
 images_ide/disk.png
 images_ide/zoom_in.png
 images_ide/zoom_out.png
+images_ide/chart_pie.png
 images_ide/crate.jpg
 images_ide/metro-back.png
 images_ide/metro-back-white.png
