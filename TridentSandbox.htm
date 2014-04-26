@@ -55,6 +55,7 @@ available for use by the sandbox app, add them here.
 <script src="libraries/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
 <script src="libraries/jqplot/plugins/jqplot.json2.min.js"></script>
 <script src="libraries/jqplot/plugins/jqplot.meterGaugeRenderer.min.js"></script>
+<script src="libraries/jqplot/plugins/jqplot.highlighter.min.js"></script>
 <script src="libraries/loki-js/lokijs.js"></script>
 <script src="libraries/codemirror-4.0/lib/codemirror.js"></script>
 <script src="libraries/codemirror-4.0/mode/xml/xml.js"></script>
@@ -232,7 +233,7 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.77;
+	var VAR_TRIDENT_VERSION = 1.80;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -246,9 +247,19 @@ img.TridentImageButton:hover
 	$(document).ready(function() {
 		alertify.set({ buttonReverse: true });
 		$("#UI_TabsOutput").tabs();
+		$("#UI_TabsDashboard").tabs();
 		$("#sb_radioset").buttonset();
 		$('.tlt').textillate();
 		//$('.tlt').textillate({ in: { effect: 'rollIn' } });
+		
+		$('#UI_TabsDashboard').on('tabsactivate', function(event, ui) {
+			var newIndex = ui.newTab.index();
+			switch (newIndex){
+				case 0: sb_dashboard.calcSummaryUsage(); break;
+				case 1: sb_dashboard.calcLocalStorageUsage(); break;
+				case 2: sb_dashboard.calcTridentDbUsage(); break;
+			}
+		});
 		
 		// For some reason IE sometimes 'remembers' this val across loads
 		$("#sb_txt_ProgramName").val("");
@@ -394,31 +405,34 @@ img.TridentImageButton:hover
 				VAR_TRIDENT_DB = e.target.result;
 				
 				// Now that not only is indexed db available but the Trident database is opened, handle url LoadSlot/RunSlot hash params
-				$("#btnBrowseSamples").show();
-				var loadSlot = API_GetURLParameter("LoadSlot");
-				if (loadSlot != null) {
-					sb_clean_sandbox();
-					
-					$("#sb_sel_local_slot").val(loadSlot);
-					
-					// let sandbox finish cleaning then load
-					setTimeout(function() {
-						sb_load_slot();
-					}, 200);
-				}
-				else {
-					var runSlot = API_GetURLParameter("RunSlot");
-					if (runSlot != null) {
+				sb_refresh_slots(function() {
+				
+					var loadSlot = API_GetURLParameter("LoadSlot");
+					if (loadSlot != null) {
 						sb_clean_sandbox();
-					
-						$("#sb_sel_local_slot").val(runSlot);
-
-					// let sandbox finish cleaning then run
+						
+						$("#sb_sel_trident_slot").val(loadSlot);
+						
+						// let sandbox finish cleaning then load
 						setTimeout(function() {
-							sb_load_slot(true);
+							sb_load_slot();
 						}, 200);
 					}
-				}
+					else {
+						var runSlot = API_GetURLParameter("RunSlot");
+						if (runSlot != null) {
+							sb_clean_sandbox();
+						
+							$("#sb_sel_trident_slot").val(runSlot);
+
+						// let sandbox finish cleaning then run
+							setTimeout(function() {
+								sb_load_slot(true);
+							}, 200);
+						}
+					}
+				
+				});
 			}
  
 			openRequest.onerror = function(e) {
@@ -430,6 +444,8 @@ img.TridentImageButton:hover
 		
 		if (localStorage || indexedDB) {
 			$("#sb_spn_localstorage_status").text("Yes");
+			$("#ui_show_dashboard").show();
+			$("#ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
 			
 			VAR_TRIDENT_HOSTED = true;
 		}
@@ -440,6 +456,7 @@ img.TridentImageButton:hover
 		// If served up from a website then we should bother to monitor possible appcache events
 		// for diagnostics.  If not appcaching the events will just not fire.
 		if (document.URL.indexOf("file://") == -1) {
+			$("#ui_browse_samples").show();
 
 			// Determine if we are connecting or running from an appcache site
 			var appCache = window.applicationCache;
@@ -476,7 +493,7 @@ img.TridentImageButton:hover
 			$("#sb_spn_appcache_progress").text(""); 
 			setTimeout(function() {
 				sb_prompt_update();
-			}, 500);
+			}, 200);
 		}
 	}
 
@@ -840,10 +857,33 @@ img.TridentImageButton:hover
 		}, 250);
 	}
 	
-	function sb_load_slot(autoRun) { 
-		var selText = $("#sb_sel_local_slot").find(":selected").text();
+	function sb_refresh_slots(callback) {
+		// clear out slots select
+		$("#sb_sel_trident_slot").html("<option></option>");
 		
-		API_GetIndexedAppKey("SandboxSaveSlots", "ProgramSlot" + selText, function(e) {
+		API_GetIndexedAppCursor('SandboxSaveSlots', function(e) {
+			var cursor = e.target.result;
+		  
+			if(cursor) {
+				var currObject = cursor.value;
+			  
+				$('#sb_sel_trident_slot').append($('<option>', {
+					value: currObject.key,
+					text: currObject.key
+				}));          
+			  
+				cursor.continue();
+			}
+			else {
+				if (callback) callback();
+			}
+		});
+	}
+	
+	function sb_load_slot(autoRun) { 
+		var selText = $("#sb_sel_trident_slot").find(":selected").text();
+		
+		API_GetIndexedAppKey("SandboxSaveSlots", selText, function(e) {
 			var res = e.target.result;
 			
 			if (res == null) {
@@ -868,7 +908,7 @@ img.TridentImageButton:hover
 	// If local storage is available (Hosted or AppCache)
 	// then this will let you load a program from a save slot
 	function sb_save_slot() { 
-		var selText = $("#sb_sel_local_slot").find(":selected").text();
+		var selText = $("#sb_sel_trident_slot").find(":selected").text();
 
 		var progNameString = $("#sb_txt_ProgramName").val();
 		var htmlTextString = editorMarkup.getValue();
@@ -881,15 +921,41 @@ img.TridentImageButton:hover
 		
 		var json_text = JSON.stringify(sandboxObject, null, 2);
 		
-		alertify.confirm("Are you sure you want to save into slot " + selText, function (e) {
-    		if (e) {
-				try {
-					API_SetIndexedAppKey("SandboxSaveSlots", "ProgramSlot" + selText, json_text);
+		if (selText != progNameString) {
+			alertify.confirm("Are you sure you want to save into slot " + progNameString, function (e) {
+				if (e) {
+					try {
+						API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
+						sb_refresh_slots();
+					}
+					catch(e) {
+						alertify.alert("Error encountered during save to TridentDB : " + e.message);
+					}
+				} 
+			});
+		}
+		else {
+			API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
+		}
+	}
+	
+	function sb_del_slot() {
+		var selText = $("#sb_sel_trident_slot").find(":selected").text();
+		
+		if (selText == "") return;
+		
+		alertify.confirm("Are you sure you want to delete Trident Program Slot : " + selText, function (e) {
+				if (e) {
+					API_GetIndexedAppKey("SandboxSaveSlots", selText, function(e) {
+						var res = e.target.result;
+						API_DelIndexedAppKey(res.id);
+						
+						sb_refresh_slots();
+					});
 				}
-				catch(e) {
-					alertify.alert("Error encountered during save to local storage : " + e.message);
+				else {
+					alertify.error("No save at that slot");
 				}
-    		} 
 		});
 	}
 	
@@ -927,11 +993,14 @@ img.TridentImageButton:hover
 	// Ideally this would clear out the sandbox entirely
 	function sb_clean_sandbox()	{
 		// clear source code
-		editorMarkup.setValue("");
-		editorScript.setValue("");
-		
-		sb_markup_hash = CryptoJS.SHA1("").toString();
-		sb_script_hash = CryptoJS.SHA1("").toString();
+		var markupText = "<h3>My Sandbox Program</h3>\r\n";
+		var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n}\r\n\r\nfunction EVT_CleanSandbox()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n}";
+
+		editorMarkup.setValue(markupText);
+		editorScript.setValue(scriptText);
+	
+		sb_markup_hash = CryptoJS.SHA1(editorMarkup.getValue()).toString();
+		sb_script_hash = CryptoJS.SHA1(editorScript.getValue()).toString();
 		
 		$("#sb_txt_ProgramName").val('New Program');
 
@@ -1136,6 +1205,28 @@ img.TridentImageButton:hover
 	
 	function fsScript()	{
 		editorScript.setOption("fullScreen", !editorScript.getOption("fullScreen"));
+	}
+	
+	function sb_fs_code() {
+		var inFullScreenMode = document.fullscreenElement || 
+		document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+
+		if (inFullScreenMode) {
+			if (document.exitFullscreen) { document.exitFullscreen(); } 
+			else if (document.msExitFullscreen) { document.msExitFullscreen(); } 
+			else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); } 
+			else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+		} 
+		else {
+			var docElm = divCode;
+			if (docElm.requestFullscreen) {
+				docElm.requestFullscreen();
+			} else if (docElm.msRequestFullscreen) {
+				docElm.msRequestFullscreen();
+			} else if (docElm.mozRequestFullScreen) {
+				docElm.mozRequestFullScreen();
+			} 
+		}    
 	}
 	
 	// function to inspect a variable/expression highlighted in a script or markup editor
@@ -1487,13 +1578,14 @@ function API_Restore_TridentDB() {
 	// Helper method to support hosted or appcache url params
 	function API_GetURLParameter(sParam) {
 		var sPageURL = window.location.hash.substring(1);
+
 		var sURLVariables = sPageURL.split('&');
 		for (var i = 0; i < sURLVariables.length; i++)
 		{
 			var sParameterName = sURLVariables[i].split('=');
 			if (sParameterName[0] == sParam)
 			{
-				return sParameterName[1];
+				return decodeURIComponent(sParameterName[1]);
 			}
 		}
 	}
@@ -1733,7 +1825,7 @@ function API_Restore_TridentDB() {
 			saveAs(fileBlob, fileName);
 		}
 		else {
-			window.navigator.msSaveBlob(fileBlob, fileName);
+			window.navigator.msSaveOrOpenBlob(fileBlob, fileName);
 		}
 	}
 	
@@ -1865,6 +1957,323 @@ function API_Restore_TridentDB() {
 		editorScript.setOption("theme", theme);
 	}
 	
+	function API_GetCursor(callback) {
+		var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
+		var store = transaction.objectStore("TridentSandboxKVP");
+
+		var cursor = store.openCursor();
+	 
+		cursor.onsuccess = callback;
+	}
+	
+	// Wrapping all Storage Summary functionality into this object
+	var sb_dashboard = {
+		tdbplot: null,
+		lsplot: null,
+		gaugeLS: null,
+		gaugeTDB: null,
+		
+		calcSummaryUsage: function() {
+			$("#spn_TridentDatabaseUsage").text("");
+			$("#ui_gaugeTDBspin").show();
+			
+			setTimeout(function() { sb_dashboard.calcSummaryUsageAction() }, 100);
+		},
+		
+		calcSummaryUsageAction: function() {
+			var totalSizeTDB = 0;
+
+			if (sb_dashboard.gaugeLS) { sb_dashboard.gaugeLS.destroy(); }
+			if (sb_dashboard.gaugeTDB) { sb_dashboard.gaugeTDB.destroy(); }
+			
+			API_GetCursor(function(e) {
+				var cursor = e.target.result;
+				if(cursor) {
+					var currObject = cursor.value;
+					var keySize = currObject.val.length;
+					totalSizeTDB += keySize;
+					
+					cursor.continue();
+				}
+				else {
+					var totalSizeLS = 0;
+
+					for (var i = 0; i < localStorage.length; i++) {
+						var keySize = localStorage[localStorage.key(i)].length;
+						totalSizeLS += keySize;
+					}
+					
+					$("#spn_LocalStorageUsage").text(totalSizeLS + " bytes.");
+					
+					var s1 = [(totalSizeLS/1024)/1024];
+
+					sb_dashboard.gaugeLS = $.jqplot('ui_gaugeLS',[s1],{
+						seriesDefaults: {
+							renderer: $.jqplot.MeterGaugeRenderer,
+							rendererOptions: {
+								label: '(Actual) Usage in MB',
+								labelPosition: 'bottom',
+								min: 0,
+								max: 20,
+								intervals:[5, 10, 15, 20],
+								intervalColors:['#66cc66', '#93b75f', '#E7E658', '#cc6666']
+							}
+						}
+					});
+					
+					if ($("#UI_TabsDashboard").tabs("option", "active") != 0) return;
+					
+					$("#ui_gaugeTDBspin").hide();
+					
+					$("#spn_TridentDatabaseUsage").text(totalSizeTDB + " bytes.");
+					
+					var s2 = [(totalSizeTDB/1024)/1024];
+
+					sb_dashboard.gaugeLS = $.jqplot('ui_gaugeTDB',[s2],{
+						seriesDefaults: {
+							renderer: $.jqplot.MeterGaugeRenderer,
+							rendererOptions: {
+								label: '(Actual) Usage in MB',
+								labelPosition: 'bottom',
+								min: 0,
+								max: 120,
+								intervals:[30, 60, 90, 120],
+								intervalColors:['#66cc66', '#93b75f', '#E7E658', '#cc6666']
+							}
+						}
+					});
+				}
+			});
+			
+		},
+	
+		calcTridentDbUsage: function() {
+			$("#ui_tdb_spnTotalSize").text("");
+			$("#ui_chartTDBspin").show();
+			
+			setTimeout(function() { sb_dashboard.calcTridentDbUsageAction() }, 100);
+		},
+		
+		calcTridentDbUsageAction: function() {
+   
+			$("#ui_tdb_txtAppName").val("");
+			$("#ui_tdb_txtKeyName").val("");
+			$("#ui_tdb_txtKeySize").val("");
+			
+			// if already plotted, destroy old plot before replotting
+			if (sb_dashboard.tdbplot) { sb_dashboard.tdbplot.destroy(); }
+			
+			// clear array of [key,sizes]
+			var arrayTDB = [];
+
+			// repopulate the listbox while simultaneously building the arrayTDB data for plot
+			$("#ui_tdb_selTridentDB").html("");
+			
+			var totalSize = 0;
+
+			API_GetCursor(function(e) {
+				var cursor = e.target.result;
+				if(cursor) {
+					var currObject = cursor.value;
+				  
+					$('#ui_tdb_selTridentDB').append($('<option>', {
+						value: currObject.id,
+						text: currObject.app + ";" + currObject.key
+					}));          
+				  
+					var keySize = currObject.val.length;
+					totalSize += keySize;
+					
+					arrayTDB.push([currObject.key.slice(0,20), keySize]);
+					cursor.continue();
+				}
+				else {
+					// if user left tab before we were ready to plot, then dont bother
+					if ($("#UI_TabsDashboard").tabs("option", "active") != 2) return;
+					
+					if (totalSize == 0) $("#ui_div_trident_usage").hide();
+					else $("#ui_div_trident_usage").show();
+				
+					$("#ui_tdb_spnTotalSize").text(totalSize + " (" + Math.round((totalSize/1024)/1024 *100)/100 + "MB)");				
+					
+					$("#ui_chartTDBspin").hide();
+					
+					sb_dashboard.tdbplot = jQuery.jqplot ('ui_tdb_chartTridentUsage', [arrayTDB], 
+					{ 
+						seriesDefaults: {
+							// Make this a pie chart.
+							renderer: jQuery.jqplot.PieRenderer, 
+							rendererOptions: {
+								// Put data labels on the pie slices.
+								// By default, labels show the percentage of the slice.
+								showDataLabels: true
+								//dataLabels: ['label']
+							}
+						}, 
+						legend: { show:false, location: 'e' },
+						highlighter: {
+						  show: true,
+						  formatString:'%s', 
+						  tooltipLocation:'sw', 
+						  useAxesFormatters:false
+						}
+					});
+				}
+			});
+
+		},
+		
+		deleteTridentKey : function() {
+			var objId = $("#ui_tdb_selTridentDB option:selected").val();
+
+			API_DelIndexedAppKey(parseInt(objId));
+
+			setTimeout(function () { sb_dashboard.calcTridentDbUsage() }, 300);
+		},
+		
+		selTdbChanged: function () {
+			var keyId = $("#ui_tdb_selTridentDB option:selected").val();
+
+			API_GetIndexedAppKeyById(parseInt(keyId), function(e) {
+				var res = e.target.result;
+				
+				if (res.app  == "TridentFiles") $("#ui_tdb_download").show();
+				else $("#ui_tdb_download").hide();
+				
+				$("#ui_tdb_txtAppName").val(res.app);
+				$("#ui_tdb_txtKeyName").val(res.key);
+				$("#ui_tdb_txtKeySize").val(res.val.length + " bytes");
+			});
+		},
+		
+		downloadTridentFile: function() {
+			var objId = $("#ui_tdb_selTridentDB option:selected").val();
+
+			// user clicked "ok"
+			API_GetIndexedAppKeyById(parseInt(objId), function(e) {
+				var res = e.target.result;
+
+				var fileName = res.key.replace("TridentFiles;", "");
+				var dataURL = res.val;
+				API_SaveDataURL(fileName, dataURL);
+			});
+		},
+		
+		renameTridentKey: function() {
+			var objId = $("#ui_tdb_selTridentDB option:selected").val();
+
+			// user clicked "ok"
+			API_GetIndexedAppKeyById(parseInt(objId), function(e) {
+				var res = e.target.result;
+			
+				API_SetIndexedAppKey(res.app, $("#ui_tdb_txtKeyName").val(), res.val);
+				API_DelIndexedAppKey(parseInt(objId));
+			});
+
+			setTimeout(function () { sb_dashboard.calcTridentDbUsage() }, 250);
+		},
+
+		calcLocalStorageUsage: function() {
+			if (sb_dashboard.lsplot) { sb_dashboard.lsplot.destroy(); }
+			
+			var arrayLS = [];
+
+			$("#ui_ls_txtKeyName").val("");
+			$("#ui_ls_txtKeySize").val("");
+			$("#ui_ls_txtLocalStorageValue").text("");
+
+			// repopulate the listbox while simultaneously building the arrayLS data for plot
+			$("#ui_ldb_selLocalStorage").html("");
+			
+			var totalSize = 0;
+
+			for (var i = 0; i < localStorage.length; i++) {
+				var keyName = localStorage.key(i);
+				var keySize = localStorage[localStorage.key(i)].length;
+				
+				arrayLS.push([keyName, keySize]);
+				
+				totalSize += keySize;
+				
+				$('#ui_ldb_selLocalStorage').append($('<option>', {
+					value: localStorage.key(i),
+					text: localStorage.key(i)
+				}));          
+			}
+			
+			if (totalSize == 0) $("#ui_div_local_usage").hide();
+			else $("#ui_div_local_usage").show();
+			
+			$("#ui_ldb_spnTotalSize").text("Total Size of Local Storage : " + totalSize);
+
+			// now (re) plot the data we just accumulated
+			sb_dashboard.lsplot = jQuery.jqplot ('ui_ldb_chartLocalUsage', [arrayLS], 
+			{ 
+				seriesDefaults: {
+					// Make this a pie chart.
+					renderer: jQuery.jqplot.PieRenderer, 
+					rendererOptions: {
+					  // Put data labels on the pie slices.
+					  // By default, labels show the percentage of the slice.
+					  showDataLabels: true
+					  //dataLabels: ['label']
+
+					}
+				}, 
+				highlighter: {
+				  show: true,
+				  formatString:'%s', 
+				  tooltipLocation:'sw', 
+				  useAxesFormatters:false
+				},
+				legend: { show:false, location: 'e' }
+			});
+		},
+		
+		selectLSKey: function() {
+			var key = $("#ui_ldb_selLocalStorage option:selected").text();
+
+			$("#ui_ls_txtKeyName").val(key);
+			$("#ui_ls_txtKeySize").val(localStorage[key].length + " bytes");
+			$("#ui_ls_txtLocalStorageValue").text(localStorage[key]);
+		},
+
+		deleteLSKey: function() {
+			var key = $("#ui_ldb_selLocalStorage option:selected").text();
+			if (key == "") {
+				alertify.error("You need to select key from the list before deleting");
+				return;
+			}
+
+			// user clicked "ok"
+			localStorage.removeItem(key);
+			sb_dashboard.calcLocalStorageUsage();
+		}
+	}
+	
+	function sb_show_dashboard() {
+		$("#sb_trident_usage").dialog({ 
+			width: 1024,
+			title: 'Trident Sandbox Storage Summary',
+			open: function() {
+				if ($("#UI_TabsDashboard").tabs("option", "active") != 0) {
+					$("#UI_TabsDashboard").tabs("option", "active", 0);
+				}
+				else {
+				  sb_dashboard.calcSummaryUsage();
+				}
+			},
+			buttons : {
+				Ok : function() { 
+					$(this).dialog( "destroy" );
+				}, 
+				Cancel : function() {
+					$(this).dialog( "destroy" );
+				}
+			}
+		});
+	}
+	
 // END API/HELPER ROUTINES
 
 </script>
@@ -1945,8 +2354,9 @@ Pick a template to use for page generation : <input style='height:30px;width:180
 </div>
 </td>
 <td align='center'>
-<button style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
-<button id="btnBrowseSamples" onclick="sb_browse_samples()" style='height:40px; display:none' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
+<button id="ui_gen_sa" style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
+<button id="ui_show_dashboard" style='height:40px; display:none;' onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/> Storage Summary</button>
+<button id="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px; display:none' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
 </td>
 <td>
 <button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/> New</button>
@@ -1994,17 +2404,14 @@ Program Name :
 		<div id="ui_editor_toolbar" style="font-size:4px">
 		<button id="sb_btn_markup" style="height:28px" onclick="sb_toggle_markup()" title='Toggle between markup only and split view. (Alt+Q)'>Mkp</button> 
 		<button id="sb_btn_togglesplit" style="height:28px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'>Split</button> 
-		<button id="sb_btn_script" style="height:28px" onclick="sb_toggle_script()" title='Toggle between script only and split view. (Alt+W)'>Script</button>&nbsp;&nbsp;&nbsp;&nbsp;
-		<button id="sb_btn_markup_fs" style="height:28px" onclick="fsMarkup()" title='Zoom the Markup Editor fullscreen'>fS Mkp</button>
-		<button id="sb_btn_script_fs" style="height:28px" onclick="fsScript()" title='Zoom the Script Editor fullscreen'>fS Script</button> 
-		<button id="sb_btn_inpect" style="height:28px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'> Inspect</button>
-		&nbsp;&nbsp;&nbsp;&nbsp;
+		<button id="sb_btn_script" style="height:28px" onclick="sb_toggle_script()" title='Toggle between script only and split view. (Alt+W)'>Script</button>
+		<button id="sb_btn_fscode" style="height:28px" onclick="sb_fs_code()" title='Zoom the editors fullscreen'>FS Code</button>
+		<button id="sb_btn_inpect" style="height:28px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'>Inspect</button>
 		<div id='sb_div_ls_slots' style='display:none'>
-		<button style="height:28px"  title='Load from selected TridentDB save slot (1-9)' onclick='sb_load_slot()'>Load TDB</button>
-		<button style="height:28px"  title='Save to selected TridentDB save slot (1-9)' onclick='sb_save_slot()'>Save TDB</button>
-		<select style="height:22px"  id='sb_sel_local_slot'><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
-		<option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option><option>16</option><option>17</option><option>18</option><option>19</option><option>20</option>
-		</select>
+		<button style="height:28px" title='Load from selected TridentDB save slot (1-9)' onclick='sb_load_slot()'>LoadDB</button>
+		<button style="height:28px" title='Save to selected TridentDB save slot (1-9)' onclick='sb_save_slot()'>SaveDB</button>
+		<select style="height:28px; font-size: 12px;"  id='sb_sel_trident_slot'></select>
+		<button style="height:28px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
 		</div>
 		</div>
 	</td></tr>
@@ -2048,7 +2455,7 @@ Program Name :
 				<button id="sb_btn_restore_file_cancel" onclick="$('#sb_div_restorefile').hide()">Cancel</button>&nbsp;&nbsp;[Pick Restore File]
 			</div>
 			<div id='sb_div_LogPlaceholder' style='background-color:#555;'>
-				<textarea id="UI_TxtLogText" rows='30' style="font-family: Lucida Console; height:100; width:100%; background-color:#333; color:#ccc">You need to allow blocked content for Trident Sandbox to initialize.</textarea><br/>
+				<textarea id="UI_TxtLogText" spellcheck='false' rows='30' style="font-family: Lucida Console; height:100; width:100%; background-color:#333; color:#ccc">You need to allow blocked content for Trident Sandbox to initialize.</textarea><br/>
 				<input type='text' id='UI_TxtLogConsole' style="width:100%;height:30px; background-color:#333; color:#ccc" onKeyDown="{ if (event.keyCode==38) $('#UI_TxtLogConsole').val(sb_lastconsolecmd) }" onKeyPress="{ if (event.keyCode==13) sb_console_eval() }"/>
 			</div>
 		</div>
@@ -2056,6 +2463,118 @@ Program Name :
 </td>
 </tr>
 </table>
+</div>
+
+<div id='sb_trident_usage' style="display:none">
+	<div id="UI_TabsDashboard">
+		<ul>
+			<li><a href="#UI_Tab_Summary">Storage Summary</a></li>
+			<li><a href="#UI_Tab_LocalStorageUsage">LocalStorage Usage</a></li>
+			<li><a href="#UI_Tab_TridentDbUsage">TridentDB Usage</a></li>
+		</ul>
+		<div id="UI_Tab_Summary">
+			<table>
+				<tr>
+					<th>Local Storage</th>
+					<th>Trident DB (IndexedDb)</th>		
+				</tr>
+				<tr>
+					<td align='center'>
+						<span id='spn_LocalStorageUsage'></span>
+						<br/>
+						<div id="ui_gaugeLS" style="height:200px; width:300px;"></div>
+					</td>
+					<td align='center'>
+						<span id='spn_TridentDatabaseUsage'></span>
+						<br/>
+						<div id="ui_gaugeTDBspin"><i class="fa fa-spinner fa-spin"></i><br/><br/>Please wait a few seconds...</div>
+						<div id="ui_gaugeTDB" style="height:200px; width:300px;"></div>
+					</td>
+				</tr>
+			</table>
+			<ul>
+			<li>Limits of 20 MB for Local Storage and 120 MB for IndexedDB are based on tests using IE 11 on Windows 8.1 and RT 8.1</li>
+			<li>The TridentDb (IndexedDb) gauge assumes there are no other IndexedDb databases besides the TridentDB. </li>
+			<li>If AppCached you might need to subtract about 6 gigs from Local Storage limit.</li>
+			</ul>
+		</div>
+		<div id="UI_Tab_LocalStorageUsage">
+			<span id='ui_ldb_spnTotalSize'></span><br/>
+			<div id='ui_div_local_usage'>
+			<table>
+				<tr>
+					<td valign='top'>
+						<div id="ui_ldb_chartLocalUsage" style="height:300px; width:300px;"></div>
+					</td>
+					<td valign='top' style='padding-top:10px'>
+						<select id="ui_ldb_selLocalStorage" size=10 onchange="sb_dashboard.selectLSKey()"></select><br/>
+						<button style="height:40px; width:100px" onclick="sb_dashboard.deleteLSKey()">Delete</button>
+					</td>
+					<td valign='top' style='padding-top:10px'>
+						<div style="background-color:#f0f0f0; padding: 15px">
+						<table>
+						<tr>
+							<td>Key<br/>
+								<input type='text' id='ui_ls_txtKeyName' style='width:220px'/>
+							</td>
+						</tr>
+						<tr>
+							<td>Size<br/>
+								<input type='text' id='ui_ls_txtKeySize' style='width:220px'/>
+							</td>
+						</tr>
+						<tr>
+							<td>Value<br/>
+								<textarea rows='6' cols='65' id='ui_ls_txtLocalStorageValue'></textarea>
+							</td>
+						</tr>
+						</table>
+						</div>
+					</td>
+				</tr>
+			</table>
+			</div>
+		</div>
+		<div id="UI_Tab_TridentDbUsage">
+			Total Size : <span id='ui_tdb_spnTotalSize'></span><div style="display:inline" id="ui_chartTDBspin" ><i class="fa fa-spinner fa-spin"></i>&nbsp;Please wait a few seconds...</div><br/>
+			<div id='ui_div_trident_usage'>
+			<table width='620px'>
+			<tr>
+				<td valign='top' align='center'>
+					<div id="ui_tdb_chartTridentUsage" style="height:300px; width:300px;"></div>
+				</td>
+				<td valign='top' style='padding-top:10px'>
+					<select id="ui_tdb_selTridentDB" size=11 onchange="sb_dashboard.selTdbChanged()"></select><br/>
+					<button style="height:40px;" onclick="sb_dashboard.deleteTridentKey()">Delete</button>
+					<button style="height:40px;" onclick="sb_dashboard.renameTridentKey()">Rename</button>
+					<button id="ui_tdb_download" style="height:40px; display:none;" onclick="sb_dashboard.downloadTridentFile()">Download</button>
+				</td>
+				<td valign='top' style='padding-top:10px'>
+					<div style='background-color:#f0f0f0; padding: 15px'>
+					<table>
+					<tr>
+						<td>App<br/>
+							<input type='text' id='ui_tdb_txtAppName' style='width:220px'/>
+						</td>
+					</tr>
+					<tr>
+						<td>Key<br/>
+							<input type='text' id='ui_tdb_txtKeyName' style='width:220px'/>
+						</td>
+					</tr>
+					<tr>
+						<td>Size<br/>
+							<input type='text' id='ui_tdb_txtKeySize' style='width:220px'/>
+						</td>
+					</tr>
+					</table>
+					</div>
+				</td>
+			</tr>
+			</table>
+			</div>
+		</div>
+	</div>
 </div>
 </body>
 </html>

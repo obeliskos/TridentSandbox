@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 177
+#rev 180
 
 CACHE:
 TridentSandbox.htm
@@ -46,6 +46,7 @@ libraries/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js
 libraries/jqplot/plugins/jqplot.dateAxisRenderer.min.js
 libraries/jqplot/plugins/jqplot.json2.min.js
 libraries/jqplot/plugins/jqplot.meterGaugeRenderer.min.js
+libraries/jqplot/plugins/jqplot.highlighter.min.js
 libraries/loki-js/lokijs.js
 libraries/codemirror-4.0/lib/codemirror.js
 libraries/codemirror-4.0/mode/xml/xml.js
