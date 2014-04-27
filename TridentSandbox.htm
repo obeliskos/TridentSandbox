@@ -838,6 +838,8 @@ img.TridentImageButton:hover
 				dataType: "json",
 
 				success: function (response) {
+					API_SetWindowMode(3);
+					
 					var sandboxObject = response;
 		
 					$("#sb_txt_ProgramName").val(sandboxObject.progName);
@@ -1004,7 +1006,7 @@ img.TridentImageButton:hover
 	function sb_clean_sandbox()	{
 		// clear source code
 		var markupText = "<h3>My Sandbox Program</h3>\r\n";
-		var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n}\r\n\r\nfunction EVT_CleanSandbox()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n}";
+		var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n}\r\n\r\nfunction EVT_CleanSandbox()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n}\r\n";
 
 		editorMarkup.setValue(markupText);
 		editorScript.setValue(scriptText);
@@ -1095,7 +1097,7 @@ img.TridentImageButton:hover
 	}
 	
 	function sb_fit_log() {
-		var used = 126;
+		var used = 80;
 		var isCaptionVisible = $("#sb_div_caption").is(":visible");
 		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
 		var isDevbarVisible = true;
@@ -1113,6 +1115,9 @@ img.TridentImageButton:hover
 				if (element.id == "divCode") isDevbarVisible = false;
 			}
 		}
+		
+		// subtract height of tab strip itself (low width might wrap tabs)
+		used += $("#UI_TabsOutput").find(".ui-tabs-nav").height();
 		
 		if (isCaptionVisible||isLoaderVisible||isDevbarVisible) {
 			if (isCaptionVisible) used += ($("#sb_div_caption").height());
@@ -2509,7 +2514,7 @@ Program Name :
 			<li><a href="#UI_Tab_Html">Log (HTML)</a></li>
 			<li><a href="#UI_Tab_Text">Log (Text)</a></li>
 		</ul>
-		<div id="UI_Tab_Main">
+		<div id="UI_Tab_Main" style="overflow: auto;">
 			<div id='sb_div_userfile' style="display:none">
 				<input style='height:30px;width:400px;' id='sb_user_file' type="file" name="userfileloader" onchange="sb_user_load()" />
 				<button id="sb_btn_user_file_cancel" onclick="$('#sb_div_userfile').hide()">Cancel</button>&nbsp;&nbsp;[Text]
@@ -2521,7 +2526,7 @@ Program Name :
 			<div id='UI_LibUnitPlaceholder' style="display:none"></div>
 			<div id='UI_MainPlaceholder' style='background-color:white'><br/><br/></div>
 		</div>
-		<div id="UI_Tab_Html">
+		<div id="UI_Tab_Html" style="overflow: auto;">
 			<div id='UI_HtmlLogPlaceholder' style='background-color:white'><br/><br/></div>
 		</div>
 		<div id="UI_Tab_Text" style="background-color:#555">
