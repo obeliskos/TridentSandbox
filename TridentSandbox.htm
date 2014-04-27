@@ -358,7 +358,7 @@ img.TridentImageButton:hover
 		// if served up from anywhere other than filesystem ... show
 		// if served up from filesystem and localStorage is available... show 
 		// Mozilla supports ajax calls under filesystem
-		if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB || applicationCache) {
+		if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB) {
 			$(".ui_browse_samples").show();
 			$(".ui_show_dashboard").show();
 			$(".ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
