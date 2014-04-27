@@ -1085,45 +1085,58 @@ img.TridentImageButton:hover
 	}
 	
 	function sb_fit_log() {
-		var used = 170;
+		var used = 126;
 		var isCaptionVisible = $("#sb_div_caption").is(":visible");
 		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
-		var isfullscreen = (!window.screenTop && !window.screenY);
+		var isDevbarVisible = true;
 		
-		if (isfullscreen) {
-			if (document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement) {
-				isCaptionVisible = false;
-				isLoaderVisible = false;
-			}
-		}
-		
-		if ((isCaptionVisible||isLoaderVisible)) {
-			if (isCaptionVisible) used += ($("#sb_div_caption").height()) + 5;
-			if (isLoaderVisible) used += ($("#sb_div_mainloader").height()) + 5;
-		}
-		
-		$("#UI_TxtLogText").height($(window).height() - used);
-	}
-	
-	function sb_fit_editors() {
-		var used = 15 + $("#ui_editor_toolbar").height() + $("#sb_div_devtoolbar").height();
-		var isCaptionVisible = $("#sb_div_caption").is(":visible");
-		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
 		var isfullscreen = (!window.screenTop && !window.screenY);
 		
 		// fix for metro ie fullscreen or f11 desktop ie fullscreen; if the fullscreen element is not null
 		// then we are in dev fullscreen and caption and loader should not be
 		// calculated even if they are visible (yet outside fullscreen element)
 		if (isfullscreen) {
-			if (document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement) {
+			var element = document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement;
+			if (element) {
 				isCaptionVisible = false;
 				isLoaderVisible = false;
+				if (element.id == "divCode") isDevbarVisible = false;
 			}
 		}
 		
-		if (isCaptionVisible||isLoaderVisible) {
+		if (isCaptionVisible||isLoaderVisible||isDevbarVisible) {
 			if (isCaptionVisible) used += ($("#sb_div_caption").height());
-			if (isLoaderVisible) used += ($("#sb_div_mainloader").height()) + 4;
+			if (isLoaderVisible) used += ($("#sb_div_mainloader").height() + 4);
+			if (isDevbarVisible) used += ($("#sb_div_devtoolbar").height()) + 4;
+		}
+		
+		$("#UI_TxtLogText").height($(window).height() - used);
+	}
+	
+	function sb_fit_editors() {
+		var used = $("#ui_editor_toolbar").height() + 12;
+		var isCaptionVisible = $("#sb_div_caption").is(":visible");
+		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
+		var isDevbarVisible = true;
+		
+		var isfullscreen = (!window.screenTop && !window.screenY);
+		
+		// fix for metro ie fullscreen or f11 desktop ie fullscreen; if the fullscreen element is not null
+		// then we are in dev fullscreen and caption and loader should not be
+		// calculated even if they are visible (yet outside fullscreen element)
+		if (isfullscreen) {
+			var element = document.fullscreenElement || document.msFullscreenElement || document.mozFullScreenElement;
+			if (element) {
+				isCaptionVisible = false;
+				isLoaderVisible = false;
+				if (element.id == "divCode") isDevbarVisible = false;
+			}
+		}
+		
+		if (isCaptionVisible||isLoaderVisible||isDevbarVisible) {
+			if (isCaptionVisible) used += ($("#sb_div_caption").height());
+			if (isLoaderVisible) used += ($("#sb_div_mainloader").height() + 4);
+			if (isDevbarVisible) used += ($("#sb_div_devtoolbar").height()) + 4;
 		}
 		
 		switch (editorMode) {
