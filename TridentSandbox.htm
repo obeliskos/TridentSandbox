@@ -354,22 +354,28 @@ img.TridentImageButton:hover
 		sb_fit_log();
 		sb_fit_editors();
 		
+		// ugly but lenient feature detection for Displaying Browse Samples button
+		// if served up from anywhere other than filesystem ... show
+		// if served up from filesystem and localStorage is available... show 
+		// Mozilla supports ajax calls under filesystem
+		if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB || applicationCache) {
+			$(".ui_browse_samples").show();
+			$(".ui_show_dashboard").show();
+			$(".ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
+		}
+		else {
+			$("#sb_div_diagnostic").hide();
+		}
+		
+		if (localStorage) {
+			$("#sb_spn_localstorage_status").text("Yes");
+			$("#ui_show_dashboard").show();
+		}
+		
 		$(window).resize(function() {
 			sb_fit_log();
 			sb_fit_editors();
 		});
-		
-		// Register Event Handler to warn if leaving page
-		window.onbeforeunload = function(e) {
-			// Get Hash of current editor contents to compare with last 'load' or 'new
-			// If they are different (user made changes) then warm them when they are leaving the page.  
-			var htmlHash = CryptoJS.SHA1(editorMarkup.getValue()).toString();
-			var scriptHash = CryptoJS.SHA1(editorScript.getValue()).toString();
-			
-			if (htmlHash != sb_markup_hash || scriptHash != sb_script_hash) {
-				return 'You have unsaved changes, are you sure you want to leave this page?';
-			}
-		};
 		
 		// Check for indexed db support and set up new TridentSandbox DB with simple app/key/value Object Store (Table) for internal and api use
 		// For good tutorial on indexedDB, see http://code.tutsplus.com/tutorials/working-with-indexeddb--net-34673
@@ -442,21 +448,9 @@ img.TridentImageButton:hover
 			
 		}
 		
-		if (localStorage || indexedDB) {
-			$("#sb_spn_localstorage_status").text("Yes");
-			$("#ui_show_dashboard").show();
-			$("#ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
-			
-			VAR_TRIDENT_HOSTED = true;
-		}
-		else {
-			$("#sb_div_diagnostic").hide();
-		}
-		
 		// If served up from a website then we should bother to monitor possible appcache events
 		// for diagnostics.  If not appcaching the events will just not fire.
 		if (document.URL.indexOf("file://") == -1) {
-			$("#ui_browse_samples").show();
 
 			// Determine if we are connecting or running from an appcache site
 			var appCache = window.applicationCache;
@@ -470,6 +464,22 @@ img.TridentImageButton:hover
 					appCache.addEventListener('cached', logACEvent, false);
 			}
 		}
+		else {
+			VAR_TRIDENT_HOSTED = true;
+		}
+		
+		// Register Event Handler to warn if leaving page
+		window.onbeforeunload = function(e) {
+			// Get Hash of current editor contents to compare with last 'load' or 'new
+			// If they are different (user made changes) then warm them when they are leaving the page.  
+			var htmlHash = CryptoJS.SHA1(editorMarkup.getValue()).toString();
+			var scriptHash = CryptoJS.SHA1(editorScript.getValue()).toString();
+			
+			if (htmlHash != sb_markup_hash || scriptHash != sb_script_hash) {
+				return 'You have unsaved changes, are you sure you want to leave this page?';
+			}
+		};
+		
 	});
 	
 	function progressAC(e)
@@ -1114,6 +1124,15 @@ img.TridentImageButton:hover
 	}
 	
 	function sb_fit_editors() {
+		if ($(window).width() < 1100) {
+			$(".divWideButtons").hide(); 
+			$(".divTinyButtons").show(); 
+		}
+		else {
+			$(".divWideButtons").show(); 
+			$(".divTinyButtons").hide(); 
+		}
+		
 		var used = $("#ui_editor_toolbar").height() + 12;
 		var isCaptionVisible = $("#sb_div_caption").is(":visible");
 		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
@@ -2016,7 +2035,7 @@ function API_Restore_TridentDB() {
 						totalSizeLS += keySize;
 					}
 					
-					$("#spn_LocalStorageUsage").text(totalSizeLS + " bytes.");
+					$("#spn_LocalStorageUsage").text(totalSizeLS + " bytes (" + Math.round((totalSizeLS/1024)/1024 *100)/100 + "MB)");
 					
 					var s1 = [(totalSizeLS/1024)/1024];
 
@@ -2027,8 +2046,8 @@ function API_Restore_TridentDB() {
 								label: '(Actual) Usage in MB',
 								labelPosition: 'bottom',
 								min: 0,
-								max: 20,
-								intervals:[5, 10, 15, 20],
+								max: 5,
+								intervals:[1.25, 2.5, 3.5, 5],
 								intervalColors:['#66cc66', '#93b75f', '#E7E658', '#cc6666']
 							}
 						}
@@ -2038,7 +2057,7 @@ function API_Restore_TridentDB() {
 					
 					$("#ui_gaugeTDBspin").hide();
 					
-					$("#spn_TridentDatabaseUsage").text(totalSizeTDB + " bytes.");
+					$("#spn_TridentDatabaseUsage").text(totalSizeTDB + " bytes (" + Math.round((totalSizeTDB/1024)/1024 *100)/100 + "MB)");
 					
 					var s2 = [(totalSizeTDB/1024)/1024];
 
@@ -2107,7 +2126,7 @@ function API_Restore_TridentDB() {
 					if (totalSize == 0) $("#ui_div_trident_usage").hide();
 					else $("#ui_div_trident_usage").show();
 				
-					$("#ui_tdb_spnTotalSize").text(totalSize + " (" + Math.round((totalSize/1024)/1024 *100)/100 + "MB)");				
+					$("#ui_tdb_spnTotalSize").text(totalSize + " bytes (" + Math.round((totalSize/1024)/1024 *100)/100 + "MB)");				
 					
 					$("#ui_chartTDBspin").hide();
 					
@@ -2217,7 +2236,7 @@ function API_Restore_TridentDB() {
 			if (totalSize == 0) $("#ui_div_local_usage").hide();
 			else $("#ui_div_local_usage").show();
 			
-			$("#ui_ldb_spnTotalSize").text("Total Size of Local Storage : " + totalSize);
+			$("#ui_ldb_spnTotalSize").text("Total Size of Local Storage : " + totalSize + " bytes (" + Math.round((totalSize/1024)/1024 *100)/100 + "MB)");
 
 			// now (re) plot the data we just accumulated
 			sb_dashboard.lsplot = jQuery.jqplot ('ui_ldb_chartLocalUsage', [arrayLS], 
@@ -2265,8 +2284,12 @@ function API_Restore_TridentDB() {
 	}
 	
 	function sb_show_dashboard() {
+		var dlgWidth = 1024;
+		
+		if ($(window).width() < 1044) dlgWidth = $(window).width() - 20;
+		
 		$("#sb_trident_usage").dialog({ 
-			width: 1024,
+			width: dlgWidth,
 			title: 'Trident Sandbox Storage Summary',
 			open: function() {
 				if ($("#UI_TabsDashboard").tabs("option", "active") != 0) {
@@ -2301,15 +2324,29 @@ function API_Restore_TridentDB() {
 			<div style="float:left; padding:0px;" id="sb_div_diagnostic">
 				<table style="border:1px solid; background-color:#ccc;">
 					<tr>
-						<td>Local Storage : <span id="sb_spn_localstorage_status">N/A</span></td>
+						<td>
+						<div class="divWideButtons" style="display:inline">Local Storage : </div>
+						<div class="divTinyButtons" style="display:inline">LS : </div>
+						<span id="sb_spn_localstorage_status">N/A</span></td>
 					</tr>
-					<tr><td>Indexed Db : <span id="sb_spn_indexeddb_status">N/A</span></td></tr>
-					<tr><td>AppCache : <span id="sb_spn_appcache_status">N/A</span>&nbsp;<span id="sb_spn_appcache_progress"></span></td></tr>
+					<tr><td>
+						<div class="divWideButtons" style="display:inline">Indexed Db :</div>
+						<div class="divTinyButtons" style="display:inline">IDB : </div>
+						<span id="sb_spn_indexeddb_status">N/A</span></td></tr>
+					<tr><td>
+						<div class="divWideButtons" style="display:inline">AppCache :</div>
+						<div class="divTinyButtons" style="display:inline">AC : </div>
+						<span id="sb_spn_appcache_status">N/A</span>&nbsp;<span id="sb_spn_appcache_progress"></span></td></tr>
 				</table>
 			</div>
 		</td>
 		<td>
+			<div class="divWideButtons" style="display:inline">
 			<h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An Internet Explorer 10/11 development sandbox' onclick="sb_toggle_header_font()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : Internet Explorer 10/11 dev sandbox</h1>
+			</div>
+			<div class="divTinyButtons" style="display:inline">
+			<h2 id='sb_header_caption2' title='Trident Sandbox : An Internet Explorer 10/11 development sandbox' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : IE 10/11 dev sandbox</h1>
+			</div>
 		</td>
 		<td>
 			<div><a class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-family:'heorot'" href="docs/Welcome.htm" target="_blank">HELP</a></div>
@@ -2325,7 +2362,7 @@ function API_Restore_TridentDB() {
 <td style="align:'right'">
 Load Filename : 
 <input style='height:30px;width:200px;' id='sb_file' type="file" name="fileloader" onchange="sb_load()" />&nbsp;
-Theme: <select onchange="selectTheme()" id='selTheme' style='font-size:20px;'>
+Theme: <select onchange="selectTheme()" id='selTheme' style='font-size:18px;'>
     <option selected>default</option>
     <option>3024-day</option>
     <option>3024-night</option>
@@ -2367,18 +2404,30 @@ Pick a template to use for page generation : <input style='height:30px;width:180
 </div>
 </td>
 <td align='center'>
-<button id="ui_gen_sa" style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
-<button id="ui_show_dashboard" style='height:40px; display:none;' onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/> Storage Summary</button>
-<button id="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px; display:none' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
+<div class="divWideButtons" style="display:inline">
+<button id="ui_gen_sa" class="ui_gen_sa" style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
+<button id="ui_show_dashboard" class="ui_show_dashboard" style='height:40px; display:none;' onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/> Storage Summary</button>
+<button id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px; display:none' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
+</div>
+<div class="divTinyButtons" style="display:inline">
+<button id="ui_gen_sa2" class="ui_gen_sa" style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/></button>
+<button id="ui_show_dashboard2" class="ui_show_dashboard" style='height:40px; display:none;' onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/></button>
+<button id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px; display:none' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/></button>
+</div>
 </td>
 <td>
+<div class="divWideButtons" style="display:inline">
 <button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/> New</button>
+</div>
+<div class="divTinyButtons" style="display:inline">
+<button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/></button>
+</div>
 </td>
 </tr>
 </table>
 </div>
 
-<div style="background-color:#1F7DD0; font-family:Tahoma; " id="sb_div_metalFullscreen">
+<div style="background-color:#1F7DD0; font-family:Tahoma;" id="sb_div_metalFullscreen">
 <div id="sb_div_devtoolbar" style="background-color:#ccc; border-style:solid; border-width:0px; padding: 1px">
 <table width='100%'>
 <tr>
@@ -2387,13 +2436,26 @@ Program Name :
 <input style='height:24px; width:200px; ' id='sb_txt_ProgramName' type='text' placeholder="Enter program name here" value=''/>
 </td>
 <td>
+<div class="divWideButtons" style="display:inline">
 <button id="ui_btn_run" style='height:40px; width:80px' onclick="sb_run()" title="Run your Program (Alt+R)"><img src='images_ide/run16.png'/> Run</button>
 <button style='height:40px;' onclick="sb_save()" title="Save your program (Alt+S)"><img src='images_ide/disk.png'/> Save</button>
+</div>
+<div class="divTinyButtons" style="display:inline">
+<button id="ui_btn_run" style='height:40px;' onclick="sb_run()" title="Run your Program (Alt+R)"><img src='images_ide/run16.png'/></button>
+<button style='height:40px;' onclick="sb_save()" title="Save your program (Alt+S)"><img src='images_ide/disk.png'/></button>
+</div>
 </td>
 <td>
+<div class="divWideButtons" style="display:inline">
 <button style='height:40px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><img src='images_ide/new16.png'/> CLR</button>
 <button style='height:40px;' title="Fullscreen the Dev area" onclick="API_MetalFullscreen()"><img src='images_ide/zoom_in.png'/> Dev FS</button>
 <button style='height:40px;' title="Exit Fullscreen" onclick="API_UserFullscreenExit()"><img src='images_ide/zoom_out.png'/> Exit FS</button>
+</div>
+<div class="divTinyButtons" style="display:none">
+<button style='height:40px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><img src='images_ide/new16.png'/></button>
+<button style='height:40px;' title="Fullscreen the Dev area" onclick="API_MetalFullscreen()"><img src='images_ide/zoom_in.png'/></button>
+<button style='height:40px;' title="Exit Fullscreen" onclick="API_UserFullscreenExit()"><img src='images_ide/zoom_out.png'/></button>
+</div>
 </td>
 <td>
 	<div id="sb_radioset">
@@ -2423,7 +2485,7 @@ Program Name :
 		<div id='sb_div_ls_slots' style='display:none'>
 		<button style="height:28px" title='Load from selected TridentDB save slot (1-9)' onclick='sb_load_slot()'>LoadDB</button>
 		<button style="height:28px" title='Save to selected TridentDB save slot (1-9)' onclick='sb_save_slot()'>SaveDB</button>
-		<select style="height:28px; font-size: 12px;"  id='sb_sel_trident_slot'></select>
+		<select style="height:24px; font-size: 12px;" id='sb_sel_trident_slot'></select>
 		<button style="height:28px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
 		</div>
 		</div>
@@ -2485,7 +2547,7 @@ Program Name :
 			<li><a href="#UI_Tab_LocalStorageUsage">LocalStorage Usage</a></li>
 			<li><a href="#UI_Tab_TridentDbUsage">TridentDB Usage</a></li>
 		</ul>
-		<div id="UI_Tab_Summary">
+		<div id="UI_Tab_Summary" style="overflow: auto;">
 			<table>
 				<tr>
 					<th>Local Storage</th>
@@ -2500,18 +2562,18 @@ Program Name :
 					<td align='center'>
 						<span id='spn_TridentDatabaseUsage'></span>
 						<br/>
-						<div id="ui_gaugeTDBspin"><i class="fa fa-spinner fa-spin"></i><br/><br/>Please wait a few seconds...</div>
+						<div id="ui_gaugeTDBspin"><i class="fa fa-spinner fa-spin"></i><br/><br/>Please wait...</div>
 						<div id="ui_gaugeTDB" style="height:200px; width:300px;"></div>
 					</td>
 				</tr>
 			</table>
 			<ul>
-			<li>Limits of 20 MB for Local Storage and 120 MB for IndexedDB are based on tests using IE 11 on Windows 8.1 and RT 8.1</li>
+			<li>Limits of 5 MB for Local Storage and 120 MB for IndexedDB are based on tests using IE 11 on Windows 8.1 and RT 8.1</li>
 			<li>The TridentDb (IndexedDb) gauge assumes there are no other IndexedDb databases besides the TridentDB. </li>
-			<li>If AppCached you might need to subtract about 6 gigs from Local Storage limit.</li>
+			<li>Sizes reported by Internet Options/General/Settings/Caches and Databases are double due to Unicode encoding</li>
 			</ul>
 		</div>
-		<div id="UI_Tab_LocalStorageUsage">
+		<div id="UI_Tab_LocalStorageUsage" style="overflow: auto;">
 			<span id='ui_ldb_spnTotalSize'></span><br/>
 			<div id='ui_div_local_usage'>
 			<table>
@@ -2548,8 +2610,8 @@ Program Name :
 			</table>
 			</div>
 		</div>
-		<div id="UI_Tab_TridentDbUsage">
-			Total Size : <span id='ui_tdb_spnTotalSize'></span><div style="display:inline" id="ui_chartTDBspin" ><i class="fa fa-spinner fa-spin"></i>&nbsp;Please wait a few seconds...</div><br/>
+		<div id="UI_Tab_TridentDbUsage" style="overflow: auto;">
+			Total Size : <span id='ui_tdb_spnTotalSize'></span><div style="display:inline" id="ui_chartTDBspin" ><i class="fa fa-spinner fa-spin"></i>&nbsp;Please wait...</div><br/>
 			<div id='ui_div_trident_usage'>
 			<table width='620px'>
 			<tr>
