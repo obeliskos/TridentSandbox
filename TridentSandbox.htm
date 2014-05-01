@@ -86,6 +86,7 @@ available for use by the sandbox app, add them here.
 <script src="libraries/textillate/jquery.textillate.js"></script>
 <script src="libraries/filesaver/FileSaver.js"></script>
 <script src="libraries/tinymce/tinymce.min.js"></script>
+<script src="libraries/indexed.js"></script>
 <link rel="stylesheet" href="libraries/tinymce/skins/lightgray/skin.min.css">
 <link rel="stylesheet" href="libraries/textillate/animate.css">
 <link rel="stylesheet" href="libraries/MetroJs.Full.0.9.74/MetroJs.css">
@@ -160,56 +161,6 @@ img.TridentImageButton:hover
 {
 	style.opacity:0.6;
 }
-
-#sddm
-{	margin: 0;
-	padding: 0;
-	z-index: 30}
-
-#sddm li
-{	margin: 0;
-	padding: 0;
-	list-style: none;
-	float: left;
-	font: bold 11px arial}
-
-#sddm li a
-{	display: block;
-	margin: 0 1px 0 0;
-	padding: 4px 10px;
-	width: 60px;
-	background: #5970B2;
-	color: #FFF;
-	text-align: center;
-	text-decoration: none}
-
-#sddm li a:hover
-{	background: #49A3FF}
-
-#sddm div
-{	position: absolute;
-	visibility: hidden;
-	margin: 0;
-	padding: 0;
-	background: #EAEBD8;
-	border: 1px solid #5970B2}
-
-	#sddm div a
-	{	position: relative;
-		display: block;
-		margin: 0;
-		padding: 5px 10px;
-		width: auto;
-		white-space: nowrap;
-		text-align: left;
-		text-decoration: none;
-		background: #EAEBD8;
-		color: #2875DE;
-		font: 11px arial}
-
-	#sddm div a:hover
-	{	background: #49A3FF;
-		color: #FFF}
 		
 </style>
 
@@ -233,7 +184,8 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.81;
+	var VAR_WindowMode = 2;
+	var VAR_TRIDENT_VERSION = 1.82;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -245,6 +197,12 @@ img.TridentImageButton:hover
 	var sb_script_hash = null;
 	
 	$(document).ready(function() {
+		// I dont want to allow this to run in an iframe
+		if(location.href != top.location.href) {
+			document.body.innerHTML = "Trident Sandbox does not run in an IFRAME";
+			return;
+		}
+		
 		alertify.set({ buttonReverse: true });
 		$("#UI_TabsOutput").tabs();
 		$("#UI_TabsDashboard").tabs();
@@ -280,7 +238,24 @@ img.TridentImageButton:hover
 		API_ClearLog();
 		
 		document.title = "Trident Sandbox v" + VAR_TRIDENT_VERSION;
-		$("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + VAR_TRIDENT_VERSION + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\n-->");
+		$("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + VAR_TRIDENT_VERSION + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\n-->");
+		
+		// ugly but lenient feature detection for Displaying Browse Samples button
+		// if served up from anywhere other than filesystem ... show
+		// if served up from filesystem and localStorage is available... show 
+		// Mozilla supports ajax calls under filesystem
+		if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB) {
+			$(".ui_browse_samples").show();
+			$(".ui_show_dashboard").show();
+			$(".ui_btn_launch").show();
+			$(".ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
+			shortcut.add("Alt+L", function() { sb_launch(); } );
+		}
+		else {
+			$("#sb_div_diagnostic").hide();
+		}
+
+		$("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + VAR_TRIDENT_VERSION + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\n-->");
 
 		// We are keeping track of whether the user has pending changes via a Crypto.JS hash on the markup and script
 		// This will now calculate the initial value based on our Welcome text above
@@ -290,6 +265,8 @@ img.TridentImageButton:hover
 		// CHANGE THEME name Here look at the stylesheets above to get the name
 		var themeName = "twilight";
 
+		// We are using xml mode for markup so that if we add style tag it wont mess up rendering
+		// hopefully in the future we can implement mixed rendering or add separate css
 		editorMarkup = CodeMirror.fromTextArea(document.getElementById("sb_txt_Markup"), {
 			smartIndent: false,
 			lineNumbers: true,
@@ -353,19 +330,6 @@ img.TridentImageButton:hover
 		
 		sb_fit_log();
 		sb_fit_editors();
-		
-		// ugly but lenient feature detection for Displaying Browse Samples button
-		// if served up from anywhere other than filesystem ... show
-		// if served up from filesystem and localStorage is available... show 
-		// Mozilla supports ajax calls under filesystem
-		if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB) {
-			$(".ui_browse_samples").show();
-			$(".ui_show_dashboard").show();
-			$(".ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
-		}
-		else {
-			$("#sb_div_diagnostic").hide();
-		}
 		
 		if (localStorage) {
 			$("#sb_spn_localstorage_status").text("Yes");
@@ -451,6 +415,7 @@ img.TridentImageButton:hover
 		// If served up from a website then we should bother to monitor possible appcache events
 		// for diagnostics.  If not appcaching the events will just not fire.
 		if (document.URL.indexOf("file://") == -1) {
+			VAR_TRIDENT_HOSTED = true;
 
 			// Determine if we are connecting or running from an appcache site
 			var appCache = window.applicationCache;
@@ -463,9 +428,6 @@ img.TridentImageButton:hover
 					appCache.addEventListener('updateready', logACEvent, false);
 					appCache.addEventListener('cached', logACEvent, false);
 			}
-		}
-		else {
-			VAR_TRIDENT_HOSTED = true;
 		}
 		
 		// Register Event Handler to warn if leaving page
@@ -486,8 +448,8 @@ img.TridentImageButton:hover
 	{
 		sb_appcache_progress++;
 		
-		// hardcoding 265 total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/265) + "%)");
+		// hardcoding 275 total # files
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/275) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -518,7 +480,7 @@ img.TridentImageButton:hover
 				switch ( oAppCache.status ) 
 				{
 					case oAppCache.UNCACHED : sCacheStatus = "Not cached"; break;
-					case oAppCache.IDLE : sCacheStatus = "Idle"; $("#sb_spn_appcache_status").text(""); break;
+					case oAppCache.IDLE : sCacheStatus = "Idle"; $("#sb_spn_appcache_progress").text(""); sb_fit_editors(); break;
 					case oAppCache.CHECKING : sCacheStatus = "Checking"; break;
 					case oAppCache.DOWNLOADING : sCacheStatus = "Downloading"; break; 
 					case oAppCache.UPDATEREADY : sCacheStatus = "Update ready"; break;
@@ -546,48 +508,6 @@ img.TridentImageButton:hover
             }
 		});
 	}
-
-// Simple Drop Down Menu support for programs to use
-// Copyright 2006-2007 javascript-array.com
-
-	var sb_menu_timeout	= 500;
-	var sb_menu_closetimer	= 0;
-	var sb_menu_ddmenuitem	= 0;
-
-	// open hidden layer
-	function sb_mopen(id) {	
-		// cancel close timer
-		sb_mcancelclosetime();
-
-		// close old layer
-		if(sb_menu_ddmenuitem) sb_menu_ddmenuitem.style.visibility = 'hidden';
-
-		// get new layer and show it
-		sb_menu_ddmenuitem = document.getElementById(id);
-		sb_menu_ddmenuitem.style.visibility = 'visible';
-
-	}
-	// close showed layer
-	function sb_mclose() {
-		if(sb_menu_ddmenuitem) sb_menu_ddmenuitem.style.visibility = 'hidden';
-	}
-
-	// go close timer
-	function sb_mclosetime() {
-		sb_menu_closetimer = window.setTimeout(sb_mclose, sb_menu_timeout);
-	}
-
-	// cancel close timer
-	function sb_mcancelclosetime() {
-		if(sb_menu_closetimer)
-		{
-			window.clearTimeout(sb_menu_closetimer);
-			sb_menu_closetimer = null;
-		}
-	}
-
-	// close layer when click-out
-	document.onclick = sb_mclose; 
 
 // SANDBOX I/O ROUTINES  
 	function sb_loaded(evt) {
@@ -838,8 +758,6 @@ img.TridentImageButton:hover
 				dataType: "json",
 
 				success: function (response) {
-					API_SetWindowMode(3);
-					
 					var sandboxObject = response;
 		
 					$("#sb_txt_ProgramName").val(sandboxObject.progName);
@@ -852,11 +770,15 @@ img.TridentImageButton:hover
 
 					// IE's HTML 5 file control seems to place a lock on the last loaded file which
 					// was interfering with the saving and overwriting of that same file.
-					// So i will reset it by destroying and recreating, allowing the GC to release
+					// So I will reset it by destroying and recreating, allowing the GC to release
 					// any old file locks.
 					var control = $("#sb_file");
 					control.replaceWith( control = control.clone( true ) );
                 
+					// if editors dont reflect current source when we change back to a source visible window mode 
+					// then we may need to setTimeout on the following two lines to give editors a chance to update display 
+					API_SetWindowMode(3);
+					
 					sb_run();
 				},
 				error: function (xhr, ajaxOptions, thrownError) {
@@ -887,6 +809,9 @@ img.TridentImageButton:hover
 				cursor.continue();
 			}
 			else {
+				// in case editor toolbar wrapped or flattened due to wider/thinner save slot select
+				sb_fit_editors(); 
+
 				if (callback) callback();
 			}
 		});
@@ -919,7 +844,7 @@ img.TridentImageButton:hover
 	
 	// If local storage is available (Hosted or AppCache)
 	// then this will let you load a program from a save slot
-	function sb_save_slot() { 
+	function sb_save_slot(callback) { 
 		var selText = $("#sb_sel_trident_slot").find(":selected").text();
 
 		var progNameString = $("#sb_txt_ProgramName").val();
@@ -938,7 +863,12 @@ img.TridentImageButton:hover
 				if (e) {
 					try {
 						API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
-						sb_refresh_slots();
+						sb_refresh_slots(function() {
+							// now that list is refreshed, make sure our (new?) program is selected
+							$("#sb_sel_trident_slot").val(progNameString)
+						});
+						
+						if (callback) callback();
 					}
 					catch(e) {
 						alertify.alert("Error encountered during save to TridentDB : " + e.message);
@@ -948,6 +878,8 @@ img.TridentImageButton:hover
 		}
 		else {
 			API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
+						
+			if (callback) callback();
 		}
 	}
 	
@@ -999,6 +931,11 @@ img.TridentImageButton:hover
 		else {
 			$('#sb_header_caption').css("font-family", "Heorot");
 		}
+	}
+	
+	function sb_new_program() {
+		if (VAR_WindowMode == 3) API_SetWindowMode(2);
+		sb_clean_sandbox();
 	}
 	
 	// Clear Environment  
@@ -1072,6 +1009,32 @@ img.TridentImageButton:hover
 				document.getElementById("UI_MainPlaceholder").appendChild(s);
 			}, 150);
 		}, 250);
+	}
+	
+	function sb_launch() {
+		var progName = $("#sb_txt_ProgramName").val();
+		if (progName == "") {
+			alertify.log("Load a program or give this one a program name"); 
+			return;
+		}
+		
+		var htmlHash = CryptoJS.SHA1(editorMarkup.getValue()).toString();
+		var scriptHash = CryptoJS.SHA1(editorScript.getValue()).toString();
+
+		var selSlot = $("#sb_sel_trident_slot").find(":selected").text();
+		
+		// if no pending changes have been made to the editors then skip save
+		if (progName == selSlot && htmlHash == sb_markup_hash && scriptHash == sb_script_hash) {
+			// ideally we would target progName instead of _blank to reuse existing window
+			// but due to hash params they dont refresh correctly and need full reload
+			// if you need to side by side dev you will just save in ide and manually refresh sandbox loader page
+			window.open('SandboxLoader.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
+			return;
+		}
+		
+		sb_save_slot(function() {
+			window.open('SandboxLoader.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
+		});
 	}
 	
 	function sb_toggle_markup()	{
@@ -1934,8 +1897,10 @@ function API_Restore_TridentDB() {
 	
 	// Determines whether the Code or the Output areas get full width or if they split 50/50
 	function API_SetWindowMode(mode) {
+		
 		// Code Only
 		if (mode == 1) {
+			VAR_WindowMode = mode;
 			showMarkup = true;
 			showScript = true;
 			$('#tdOutput').attr('width', '0%');
@@ -1943,21 +1908,32 @@ function API_Restore_TridentDB() {
 			$('#divCode').show();
 		
 			$("#UI_TabsOutput").hide();
+			
+			$('.CodeMirror').each(function(i, el){
+				el.CodeMirror.refresh();
+			});
 		}
 		
 		// Show Code and Output areas
 		if (mode == 2) {
-			showMarkup = 2;
+			VAR_WindowMode = mode;
+			showMarkup = true;
 			showScript = true;
 			$('#tdCode').attr('width', '50%');
 			$('#tdOutput').attr('width', '50%');
 			$('#divCode').show();
 		
 			$("#UI_TabsOutput").show();
+			
+			$('.CodeMirror').each(function(i, el){
+				el.CodeMirror.refresh();
+			});
+
 		}
 		
 		// Show Output only
 		if (mode == 3) {
+			VAR_WindowMode = mode;
 			showMarkup = true;
 			showScript = true;
 			$('#tdCode').attr('width', '0%');
@@ -2350,7 +2326,7 @@ function API_Restore_TridentDB() {
 			<h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An Internet Explorer 10/11 development sandbox' onclick="sb_toggle_header_font()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : Internet Explorer 10/11 dev sandbox</h1>
 			</div>
 			<div class="divTinyButtons" style="display:inline">
-			<h2 id='sb_header_caption2' title='Trident Sandbox : An Internet Explorer 10/11 development sandbox' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : IE 10/11 dev sandbox</h1>
+			<h2 id='sb_header_caption2' title='Trident Sandbox : An Internet Explorer 10/11 development sandbox' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : IE 10/11 dev sandbox</h2>
 			</div>
 		</td>
 		<td>
@@ -2422,7 +2398,7 @@ Pick a template to use for page generation : <input style='height:30px;width:180
 </td>
 <td>
 <div class="divWideButtons" style="display:inline">
-<button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/> New</button>
+<button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_new_program()"><img src='images_ide/add.png'/> New</button>
 </div>
 <div class="divTinyButtons" style="display:inline">
 <button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/></button>
@@ -2443,10 +2419,12 @@ Program Name :
 <td>
 <div class="divWideButtons" style="display:inline">
 <button id="ui_btn_run" style='height:40px; width:80px' onclick="sb_run()" title="Run your Program (Alt+R)"><img src='images_ide/run16.png'/> Run</button>
+<button class="ui_btn_launch" style='height:40px; width:100px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><img src='images_ide/application_go.png'/> Launch</button>
 <button style='height:40px;' onclick="sb_save()" title="Save your program (Alt+S)"><img src='images_ide/disk.png'/> Save</button>
 </div>
 <div class="divTinyButtons" style="display:inline">
-<button id="ui_btn_run" style='height:40px;' onclick="sb_run()" title="Run your Program (Alt+R)"><img src='images_ide/run16.png'/></button>
+<button style='height:40px;' onclick="sb_run()" title="Run your Program (Alt+R)"><img src='images_ide/run16.png'/></button>
+<button class="ui_btn_launch" style='height:40px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><img src='images_ide/application_go.png'/></button>
 <button style='height:40px;' onclick="sb_save()" title="Save your program (Alt+S)"><img src='images_ide/disk.png'/></button>
 </div>
 </td>
@@ -2490,7 +2468,7 @@ Program Name :
 		<div id='sb_div_ls_slots' style='display:none'>
 		<button style="height:28px" title='Load from selected TridentDB save slot (1-9)' onclick='sb_load_slot()'>LoadDB</button>
 		<button style="height:28px" title='Save to selected TridentDB save slot (1-9)' onclick='sb_save_slot()'>SaveDB</button>
-		<select style="height:24px; font-size: 12px;" id='sb_sel_trident_slot'></select>
+		<select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot'></select>
 		<button style="height:28px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
 		</div>
 		</div>

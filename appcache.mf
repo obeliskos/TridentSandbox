@@ -1,8 +1,9 @@
 CACHE MANIFEST
-#rev 181
+#rev 182
 
 CACHE:
 TridentSandbox.htm
+SandboxLoader.htm
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/animated-overlay.gif
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/ui-bg_flat_0_aaaaaa_40x100.png
@@ -98,6 +99,10 @@ libraries/tinymce/skins/lightgray/skin.min.css
 libraries/tinymce/plugins/moxiemanager/plugin.min.js
 libraries/tinymce/skins/lightgray/skin.min.css
 libraries/tinymce/skins/lightgray/content.min.css
+libraries/tinymce/skins/lightgray/fonts/tinymce.eot
+libraries/tinymce/skins/lightgray/fonts/tinymce.svg
+libraries/tinymce/skins/lightgray/fonts/tinymce.woff
+libraries/tinymce/skins/lightgray/fonts/tinymce.ttf
 libraries/prettyprint/prettyprint.js
 libraries/shortcut.js
 libraries/math.min.js
@@ -124,6 +129,7 @@ libraries/textillate/jquery.lettering.js
 libraries/textillate/jquery.textillate.js
 libraries/textillate/animate.css
 libraries/filesaver/FileSaver.js
+libraries/indexed.js
 images_ide/cog.png
 images_ide/add.png
 images_ide/local.svg
@@ -137,6 +143,7 @@ images_ide/zoom_in.png
 images_ide/zoom_out.png
 images_ide/chart_pie.png
 images_ide/crate.jpg
+images_ide/application_go.png
 images_ide/metro-back.png
 images_ide/metro-back-white.png
 images_ide/nixus/32x32/Add.png
@@ -231,7 +238,6 @@ samples/CryptoJS%20Notepad.prg
 samples/CSS%20Transforms.prg
 samples/DigitalClock.prg
 samples/Drag%20Drop%20Thumbnailer.prg
-samples/Drop%20Down%20Menu.prg
 samples/Dungeon%20Generator.prg
 samples/Dynamic%20Image%20Load.prg
 samples/Dynatree%20Demo.prg
@@ -246,6 +252,7 @@ samples/Hosted%20Files%20Database.prg
 samples/Hosted%20Samples%20Browser.prg
 samples/HTML%205%20Starfield%20Fullscreen.prg
 samples/HTML%205%20Starfield.prg
+samples/IMDB%20Search.prg
 samples/jqPlot%20Demo.prg
 samples/jQuery%20UI%20Demo.prg
 samples/jQuery%20UI%20Menu.prg
@@ -268,6 +275,7 @@ samples/Trident%20Binary%20Encryptor.prg
 samples/Trident%20DB%20Usage.prg
 samples/WebGL%20Spinning%20Box.prg
 samples/WebGL%20Spinning%20Crate.prg
+samples/XDA%20RSS.prg
 libraries/web_worker_demo.js
 
 NETWORK:

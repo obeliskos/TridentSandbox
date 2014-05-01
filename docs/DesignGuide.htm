@@ -10,56 +10,97 @@ Topics : [ <a href="Welcome.htm">Welcome</a> ] [ <a href="ApiReference.htm">API 
 
 <p>HTML 5 and Javascript development is well documented so I wont cover gereral language or browser development in this guide.&nbsp; This guide will describe the TridentSandbox environment, how your apps run within it, and how you might want to adapt your code to make sure it doesn&#39;t interfere with the&nbsp;TridentSandbox environment.</p>
 
-<h3><strong>Trident Sandbox Environment</strong></h3>
+<h3><b>Trident Sandbox Environment(s) (AKA the Lone Rangers)</b></h3>
 
-<p>When you load Trident Sandbox, you will see alot of User Interface elements.&nbsp; The screen is divided into many different regions such as Title bar, Loader Bar, Dev Bar, Code Editor Areas, and Output Area.&nbsp;&nbsp;All of these&nbsp;regions are constructed using&nbsp;HTML&nbsp;Document Object Model (DOM) elements (many elements per region) and they were defined in the TridentSandbox.htm file itself using static HTML.&nbsp; Since the Trident Sandbox web page is loaded from your local filesystem, Internet Explorer treats it a little differently than a web page coming from a real web server.&nbsp; First it warns you about script and you must explicity choose to enable them.&nbsp; The scripts can&#39;t really do anything dangerous since Internet Explorer is sandboxed, but that is something you have to approve.&nbsp;</p>
+<p>Trident Sandbox has two primary 'environments', Local Filesystem and AppCached.&nbsp; Local Filesystem environment is when you download the zip file run the html page from your hard disk.&nbsp; AppCached is when you visit my <a href="http://www.obeliskos.com/TridentSandbox" target="_blank">http://www.obeliskos.com/TridentSandbox</a> web page which uses 
+HTML 5 <a href="http://msdn.microsoft.com/en-us/library/ie/hh673545(v=vs.85).aspx" target="_blank">AppCache</a> technology to download all required files into a cache 
+so that the site continues to work and be available even when offline.&nbsp; When using the local filesystem environment you do not have access to Local Storage or IndexedDb so you have to use the file pickers, not only 
+for loading and saving programs but for loading and saving your programs data.&nbsp; Using the local filesystem environment also requires you to 'enable scripts' whenever you visit the webpage.&nbsp; The AppCached environment turns your browser into more interactive environment because the environment itself allows you to 
+save files to a Trident Database with less user interaction than the file pickers.&nbsp; This capability extends to your programs as well, as they can save data without forcing the user to 'save as' or use filepickers to save/load data.&nbsp; The Local filesystem environment 
+can also make internet web requests (ajax) to websites to get data with no security concerns or settings to change (the AppCache environment requires workaround discussed in Hosting and AppCache section). &nbsp; 
+The local filesystem environment is also very portable and wont accidentally get erased if you delete your browsing history without adding a shortcut to the page.&nbsp; You can use both environments, but for any given program your first design choice might be which environment to use.</p>
 
-<h3>Libraries</h3>
+<h3><b>Web design in a div shell</b></h3>
 
-<p>With the Trident Sandbox main page, it tells Internet Explorer that it will need to load all of the libraries it wants to use itself or make available for programs to use.&nbsp; Since it has already included these libraries, you don&#39;t have to... those libraries and components are there ready to be used.&nbsp; The current set of libraries include jQuery, jQueryUI, alertify.js, jqPlot, HightChartTable, Crypto.JS, jqGrid,&nbsp;dynatree, FullCalendar, and&nbsp;Loki.JS.&nbsp;</p>
+<p>When you load Trident Sandbox, you will see alot of User Interface elements.&nbsp; The screen is divided into many different regions such as Title bar, Loader Bar, Dev Bar, Code Editor Areas, and Output Area.&nbsp;&nbsp;All of these&nbsp;regions are constructed using&nbsp;HTML&nbsp;Document Object Model (DOM) elements (many elements per region) 
+and they were defined in the TridentSandbox.htm file itself using static HTML.&nbsp;  By default, the html that you enter will be placed into the Main Output region of the screen inside an HTML DIV container.&nbsp;  While you have the capability of 'going outside' this 'box' using javascript, the idea here is to keep it 
+simple so that you don't have to know about the rest of the page.&nbsp; That is the reasoning behind the API Calls (see API Reference), if you are going to be doing custom logic it's best to use this API so that future changes to the 
+program will attempt to be backwards compatible wherever possible. &nbsp;</p>
 
-<h3>AJAX Limiations</h3>
+<h3><b>A nice collection of symbolic logic</b></h3>
 
-<p>Another difference is that your cannot make an AJAX call to yourself... sometimes you might want to automatically load a file, script, an html fragment from a folder location relative to your web page.. you cannot do that in Trident Sandbox.&nbsp; You can make an AJAX call to real web server to get data such as that, but not from your local filesystem.</p>
+<p>Trident Sandbox comes with a set of third party javascript libraries (See Welcome page for list of them).  These libraries attempt to make a richer development environment and fill some core functional areas.  If you run the local filesystem environment, you can add other libraries by placing them in the 'libraries' folder and including 
+their scripts and styles in the TridentSandbox.htm page.&nbsp; They are already 'included' and ready for use if you know how to use them... i may have samples to show how to use them or you can follow the links on the 'Welcome' help page to visit their site and learn.&nbsp; 
+The AppCached environment is somewhat contrained regarding adding your own choice of libraries but there are workarounds with library units or other methods which might be improved in the future.&nbsp; </p>
 
-<h3>Lack of LocalStorage / IndexedDB</h3>
+<h3><b>The sky's the limit (assuming it fits in two text boxes)</b></h3>
 
-<p>If your files are served up from a local filesystem they are considered to have a null domain.&nbsp; LocalStorage and IndexedDB provide each distinct web domain a sandboxed file system where they can store data without dialogs.&nbsp; Since we have null domain Internet Explorer does not allow us to utilize these features.&nbsp; If you were to serve up the TridentSandbox files from a web server then you would be able to use these features.&nbsp; (Note : you will probably need to use a numerical or dns address not a machine name)</p>
+<p>The original intent of this application was to fill a niche in Windows RT hybrid/tablet ecosystem.&nbsp; Compared to its out-of-the-box, on-device scripting capabilities just being able to enter a single HTML/Javascript pair, saved in a single file, and run within a preconfigured environment 
+is a significant capability.&nbsp; The scale is usually small and it is usually for testing out smaller things, however it is nice to know 
+you can expand beyond this (ahem) architecture if you program needs better organization.&nbsp; Up to and including now, I only provide options/workarounds for the hosted/appcache environments via the non-standard and not-so-portable Markup and Script Units (see link at top of page).&nbsp; It is possible in the future 
+that in future i support an arbitrary number of HTML, Javascript, and even CSS files saved into a single PRG file.&nbsp; I am just now at the point where the environment is sound enough for me to develop programs other than sample 
+programs, so i expect that if i really need it, i will add it.</p>
 
-<h3>File API</h3>
+<h3><b>It's all about the 'Runtime'... eventually</b></h3>
 
-<p>This is the only I/O functionality available when served up from a local filesystem.&nbsp; This is an HTML 5 functionality added in Internet Explorer 10 which lets you load files from anywhere in your filesystem.&nbsp; This cannot be done automatically, the user has to manually (for security purposes) pick the file to read/import.&nbsp;&nbsp; You can also save files... this appears to the user as a file download so they will have to make sure the file goes in the correct place.&nbsp; Trident Sandbox uses this File API to load and save your PRG files, and makes a similar functionality available to the user to use in their own programs.&nbsp;&nbsp; Although the File API does support Binary data I/O, Trident Sandbox (at least currently) only works with loading and saving strings.&nbsp; This is usually sufficient since any Javascript object can be converted to a string and then converted back to an object using JSON.parse() and JSON.stringify()... but if you need binary data input and output you will need to establish your own &lt;file&gt; element within your HTML and code your own event handlers.</p>
+<p>So you spend a few hours/days/months creating your awesome sandbox app and you want to start using it on a daily basis but you've got all this 'environmenty' stuff cluttering up the screen.&nbsp;  There are a few methods you can use to hide the environment interface and 
+give your program much more of your screen space.  The easiest to use while still developing are the API calls to set window mode and toolbar mode.  If you are running in the local filesystem environment you also have the ability to 'Generate Standalone App' (see its own help page linked at top).&nbsp; 
+This lets you use a template file to generate a html file containing just your program's user interface but with the full API to back it up.&nbsp; If you make changes to your code, you would need to regenerate this file again.&nbsp; In the AppCache environment things are now even better with a Launch (in new window) button, 
+which requires only that you save your program into a Trident Sandbox save slot (TridentDB sandbox storage) and then will launch it in a new window using the SandboxLoader... the url indicates the program to run and can be bookmarked.&nbsp;</p>
 
-<h3>Fullscreen API</h3>
+<h3><b>Metro IE vs Rural IE</b></h3>
 
-<p>This is another HTML 5 standard which Internet Explorer added in IE 11.&nbsp; It does just that, you can make a simple javascript request to make some named visual element go fullscreen.&nbsp; I use this in some places in TridentSandbox.&nbsp; I will just point out that when in this fullscreen mode you cannot scroll the page, if your content overflows and you dont provide your own scrolling within it (like a scrollable div), then that content will not be seen.&nbsp; This is probably best suited for canvas graphics or simple pages.</p>
+<p>Following the trend Trident Sandbox environment, or the other way around, Internet Explorer on Windows 8/RT has two flavors : Metro and Desktop based.&nbsp; The only discernable differences i have found are with the implementation of the File API.&nbsp; The file loaders/pickers work just fine on both and metro does very good here, but the save functionality only saves to your downloads folder and cannot overwrite a file (it will append a (1) after your filename to give it unique name).&nbsp; As such, I generally recommend using the desktop version, but this is less of an issue with 
+the AppCache environment and can be very effectively used in Metro IE, especially as a viewer for 'Launching' and bookmarking your sandbox apps.</p>
 
-<h3>Metro IE vs Desktop IE</h3>
+<h3><b>Getting to know your new 5000 page W3C and ECMA specs</b></h3>
 
-<p>The only discernable differences i have found are with the implementation of the File API.&nbsp; The file loaders/pickers work just fine on both and metro does very good here, but the save functionality (unless i am missing something), only saves to your downloads folder and cannot overwrite a file it will append a (1) after your filename to give it unique name.&nbsp; This is kind of a big issue if you are doing active development on a program, so you might want to use metro for running existing programs / samples instead of for active development.&nbsp; For active development the desktop IE seems to work best.</p>
+<p>The core engine of web browsers are not really pretty at the core, but nowadays they are targeted toward compliance with commitee standards, mainly <a href="http://www.w3schools.com/web/web_standards.asp" target="_blank">W3C and EMCA.</a>&nbsp; It is beyond the scope of this help document to cover all of these standards but I can give you a high level overview of some key areas.&nbsp; 
+W3C standards mostly cover web/html standards while ECMA covers JavaScript standards.&nbsp Each browser implements a patchwork of ECMA/W3C standards most developers have to find common 
+functionality supported across all browsers.&nbsp;  You might want to do the same or you might not care about other browsers.&nbsp;  A good reference site for determining the features 
+your browser implements is <a href="http://caniuse.com/" target="_blank">CanIUse</a>.&nbsp; An overview of the roadmap of W3C APIs (most of which you probably can't use today) can be found <a href="http://en.wikipedia.org/wiki/File:HTML5-APIs-and-related-technologies-by-Sergey-Mavrody.png" target="_blank">here.</a>&nbsp; 
+So make sure your browser supports the cool API just read about... for Internet Explorer 11 some of the key features you have would be File API, Fullscreen API, WebGL, LocalStorage, IndexedDB, HTML5 Drag and Drop, CryptoAPI via mscrypto, HTML 5 Video/Audio, AppCache, Web Workers, Typed Arrays, CSS effects, etc.</p>
 
-<h3><strong>How your programs run within Trident Sandbox</strong></h3>
+<h3><b>How to be a good Trident Sandbox citizen</b></h3>
 
-<p>When you write a program using the editor controls, and then click on the &#39;Run&#39; button, Trident Sandbox dynamically tears down (clears) the HTML DOM elements that were previously in the Output Area, it will then insert your html into a DIV (container for DOM elements) whose parent is the Main Output tab of the Output Area.&nbsp; After adding your html Trident Sandbox will construct a script element and insert it after your html into that same DIV container.&nbsp; Internet explorer is smart enough to parse the script immediately after it has been inserted so your program magically dynamically runs.&nbsp; The DOM is a hierarchy so your html and javascript have been inserted into this hierarchy at a relatively &#39;deep&#39; level.&nbsp;&nbsp; Traditionally, as good practice, &nbsp;scripts are inserted into the HEAD region of the DOM hierarchy, but Internet Explorer is smart enough to handle this deeper&nbsp;location convention.&nbsp; Keeping these elements localized deep and in one place makes cleaning them out cleaner and easier.</p>
+<p><i>As of version 1.82, Trident Sandbox provides a 'Launch' button which loads SandboxLoader.htm page (See AppCache section for more detail).&nbsp; This method does not require cleanup since the program 'launched' is the sole occupant of that page 'load'.&nbsp; It is compatible with the cleanup method below but if you always use 'Launch' instead of Run, then you can skip the guidance below.</i></p>
 
-<h3><strong>Design Considerations (How to be a good Trident Sandbox citizen)</strong></h3>
+<p>Trident Sandbox is run from your own computer/device so this is more of a possible concern for you than me.&nbsp; Trident Sandbox supports loading and saving many programs without reloading the main page.&nbsp; Whenever you change programs or even re-run your program, it cleans out your old html and script and puts new code in its place.&nbsp; This swapping in and out of dynamic html is a clean process right? Well sort of... but not really...</p>
 
-<p>Trident Sandbox is run from your own computer/device so this is more of a possible concern for you than me.&nbsp; Trident Sandbox supports loading and saving many programs without reloading the main page.&nbsp; Whenever you change programs or even re-run your program, it cleans out your old html and script and puts new code in its place.&nbsp; This swapping in and out of dynamic html is a clean process right? Well... sort of but there is a big catch.&nbsp; Internet explorer (any many other browsers) don&#39;t like to get rid of global variables even if they were declared in javascript that has been completely removed, those variables will still exist.&nbsp; This can cause conflicts between programs if they do not take steps to avoid this. If you dont mind hitting refresh on your browser whenever a conflict arises you dont need to worry about this, reloading the page completely removes everything... but its not that hard to make sure your variables and memory are cleaned up when we unload your program.</p>
+<p><b>Variables</b> created outside of a function (global variables) are not removed after the sandbox is cleared out.&nbsp; They are attached to the global window object... so they linger until you reload the Trident Sandbox webpage.&nbsp; This became very apparent with variables such as &#39;canvas&#39; and &#39;ctx&#39;.&nbsp; Possibly the html canvas they were referencing was not being unloaded. Either way a bunch of global variables were just accumulating and depending on much memory a program puts into global variables, this could cause memory leaks, reference conflicts, etc.</p>
 
-<p>I have created a sample program (Proper Cleanup Method.PRG) which details this process with example code, but here is a summary :</p>
-
-<p>Variables created outside of a function (global variables) are not removed after the sandbox is cleared out. They are attached to the global window object... so they linger until you reload the Trident Sandbox webpage. This became very apparent with variables such as &#39;canvas&#39; and &#39;ctx&#39;. Possibly the html canvas they were referencing was not being unloaded. Either way a bunch of global variables were just accumulating and depending on much memory a program puts into global variables, this could cause memory leaks, reference conflicts, etc.</p>
-
-<p>The simplest conflict resolution solution would be to make sure all global variables are named uniquely. This is good enough at first but not ideal for preventing memory leaks.</p>
-
-<p>Here is how I will support the ability for your programs to mitigate these issues :</p>
-
-<p>Create a stub global variable... this format is JSON/javascript object notation (see Proper Cleanup Method.prg). You can uniquely name this, or use a common &#39;sandboxVars&#39; or &#39;sbv&#39; name. That object can&#39;t be deleted either but its contents can. So within that stub variable you can create your variables/object references etc. To fulfill the cleanup process you will implement a callback function EVT_CleanSandbox() where you will delete the variables within that stub variable (or at least the ones which may conflict or consume alot of memory). You might also release timers, stop animation loops, etc. Trident Sandbox will then call your cleanup function between each program &#39;Run&#39;, before it unloads your program (for instance if you press the &#39;New&#39; toolbar button or open another program).</p>
-
-<p>Functions also exhibit this same behavior.&nbsp;&nbsp;If your programs grow large and contain many functions you may want to null them out 
-as well in your EVT_CleanSandbox() callback.&nbsp;&nbsp;Ideally you would place your functions inside the stub object as one big global application object with only a few bootstrap lines of global code to 
-call into that global app object's functions.&nbsp;&nbsp;Then, in your cleanup function, you can actually delete them as well.&nbsp;&nbsp;I have not run into a situation where one program has adversely affected 
+<p><b>Functions</b> created are also attached to the global window object in the DOM, and are not removed after the sandbox is cleared out.&nbsp; So they also linger.&nbsp; I have not run into a situation where one program has adversely affected 
 another program due to lingering functions since a new program with a function by the same name will just overwrite the old function... but the memory used up by them will just accumulate if 
 you go in and out of many programs.</p>
+
+<p><b>Interval Timers</b> created via setInterval are not shutdown automatically, so you will need a way for your program to stop these if Trident Sandbox switches to another program or re-runs the same program.&nbsp; Not stopping these correctly might lead to excessive battery drain.</p>
+
+<p>I have created a sample program <i><b>(Proper Cleanup Method.PRG)</b></i> which details this process with example code, but here is a summary :</p>
+
+<p>The simplest conflict resolution solution would be to make sure all global variables are named uniquely.&nbsp; This is good enough at first but not ideal for preventing memory leaks.</p>
+
+<p>Ideally, you would <b>create a stub global javascript object variable</b> (see Proper Cleanup Method.prg).&nbsp; You can uniquely name this variable, or use a 
+common &#39;sandboxVars&#39; or &#39;sbv&#39; name.&nbsp; That object can&#39;t be deleted either but its contents can. So within that stub variable you can create your variables/object 
+references, even functions etc.&nbsp; To fulfill the cleanup process you will implement a callback function <b>EVT_CleanSandbox()</b> where you will delete the variables within that stub variable (or at least the 
+ones which may conflict or consume alot of memory).&nbsp; You might also release timers, stop animation loops, etc.&nbsp; Trident Sandbox will then call your cleanup function between each 
+program &#39;Run&#39;, before it unloads your program (for instance if you press the &#39;New&#39; toolbar button or open another program).</p>
+
+<p>The Random Dungeon Generator is a good example of creating a structured javascript object which can easily be cleaned up, and the Digital Clock and Easel JS sample show how you 
+might clean up timers.</p>
+
+<h3><b>A Martian diagnosing an Earth Rover</b></h3> 
+
+<p>So we have turned a browser engine into a dev platform creating client programs, and maybe there is a problem with that client program.&nbsp; You have options.&nbsp; In many 
+instances you might just want to dump some debug statements to the text log via the API_LogMessage() function.&nbsp; You also have the ability to inspect a variable by highlighting it and 
+clicking the 'Inspect' button which can dump and object into a nice graphical outline that you can drill down into.&nbsp; This inspection capability can be called from your code as well, by using the 
+API_Inspect(obj) function.&nbsp; If that is not enough you can tap into the awesome power of the <a href="http://msdn.microsoft.com/en-us/library/gg589512(v=vs.85).aspx" target="_blank">Internet Explorer Developer Tools</a> (F12 button).&nbsp; 
+Opening that up you can go to the console or debugger tab to monitor errors as they happen.&nbsp; Since the Trident Sandbox javascript is there too, it might be hard to find your code to add breakpoints.&nbsp; In that case 
+you might put <b>debugger;</b> statements at certain points in your program to force a breakpoint (if the F12 debugger is open).&nbsp; At that point you can graphically add other breakpoints or step through your code and inspect variables.&nbsp; The F12 developer 
+tools are really quite powerful in IE 10/11 and are on par with mozilla firebug for debugging javascript, inspecting/modifying HTML dynamically, or monitoring or issuing console commands.</p>
+
+<p>Fortunately, the environment you are scripting is mostly just your browser engine... HTML/Javascript in a package similar in the concepts of javascript <a href="http://jsfiddle.net/" target="_blank">'fiddles'</a>.&nbsp; So it is fairly easy 
+to translate your tasks to and from traditional web logic and use GOOGLE as your guide for many questions.&nbsp; This 'mainstream' web development pool of information does not utilize the TridentSandbox API_ functions, VAR_ variables, or UI_ elements.&nbsp; 
+They also rarely need to clean up after themselves such as in our 'good citizen' section above.&nbsp; So don't expect answers or familiarity with those if you start asking questions around the web... first try converting to a js-fiddle.  If your js-fiddle 
+has the same problem, you might save it to their servers, get a shareable link to it, and use that as a reference point for questions on development discussion forums.</p>
 </body>
 </html>
