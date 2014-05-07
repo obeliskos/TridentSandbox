@@ -32,6 +32,8 @@ available for use by the sandbox app, add them here.
 <script src="libraries/jquery/jquery-2.1.0.js"></script>
 <script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
+<link rel="stylesheet" type="text/css" href="css/sandbox.css" />
+<script src="scripts/tridentlist.js"></script>
 <script src="libraries/alertify.js-0.3.11/lib/alertify.js"></script>
 <script src="libraries/cryptojs/components/core.js"></script>
 <script src="libraries/cryptojs/rollups/sha1.js"></script>
@@ -175,7 +177,7 @@ img.TridentImageButton:hover
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
-	var VAR_TRIDENT_ENV_TYPE = 'IDE'; // IDE, Gen S/A Templates should set to STANDALONE
+	var VAR_TRIDENT_ENV_TYPE = 'SBL'; // IDE, STANDALONE, SBL
 	var VAR_TRIDENT_DB = null;
 
 	$(document).ready(function() {
@@ -841,7 +843,7 @@ function API_Restore_TridentDB() {
 	}
 	
 	function API_SetBackgroundColor(colorCode) {
-		$("#UI_Tab_Main").css("background-color", colorCode);
+		$("body").css("background-color", colorCode);
 		$("#UI_MainPlaceholder").css("background-color", colorCode);
 	}
 	

@@ -17,8 +17,9 @@ A side effect of this is that you have no Trident DB save slots which avoid usin
 <p>A <b>Hosted</b> environment means you take the Trident Sandbox 'website' and put it on a real web server.  If your website is accessed via a browser with a numerical ip address or real dns address 
 then you have the ability to use several sandboxed storage mechanisms other than the FileAPI.  For local storage you have about 5 megs you can use without even asking the user for permission or 
 specify locations (your program determines where to save and does not need user to initiate this action). A larger sandboxed storage area can be provided by IndexedDB which defaults to about 10 megs 
-but upon reaching this limit it will ask the user if it is ok to expand this to get more space.  I have yet to fully test this but the max limit is probably about 45megs on Windows RT IE 11 and 250megs on 
-x86 IE11 (IE 10 limits will probably be similar).  Your actual storage may be half of this though as it probably wastes half of this space (due to saving in unicode?).</p>
+but upon reaching this limit it will ask the user if it is ok to expand this to get more space.  After testing with Windows 8.1 and Windows RT 8.1, the indexedDB maximum storage size seems to be about 120 
+megs of usable space which corresponds to about 250megs of unicode storage (which is what is shown in Internet Explorer Tools/Internet Options/General/Settings/Caches and databases as 
+'Data Storage'.</p>
 
 <p>An <b>AppCached</b> environment is a hosted environment that is configured to let the client download all or some of its resources for either performance reasons or for offline use of the website.  This 'caching' 
 is done by configuring a cache manifest file and registering it to your webpage (in it's <html> tag).  Trident Sandbox supports this and provides the cache manifest file along with the 

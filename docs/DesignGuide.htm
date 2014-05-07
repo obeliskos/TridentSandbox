@@ -18,7 +18,7 @@ so that the site continues to work and be available even when offline.&nbsp; Whe
 for loading and saving programs but for loading and saving your programs data.&nbsp; Using the local filesystem environment also requires you to 'enable scripts' whenever you visit the webpage.&nbsp; The AppCached environment turns your browser into more interactive environment because the environment itself allows you to 
 save files to a Trident Database with less user interaction than the file pickers.&nbsp; This capability extends to your programs as well, as they can save data without forcing the user to 'save as' or use filepickers to save/load data.&nbsp; The Local filesystem environment 
 can also make internet web requests (ajax) to websites to get data with no security concerns or settings to change (the AppCache environment requires workaround discussed in Hosting and AppCache section). &nbsp; 
-The local filesystem environment is also very portable and wont accidentally get erased if you delete your browsing history without adding a shortcut to the page.&nbsp; You can use both environments, but for any given program your first design choice might be which environment to use.</p>
+The local filesystem environment is also very portable and wont accidentally get erased if you delete your browsing history without adding TridentSandbox to your favorites.&nbsp; You can use both environments, but for any given program your first design choice might be which environment to use.</p>
 
 <h3><b>Web design in a div shell</b></h3>
 
@@ -31,7 +31,7 @@ program will attempt to be backwards compatible wherever possible. &nbsp;</p>
 
 <p>Trident Sandbox comes with a set of third party javascript libraries (See Welcome page for list of them).  These libraries attempt to make a richer development environment and fill some core functional areas.  If you run the local filesystem environment, you can add other libraries by placing them in the 'libraries' folder and including 
 their scripts and styles in the TridentSandbox.htm page.&nbsp; They are already 'included' and ready for use if you know how to use them... i may have samples to show how to use them or you can follow the links on the 'Welcome' help page to visit their site and learn.&nbsp; 
-The AppCached environment is somewhat contrained regarding adding your own choice of libraries but there are workarounds with library units or other methods which might be improved in the future.&nbsp; </p>
+The AppCached environment is somewhat constrained regarding adding your own choice of libraries but there are workarounds with library units or other methods which might be improved in the future.&nbsp; </p>
 
 <h3><b>The sky's the limit (assuming it fits in two text boxes)</b></h3>
 
@@ -50,7 +50,7 @@ which requires only that you save your program into a Trident Sandbox save slot 
 
 <h3><b>Metro IE vs Rural IE</b></h3>
 
-<p>Following the trend Trident Sandbox environment, or the other way around, Internet Explorer on Windows 8/RT has two flavors : Metro and Desktop based.&nbsp; The only discernable differences i have found are with the implementation of the File API.&nbsp; The file loaders/pickers work just fine on both and metro does very good here, but the save functionality only saves to your downloads folder and cannot overwrite a file (it will append a (1) after your filename to give it unique name).&nbsp; As such, I generally recommend using the desktop version, but this is less of an issue with 
+<p>Following the trend of the Trident Sandbox environment, or perhaps the other way around, Internet Explorer on Windows 8/RT has two flavors : Metro and Desktop based.&nbsp; The only discernable differences i have found are with the implementation of the File API.&nbsp; The file loaders/pickers work just fine on both and metro does very good here, but the save functionality only saves to your downloads folder and cannot overwrite a file (it will append a (1) after your filename to give it unique name).&nbsp; As such, I generally recommend using the desktop version, but this is less of an issue with 
 the AppCache environment and can be very effectively used in Metro IE, especially as a viewer for 'Launching' and bookmarking your sandbox apps.</p>
 
 <h3><b>Getting to know your new 5000 page W3C and ECMA specs</b></h3>
