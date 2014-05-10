@@ -187,7 +187,7 @@
               case '$gte':
                 return val1 >= val2;
               case '$lte':
-                return val1 != val2;
+                return val1 <= val2;
               case '$ne':
                 return val1 != val2;
               case '$eq':

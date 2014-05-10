@@ -237,6 +237,13 @@ img.TridentImageButton:hover
 			}
 			
 		}
+		
+		$(window).resize(function() {
+			// Allow User Programs to receive window resize events
+			// by implementing this callback
+			if (EVT_WindowResize != null) EVT_WindowResize();
+		});
+		
 	});
 	
 	function errorHandler(evt) {
@@ -861,6 +868,13 @@ function API_Restore_TridentDB() {
 		cursor.onsuccess = callback;
 	}
 
+	function API_ShowPasswordDialog(callback) {
+		$("#UI_PasswordDialog").show();
+		$("#sb_password_text").focus();
+		$("#sb_password_ok").unbind("click");
+		$("#sb_password_ok").bind("click", function() { callback($("#sb_password_text").val()); });
+	}
+	
 </script>
 </head>
 <body>
@@ -879,6 +893,29 @@ function API_Restore_TridentDB() {
 			<div id='UI_MainPlaceholder' style='background-color:white'></div>
 		</div>
 	</div>
+
+	<div id="UI_PasswordDialog" style="display:none">
+
+		<h3><span class="fa"><i class="fa fa-lock"></i></span> Authorization</h3>
+
+		<form action="javascript:void(0);" method="POST">
+
+			<fieldset>
+
+				<p><label for="password">Enter Password</label>
+				<input id="sb_password_text" type="password" id="password" value="" placeholder="password" >
+                </p>
+				<p>
+                	<button id="sb_password_ok" onclick="$('#UI_PasswordDialog').hide();">Ok</button>
+					<button onclick="$('#UI_PasswordDialog').hide();">Cancel</button>
+        		</p>
+
+			</fieldset>
+
+		</form>
+
+	</div> <!-- end login -->
+
 
 </body>
 </html>

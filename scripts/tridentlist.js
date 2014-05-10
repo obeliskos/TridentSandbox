@@ -93,8 +93,14 @@ function TridentList(listId, userCallback) {
     this.updateListItem = function(id, caption, description) {
         var item = $("#" + this.listSettings.listElementId).find("li[aria-describedby="+id+"]");
     	
-        $(item).find("span.tlistitem-caption").text(caption);
-        $(item).find("span.tlistitem-description").text(description);
+		if (this.listSettings.bright) {
+			$(item).find("span.tlistitem-caption-bright").text(caption);
+			$(item).find("span.tlistitem-description-bright").text(description);
+		}
+		else {
+			$(item).find("span.tlistitem-caption").text(caption);
+			$(item).find("span.tlistitem-description").text(description);
+		}
     }
     
     // pass in the item id you want 'selected'

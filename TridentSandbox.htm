@@ -3,14 +3,15 @@
 <html manifest="appcache.mf"> 
 <head>
 <title>Trident Sandbox</title>
-<!-- 
-<meta name="application-name" content="Trident Sandbox v1.6"/>
-<meta name="msapplication-TileColor" content="#1F96CF"/>
-<meta name="msapplication-square70x70logo" content="/images_ide/live_tile/Poseidon-Small70.png"/>
-<meta name="msapplication-square150x150logo" content="/images_ide/live_tile/Poseidon-Normal150.png"/>
-<meta name="msapplication-wide310x150logo" content="/images_ide/live_tile/Poseidon-Wide310.png"/>
-<meta name="msapplication-square310x310logo" content="/images_ide/live_tile/Poseidon-Square310.jpg"/>
--->
+<meta charset="utf-8">
+<meta name="description" content="Trident Sandbox is an in-browser HTML/Javascript Scripting IDE that uses HTML 5 Application Cache functionality to run offline." />
+
+<meta name="application-name" content="Trident Sandbox"/>
+<meta name="msapplication-TileColor" content="#1F7DD0"/>
+<meta name="msapplication-square70x70logo" content="images_ide/live_tile/Poseidon-Small70.png"/>
+<meta name="msapplication-square150x150logo" content="images_ide/live_tile/Poseidon-Normal150.png"/>
+<meta name="msapplication-wide310x150logo" content="images_ide/live_tile/Poseidon-Wide310.png"/>
+<meta name="msapplication-square310x310logo" content="images_ide/live_tile/Poseidon-Square310.jpg"/>
 
 <!--	TRIDENT SANDBOX : A 'jsfiddle-like' sandbox for Internet Explorer 10/11
 		GitHub development at : https://github.com/obeliskos/TridentSandbox
@@ -59,18 +60,20 @@ available for use by the sandbox app, add them here.
 <script src="libraries/jqplot/plugins/jqplot.meterGaugeRenderer.min.js"></script>
 <script src="libraries/jqplot/plugins/jqplot.highlighter.min.js"></script>
 <script src="libraries/loki-js/lokijs.js"></script>
-<script src="libraries/codemirror-4.0/lib/codemirror.js"></script>
-<script src="libraries/codemirror-4.0/mode/xml/xml.js"></script>
-<script src="libraries/codemirror-4.0/mode/javascript/javascript.js"></script>
-<script src="libraries/codemirror-4.0/mode/htmlmixed/htmlmixed.js"></script>
-<script src="libraries/codemirror-4.0/addon/display/fullscreen.js"></script>
-<script src="libraries/codemirror-4.0/addon/fold/foldcode.js"></script>
-<script src="libraries/codemirror-4.0/addon/fold/foldgutter.js"></script>
-<script src="libraries/codemirror-4.0/addon/fold/brace-fold.js"></script>
-<script src="libraries/codemirror-4.0/addon/fold/xml-fold.js"></script>
-<script src="libraries/codemirror-4.0/addon/fold/markdown-fold.js"></script>
-<script src="libraries/codemirror-4.0/addon/fold/comment-fold.js"></script>
-<link rel="stylesheet" href="libraries/codemirror-4.0/addon/fold/foldgutter.css" />
+<script src="libraries/codemirror/lib/codemirror.js"></script>
+<script src="libraries/codemirror/mode/xml/xml.js"></script>
+<script src="libraries/codemirror/mode/javascript/javascript.js"></script>
+<script src="libraries/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<script src="libraries/codemirror/mode/css/css.js"></script>
+<script src="libraries/codemirror/addon/display/fullscreen.js"></script>
+<script src="libraries/codemirror/addon/fold/foldcode.js"></script>
+<script src="libraries/codemirror/addon/fold/foldgutter.js"></script>
+<script src="libraries/codemirror/addon/fold/brace-fold.js"></script>
+<script src="libraries/codemirror/addon/fold/xml-fold.js"></script>
+<script src="libraries/codemirror/addon/fold/markdown-fold.js"></script>
+<script src="libraries/codemirror/addon/fold/comment-fold.js"></script>
+<script src="libraries/codemirror/addon/edit/closetag.js"></script>
+<link rel="stylesheet" href="libraries/codemirror/addon/fold/foldgutter.css" />
 <script src="libraries/nicEdit/nicEdit.js"></script>
 <script src="libraries/prettyprint/prettyprint.js"></script>
 <script src="libraries/shortcut.js"></script>
@@ -92,37 +95,37 @@ available for use by the sandbox app, add them here.
 <link rel="stylesheet" href="libraries/tinymce/skins/lightgray/skin.min.css">
 <link rel="stylesheet" href="libraries/textillate/animate.css">
 <link rel="stylesheet" href="libraries/MetroJs.Full.0.9.74/MetroJs.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/lib/codemirror.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/addon/display/fullscreen.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/night.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/3024-day.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/3024-night.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/ambiance.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/ambiance-mobile.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/base16-dark.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/base16-light.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/blackboard.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/cobalt.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/eclipse.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/elegant.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/erlang-dark.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/lesser-dark.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/mbo.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/midnight.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/monokai.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/neat.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/night.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/paraiso-dark.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/paraiso-light.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/pastel-on-dark.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/rubyblue.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/solarized.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/the-matrix.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/tomorrow-night-eighties.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/twilight.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/vibrant-ink.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/xq-dark.css">
-<link rel="stylesheet" href="libraries/codemirror-4.0/theme/xq-light.css">
+<link rel="stylesheet" href="libraries/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="libraries/codemirror/addon/display/fullscreen.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/night.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/3024-day.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/3024-night.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/ambiance.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/ambiance-mobile.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/base16-dark.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/base16-light.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/blackboard.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/cobalt.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/eclipse.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/elegant.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/erlang-dark.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/lesser-dark.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/mbo.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/midnight.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/monokai.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/neat.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/night.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/paraiso-dark.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/paraiso-light.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/pastel-on-dark.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/rubyblue.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/solarized.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/the-matrix.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/tomorrow-night-eighties.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/twilight.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/vibrant-ink.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/xq-dark.css">
+<link rel="stylesheet" href="libraries/codemirror/theme/xq-light.css">
 <link rel="stylesheet" type="text/css" href="libraries/jqplot/jquery.jqplot.css" />
 <link rel="stylesheet" type="text/css" href="libraries/dynatree/skin/ui.dynatree.css" />
 <link rel="stylesheet" type="text/css" href="libraries/jqGrid-4.5.4/css/ui.jqgrid.css" />
@@ -187,7 +190,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.83;
+	var VAR_TRIDENT_VERSION = 1.84;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -271,9 +274,10 @@ img.TridentImageButton:hover
 		// hopefully in the future we can implement mixed rendering or add separate css
 		editorMarkup = CodeMirror.fromTextArea(document.getElementById("sb_txt_Markup"), {
 			smartIndent: false,
+	        autoCloseTags: true,
 			lineNumbers: true,
 			theme: themeName,
-			mode: "xml",
+			mode: "htmlmixed",
 			foldGutter: true,
 			gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
 			extraKeys: {
@@ -341,6 +345,11 @@ img.TridentImageButton:hover
 		$(window).resize(function() {
 			sb_fit_log();
 			sb_fit_editors();
+			
+			// Allow User Programs to receive window resize events
+			// by implementing this callback
+			//if (EVT_WindowResize != null) EVT_WindowResize();
+			if (typeof(EVT_WindowResize) != "undefined") EVT_WindowResize();
 		});
 		
 		// Check for indexed db support and set up new TridentSandbox DB with simple app/key/value Object Store (Table) for internal and api use
@@ -943,6 +952,10 @@ img.TridentImageButton:hover
 	// Clear Environment  
 	// Ideally this would clear out the sandbox entirely
 	function sb_clean_sandbox()	{
+		// clear any old passwords and password handlers
+		$("#sb_password_text").val("");
+		$("#sb_password_ok").unbind("click");
+		
 		// clear source code
 		var markupText = "<h3>My Sandbox Program</h3>\r\n";
 		var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n}\r\n\r\nfunction EVT_CleanSandbox()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n}\r\n";
@@ -1604,6 +1617,9 @@ function API_Restore_TridentDB() {
 		
 		document.title = "Trident Sandbox v" + VAR_TRIDENT_VERSION;
 	
+		// clear any old passwords and password handlers
+		$("#sb_password_text").val("");
+		$("#sb_password_ok").unbind("click");
 		$("#sb_div_restorefile").hide();
 		
 		API_SetBackgroundColor("#fff");
@@ -1980,6 +1996,13 @@ function API_Restore_TridentDB() {
 		var cursor = store.openCursor();
 	 
 		cursor.onsuccess = callback;
+	}
+	
+	function API_ShowPasswordDialog(callback) {
+		$("#UI_PasswordDialog").show();
+		$("#sb_password_text").focus();
+		$("#sb_password_ok").unbind("click");
+		$("#sb_password_ok").bind("click", function() { callback($("#sb_password_text").val()); });
 	}
 	
 	// Wrapping all Storage Summary functionality into this object
@@ -2526,6 +2549,29 @@ Program Name :
 </table>
 </div>
 
+	<div id="UI_PasswordDialog" style="display:none">
+
+		<h3><span class="fa"><i class="fa fa-lock"></i></span> Authorization</h3>
+
+		<form action="javascript:void(0);" method="POST">
+
+			<fieldset>
+
+				<p><label for="password">Enter Password</label>
+				<input id="sb_password_text" type="password" id="password" value="" placeholder="password" >
+                </p>
+				<p>
+                	<button id="sb_password_ok" onclick="$('#UI_PasswordDialog').hide();">Ok</button>
+					<button onclick="$('#UI_PasswordDialog').hide();">Cancel</button>
+        		</p>
+
+			</fieldset>
+
+		</form>
+
+	</div> <!-- end login -->
+
+
 <div id='sb_trident_usage' style="display:none">
 	<div id="UI_TabsDashboard">
 		<ul>
@@ -2636,6 +2682,7 @@ Program Name :
 			</div>
 		</div>
 	</div>
+
 </div>
 </body>
 </html>

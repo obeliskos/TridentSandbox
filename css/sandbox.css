@@ -1,3 +1,113 @@
+/* ---------- Password Dialog ---------- */
+
+#UI_PasswordDialog {
+    margin: auto;
+	width: 400px;
+    position: absolute;
+    top:100px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+	z-index: 10;
+}
+
+#UI_PasswordDialog input {
+	border: none;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	-webkit-appearance: none;
+}
+
+#UI_PasswordDialog button {
+	border: none;
+	font-family: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	-webkit-appearance: none;
+}
+
+#UI_PasswordDialog h3 {
+	background-color: #f95252;
+	-webkit-border-radius: 20px 20px 0 0;
+	-moz-border-radius: 20px 20px 0 0;
+	border-radius: 20px 20px 0 0;
+	color: #fff;
+	font-size: 20px;
+	padding: 14px 26px;
+    margin:0px;
+}
+
+#UI_PasswordDialog h3 span[class*="fa"] {
+	margin-right: 14px;
+    
+}
+
+#UI_PasswordDialog fieldset {
+	background-color: #fff;
+	-webkit-border-radius: 0 0 20px 20px;
+	-moz-border-radius: 0 0 20px 20px;
+	border-radius: 0 0 20px 20px;
+	padding: 0px 26px 20px;
+}
+
+#UI_PasswordDialog fieldset p {
+	color: #777;
+	margin-bottom: 14px;
+}
+
+#UI_PasswordDialog fieldset p:last-child {
+	margin-bottom: 0;
+}
+
+#UI_PasswordDialog fieldset input {
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#UI_PasswordDialog fieldset button {
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+#UI_PasswordDialog fieldset input[type="password"] {
+	background-color: #eee;
+	color: #777;
+	padding: 4px 10px;
+	width: 328px;
+}
+
+#UI_PasswordDialog fieldset input[type="button"] {
+	background-color: #33cc77;
+	color: #fff;
+	display: block;
+	margin: 0 auto;
+	padding: 4px 0;
+	width: 100px;
+}
+
+#UI_PasswordDialog fieldset button {
+	background-color: #33cc77;
+	color: #fff;
+	display: inline;
+	margin: 0 auto;
+	padding: 4px 0;
+	width: 100px;
+}
+
+#UI_PasswordDialog fieldset button:hover {
+	background-color: #28ad63;
+}
+#UI_PasswordDialog fieldset input[type="button"]:hover {
+	background-color: #28ad63;
+}
+
+/* Navlist */
+
 ul.tnavlist
 {
 	list-style-type:none;

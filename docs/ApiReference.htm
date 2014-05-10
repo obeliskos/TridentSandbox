@@ -135,6 +135,10 @@ object inspector programmatically to display the contents of your own variable, 
 			<td>Call this method within your own program or as a Text Log Console command, passing it a javascript object to inspect, and it will bring up a dialog containing a Trident Sandbox object inspector.  This utilizes the prettyprint.js library to display</td>
 		</tr>
 		<tr>
+			<td>API_ShowPasswordDialog(callback)</td>
+			<td>Display a Password Entry dialog where the user can enter a password.  The callback you pass in will be called if they click on the dialog's Ok button.</td>
+		</tr>
+		<tr>
 			<td>API_PlaySound(soundFilename)</td>
 			<td>This method plays the sound indicated by soundFilename. It assumes the file is in the 'sounds' subfolder.</td>
 		</tr>
@@ -239,8 +243,9 @@ object inspector programmatically to display the contents of your own variable, 
 			<td>You might call this API function within a real program to dynamically retrieve the unit as a string which you can then insert into a div such as the HTML output log (UI_HtmlLogPlaceholder)</td>
 		</tr>
 		<tr>
-			<td>API_ImportMarkupUnit(unitName, clearFirst)</td>
-			<td>You might call this API function to automatically load the markup unit into the HTML log tab.  If you pass 'true' for the clearFirst param you will clear out any old html, otherwise you will append to the HTML output.</td>
+			<td>API_ImportMarkupUnit(unitName, clearFirst) (Obsolete)</td>
+			<td>You might call this API function to automatically load the markup unit into the HTML log tab.  Since the SandboxLoader page does not have an HTML log tab, this will not work with the 'Launch' Command.  
+			If you pass 'true' for the clearFirst param you will clear out any old html, otherwise you will append to the HTML output.  To work across 'Run' and 'Launch' environments, you should use API_GetMarkupUnit instead.</td>
 		</tr>
 		<tr>
 			<td>API_LogScriptUnits()</td>
@@ -267,6 +272,10 @@ object inspector programmatically to display the contents of your own variable, 
 		<tr>
 			<th>Event Name</th>
 			<th>Description</th>
+		</tr>
+		<tr>
+			<td>EVT_WindowResize()</td>
+			<td>Implement this callback to be notified whenever the browser window is resized.</td>
 		</tr>
 		<tr>
 			<td>EVT_UserLoadCallback(filestring, filename)</td>
