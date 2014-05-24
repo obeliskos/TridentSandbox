@@ -1,3 +1,6 @@
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: http://codemirror.net/LICENSE
+
 // This is CodeMirror (http://codemirror.net), a code editor
 // implemented in JavaScript on top of the browser's DOM.
 //
@@ -460,7 +463,7 @@
   // the the current scroll position). viewPort may contain top,
   // height, and ensure (see op.scrollToPos) properties.
   function visibleLines(display, doc, viewPort) {
-    var top = viewPort && viewPort.top != null ? viewPort.top : display.scroller.scrollTop;
+    var top = viewPort && viewPort.top != null ? Math.max(0, viewPort.top) : display.scroller.scrollTop;
     top = Math.floor(top - paddingTop(display));
     var bottom = viewPort && viewPort.bottom != null ? viewPort.bottom : top + display.wrapper.clientHeight;
 
@@ -476,7 +479,7 @@
         return {from: lineAtHeight(doc, heightAtLine(getLine(doc, ensureTo)) - display.wrapper.clientHeight),
                 to: ensureTo};
     }
-    return {from: from, to: to};
+    return {from: from, to: Math.max(to, from + 1)};
   }
 
   // LINE NUMBERS
@@ -663,7 +666,6 @@
     cm.display.sizer.style.minHeight = cm.display.heightForcer.style.top = measure.docHeight + "px";
     cm.display.gutters.style.height = Math.max(measure.docHeight, measure.clientHeight - scrollerCutOff) + "px";
   }
-
 
   function checkForWebkitWidthBug(cm, measure) {
     // Work around Webkit bug where it sometimes reserves space for a
@@ -1147,7 +1149,8 @@
     if (hasHandler(doc, "beforeSelectionChange") || doc.cm && hasHandler(doc.cm, "beforeSelectionChange"))
       sel = filterSelectionChange(doc, sel);
 
-    var bias = cmp(sel.primary().head, doc.sel.primary().head) < 0 ? -1 : 1;
+    var bias = options && options.bias ||
+      (cmp(sel.primary().head, doc.sel.primary().head) < 0 ? -1 : 1);
     setSelectionInner(doc, skipAtomicInSelection(doc, sel, bias, true));
 
     if (!(options && options.scroll === false) && doc.cm)
@@ -1927,6 +1930,10 @@
     if (!updated && op.selectionChanged) updateSelection(cm);
     if (!updated && op.startHeight != cm.doc.height) updateScrollbars(cm);
 
+    // Abort mouse wheel delta measurement, when scrolling explicitly
+    if (display.wheelStartX != null && (op.scrollTop != null || op.scrollLeft != null || op.scrollToPos))
+      display.wheelStartX = display.wheelStartY = null;
+
     // Propagate the scroll position to the actual DOM scroller
     if (op.scrollTop != null && display.scroller.scrollTop != op.scrollTop) {
       var top = Math.max(0, Math.min(display.scroller.scrollHeight - display.scroller.clientHeight, op.scrollTop));
@@ -2140,7 +2147,8 @@
 
   function viewCuttingPoint(cm, oldN, newN, dir) {
     var index = findViewIndex(cm, oldN), diff, view = cm.display.view;
-    if (!sawCollapsedSpans) return {index: index, lineN: newN};
+    if (!sawCollapsedSpans || newN == cm.doc.first + cm.doc.size)
+      return {index: index, lineN: newN};
     for (var i = 0, n = cm.display.viewFrom; i < index; i++)
       n += view[i].size;
     if (n != oldN) {
@@ -2352,7 +2360,7 @@
         var pos = posFromMouse(cm, e);
         if (!pos || clickInGutter(cm, e) || eventInWidget(cm.display, e)) return;
         e_preventDefault(e);
-        var word = findWordAt(cm.doc, pos);
+        var word = findWordAt(cm, pos);
         extendSelection(cm.doc, word.anchor, word.head);
       }));
     else
@@ -2567,17 +2575,17 @@
       lastClick = {time: now, pos: start};
     }
 
-    var sel = cm.doc.sel, addNew = mac ? e.metaKey : e.ctrlKey;
-    if (cm.options.dragDrop && dragAndDrop && !addNew && !isReadOnly(cm) &&
+    var sel = cm.doc.sel, modifier = mac ? e.metaKey : e.ctrlKey;
+    if (cm.options.dragDrop && dragAndDrop && !isReadOnly(cm) &&
         type == "single" && sel.contains(start) > -1 && sel.somethingSelected())
-      leftButtonStartDrag(cm, e, start);
+      leftButtonStartDrag(cm, e, start, modifier);
     else
-      leftButtonSelect(cm, e, start, type, addNew);
+      leftButtonSelect(cm, e, start, type, modifier);
   }
 
   // Start a text drag. When it ends, see if any dragging actually
   // happen, and treat as a click if it didn't.
-  function leftButtonStartDrag(cm, e, start) {
+  function leftButtonStartDrag(cm, e, start, modifier) {
     var display = cm.display;
     var dragEnd = operation(cm, function(e2) {
       if (webkit) display.scroller.draggable = false;
@@ -2586,7 +2594,8 @@
       off(display.scroller, "drop", dragEnd);
       if (Math.abs(e.clientX - e2.clientX) + Math.abs(e.clientY - e2.clientY) < 10) {
         e_preventDefault(e2);
-        extendSelection(cm.doc, start);
+        if (!modifier)
+          extendSelection(cm.doc, start);
         focusInput(cm);
         // Work around unexplainable focus problem in IE9 (#2127)
         if (ie_upto10 && !ie_upto8)
@@ -2624,7 +2633,7 @@
       start = posFromMouse(cm, e, true, true);
       ourIndex = -1;
     } else if (type == "double") {
-      var word = findWordAt(doc, start);
+      var word = findWordAt(cm, start);
       if (cm.display.shift || doc.extend)
         ourRange = extendRange(doc, ourRange, word.anchor, word.head);
       else
@@ -2670,13 +2679,15 @@
             ranges.push(new Range(Pos(line, leftPos), Pos(line, findColumn(text, right, tabSize))));
         }
         if (!ranges.length) ranges.push(new Range(start, start));
-        setSelection(doc, normalizeSelection(startSel.ranges.slice(0, ourIndex).concat(ranges), ourIndex), sel_mouse);
+        setSelection(doc, normalizeSelection(startSel.ranges.slice(0, ourIndex).concat(ranges), ourIndex),
+                     {origin: "*mouse", scroll: false});
+        cm.scrollIntoView(pos);
       } else {
         var oldRange = ourRange;
         var anchor = oldRange.anchor, head = pos;
         if (type != "single") {
           if (type == "double")
-            var range = findWordAt(doc, pos);
+            var range = findWordAt(cm, pos);
           else
             var range = new Range(Pos(pos.line, 0), clipPos(doc, Pos(pos.line + 1, 0)));
           if (cmp(range.anchor, anchor) > 0) {
@@ -2808,7 +2819,8 @@
       try {
         var text = e.dataTransfer.getData("Text");
         if (text) {
-          var selected = cm.state.draggingText && cm.listSelections();
+          if (cm.state.draggingText && !(mac ? e.metaKey : e.ctrlKey))
+            var selected = cm.listSelections();
           setSelectionNoUndo(cm.doc, simpleSelection(pos, pos));
           if (selected) for (var i = 0; i < selected.length; ++i)
             replaceRange(cm.doc, "", selected[i].anchor, selected[i].head, "drag");
@@ -3164,6 +3176,9 @@
         var extval = display.input.value = "\u200b" + (selected ? display.input.value : "");
         display.prevInput = selected ? "" : "\u200b";
         display.input.selectionStart = 1; display.input.selectionEnd = extval.length;
+        // Re-set this, in case some other handler touched the
+        // selection in the meantime.
+        display.selForContextMenu = cm.doc.sel;
       }
     }
     function rehide() {
@@ -3764,10 +3779,11 @@
     else if (unit == "column") moveOnce(true);
     else if (unit == "word" || unit == "group") {
       var sawType = null, group = unit == "group";
+      var helper = doc.cm && doc.cm.getHelper(pos, "wordChars");
       for (var first = true;; first = false) {
         if (dir < 0 && !moveOnce(!first)) break;
         var cur = lineObj.text.charAt(ch) || "\n";
-        var type = isWordChar(cur) ? "w"
+        var type = isWordChar(cur, helper) ? "w"
           : group && cur == "\n" ? "n"
           : !group || /\s/.test(cur) ? null
           : "p";
@@ -3807,13 +3823,15 @@
   }
 
   // Find the word at the given position (as returned by coordsChar).
-  function findWordAt(doc, pos) {
-    var line = getLine(doc, pos.line).text;
+  function findWordAt(cm, pos) {
+    var doc = cm.doc, line = getLine(doc, pos.line).text;
     var start = pos.ch, end = pos.ch;
     if (line) {
+      var helper = cm.getHelper(pos, "wordChars");
       if ((pos.xRel < 0 || end == line.length) && start) --start; else ++end;
       var startChar = line.charAt(start);
-      var check = isWordChar(startChar) ? isWordChar
+      var check = isWordChar(startChar, helper)
+        ? function(ch) { return isWordChar(ch, helper); }
         : /\s/.test(startChar) ? function(ch) {return /\s/.test(ch);}
         : function(ch) {return !/\s/.test(ch) && !isWordChar(ch);};
       while (start > 0 && check(line.charAt(start - 1))) --start;
@@ -4618,13 +4636,25 @@
     },
     transposeChars: function(cm) {
       runInOp(cm, function() {
-        var ranges = cm.listSelections();
+        var ranges = cm.listSelections(), newSel = [];
         for (var i = 0; i < ranges.length; i++) {
           var cur = ranges[i].head, line = getLine(cm.doc, cur.line).text;
-          if (cur.ch > 0 && cur.ch < line.length - 1)
-            cm.replaceRange(line.charAt(cur.ch) + line.charAt(cur.ch - 1),
-                            Pos(cur.line, cur.ch - 1), Pos(cur.line, cur.ch + 1));
+          if (line) {
+            if (cur.ch == line.length) cur = new Pos(cur.line, cur.ch - 1);
+            if (cur.ch > 0) {
+              cur = new Pos(cur.line, cur.ch + 1);
+              cm.replaceRange(line.charAt(cur.ch - 1) + line.charAt(cur.ch - 2),
+                              Pos(cur.line, cur.ch - 2), cur, "+transpose");
+            } else if (cur.line > cm.doc.first) {
+              var prev = getLine(cm.doc, cur.line - 1).text;
+              if (prev)
+                cm.replaceRange(line.charAt(0) + "\n" + prev.charAt(prev.length - 1),
+                                Pos(cur.line - 1, prev.length - 1), Pos(cur.line, 1), "+transpose");
+            }
+          }
+          newSel.push(new Range(cur, cur));
         }
+        cm.setSelections(newSel);
       });
     },
     newlineAndIndent: function(cm) {
@@ -5750,6 +5780,8 @@
     }
 
     signal(cm, "renderLine", cm, lineView.line, builder.pre);
+    if (builder.pre.className)
+      builder.textClass = joinClasses(builder.pre.className, builder.textClass || "");
     return builder;
   }
 
@@ -7054,10 +7086,15 @@
   }
 
   var nonASCIISingleCaseWordChar = /[\u00df\u3040-\u309f\u30a0-\u30ff\u3400-\u4db5\u4e00-\u9fcc\uac00-\ud7af]/;
-  var isWordChar = CodeMirror.isWordChar = function(ch) {
+  var isWordCharBasic = CodeMirror.isWordChar = function(ch) {
     return /\w/.test(ch) || ch > "\x80" &&
       (ch.toUpperCase() != ch.toLowerCase() || nonASCIISingleCaseWordChar.test(ch));
   };
+  function isWordChar(ch, helper) {
+    if (!helper) return isWordCharBasic(ch);
+    if (helper.source.indexOf("\\w") > -1 && isWordCharBasic(ch)) return true;
+    return helper.test(ch);
+  }
 
   function isEmpty(obj) {
     for (var n in obj) if (obj.hasOwnProperty(n) && obj[n]) return false;
@@ -7558,7 +7595,7 @@
 
   // THE END
 
-  CodeMirror.version = "4.1.1";
+  CodeMirror.version = "4.2.1";
 
   return CodeMirror;
 });
