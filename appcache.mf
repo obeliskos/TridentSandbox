@@ -1,8 +1,9 @@
 CACHE MANIFEST
-#rev 185
+#rev 186
 
 CACHE:
 TridentSandbox.htm
+SilentSandbox.htm
 SandboxLoader.htm
 css/sandbox.css
 scripts/tridentlist.js
@@ -28,9 +29,11 @@ libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-u
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/index.html
 libraries/alertify.js-0.3.11/lib/alertify.js
 libraries/cryptojs/components/core.js
+libraries/cryptojs/components/lib-typedarrays.js
 libraries/cryptojs/rollups/sha1.js
 libraries/cryptojs/rollups/aes.js
 libraries/cryptojs/rollups/md5.js
+libraries/cryptojs/rollups/hmac-sha1.js
 libraries/cryptojs/components/enc-base64-min.js
 libraries/cryptojs/components/enc-utf16-min.js
 libraries/localStorageDB/localstoragedb.min.js
@@ -239,6 +242,7 @@ samples/Analog%20Clocks%20SVG.prg
 samples/Browser%20UserAgent.prg
 samples/Canvas%20Tiles.prg
 samples/CryptoJS.prg
+samples/CryptoJS%20File%20Hasher.prg
 samples/CryptoJS%20Notepad.prg
 samples/CSS%20Transforms.prg
 samples/DigitalClock.prg

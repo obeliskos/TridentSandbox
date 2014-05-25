@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--html-->
-<html manifest="appcache.mf"> 
+<html> 
 <head>
 <title>Trident Sandbox</title>
 <meta charset="utf-8">
@@ -473,8 +473,8 @@ img.TridentImageButton:hover
 	{
 		sb_appcache_progress++;
 		
-		// hardcoding 285 total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/285) + "%)");
+		// hardcoding 284 total # files
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/284) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic

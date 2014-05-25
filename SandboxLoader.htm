@@ -36,11 +36,13 @@ available for use by the sandbox app, add them here.
 <script src="scripts/tridentlist.js"></script>
 <script src="libraries/alertify.js-0.3.11/lib/alertify.js"></script>
 <script src="libraries/cryptojs/components/core.js"></script>
+<script src="libraries/cryptojs/components/lib-typedarrays.js"></script>
+<script src="libraries/cryptojs/components/enc-base64-min.js"></script>
+<script src="libraries/cryptojs/components/enc-utf16-min.js"></script>
 <script src="libraries/cryptojs/rollups/sha1.js"></script>
 <script src="libraries/cryptojs/rollups/aes.js"></script>
 <script src="libraries/cryptojs/rollups/md5.js"></script>
-<script src="libraries/cryptojs/components/enc-base64-min.js"></script>
-<script src="libraries/cryptojs/components/enc-utf16-min.js"></script>
+<script src="libraries/cryptojs/rollups/hmac-sha1.js"></script>
 <script src="libraries/localStorageDB/localstoragedb.min.js"></script>
 <script src="libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js"></script>
 <script src="libraries/jqGrid-4.5.4/js/i18n/grid.locale-en.js"></script>
@@ -187,6 +189,12 @@ img.TridentImageButton:hover
 			document.body.innerHTML = "Trident Sandbox does not run in an IFRAME";
 			return;
 		}
+		
+		// Fix for IE 10 and possibly IE 11 (on 8.1 update 0)
+		// Needed for Crypto.JS to work properly with typearray lib
+		if (typeof Uint8ClampedArray == "undefined") {
+            Uint8ClampedArray = Uint8Array;
+        }
 		
 		alertify.set({ buttonReverse: true });
 		
@@ -697,8 +705,9 @@ function API_Restore_TridentDB() {
 	function API_MetalFullscreen() {
 	}
 	
-	function API_UserFullscreen() {
-		var elem = UI_TabsOutput;
+	function API_UserFullscreen(elem) {
+		if (elem == null) elem = document.getElementById("UI_MainPlaceholder");
+		
 		if (elem.requestFullscreen) {
 			elem.requestFullscreen();
 		} else if (elem.msRequestFullscreen) {
