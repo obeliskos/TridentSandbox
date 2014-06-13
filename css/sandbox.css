@@ -125,13 +125,16 @@ li.tnavli
 a.tnava:link,a.tnava:visited
 {
 	display:block;
-	min-width:160px;
+	min-width:120px;
 	font-weight:bold;
 	font-size:26px;
 	color:#FFFFFF;
 	background-color:#363;
 	text-align:center;
-	padding:4px;
+	padding-left:20px;
+	padding-right:20px;
+	padding-top:8px;
+	padding-bottom:8px;
 	text-decoration:none;
 	text-transform:uppercase;
 }

@@ -72,7 +72,11 @@ available for use by the sandbox app, add them here.
 <script src="libraries/codemirror/addon/fold/xml-fold.js"></script>
 <script src="libraries/codemirror/addon/fold/markdown-fold.js"></script>
 <script src="libraries/codemirror/addon/fold/comment-fold.js"></script>
-<link rel="stylesheet" href="libraries/codemirror-4.0/addon/fold/foldgutter.css" />
+<link rel="stylesheet" href="libraries/codemirror/addon/dialog/dialog.css">
+<script src="libraries/codemirror/addon/dialog/dialog.js"></script>
+<script src="libraries/codemirror/addon/search/searchcursor.js"></script>
+<script src="libraries/codemirror/addon/search/search.js"></script>
+<link rel="stylesheet" href="libraries/codemirror/addon/fold/foldgutter.css" />
 <script src="libraries/nicEdit/nicEdit.js"></script>
 <script src="libraries/prettyprint/prettyprint.js"></script>
 <script src="libraries/shortcut.js"></script>
@@ -91,6 +95,9 @@ available for use by the sandbox app, add them here.
 <script src="libraries/filesaver/FileSaver.js"></script>
 <script src="libraries/tinymce/tinymce.min.js"></script>
 <script src="libraries/indexed.js"></script>
+<script src="libraries/moment.min.js"></script>
+<script src="libraries/babylon.js/babylon.1.11.js"></script>
+<script src="libraries/json-editor/jsoneditor.js"></script>
 <link rel="stylesheet" href="libraries/tinymce/skins/lightgray/skin.min.css">
 <link rel="stylesheet" href="libraries/textillate/animate.css">
 <link rel="stylesheet" href="libraries/MetroJs.Full.0.9.74/MetroJs.css">
@@ -176,7 +183,7 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.86;
+	var VAR_TRIDENT_VERSION = 1.87;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -627,7 +634,7 @@ function API_Restore_TridentDB() {
 	function API_LoadScriptUnit(unitName) {
 	}
 	
-	function API_ImportScriptUnit(unitName) {
+	function API_ImportScriptUnit(unitName, callback) {
 		API_GetIndexedAppKey("SandboxScriptUnits", unitName, function(e) {
 			var res = e.target.result;
 			
@@ -636,8 +643,25 @@ function API_Restore_TridentDB() {
 				return;
 			}
 			
-			API_AppendUnitScript(res.val);
+			API_AppendUnitScript(res.val, callback);
 		});
+	}
+	
+	function API_AppendUnitScript(scriptText, callback) {
+		var s = document.createElement("script");
+		s.innerHTML = scriptText;
+		
+		document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
+		
+		if (typeof(callback) == "function") {
+			setTimeout(function() {
+				callback();
+			}, 100);
+		}
+	}
+	
+	function API_ClearUnitScripts() {
+		$("#UI_LibUnitPlaceholder").empty();
 	}
 	
 	// API/HELPER ROUTINES 
@@ -685,17 +709,6 @@ function API_Restore_TridentDB() {
 	}
 	
 	function API_ClearLog()	{
-	}
-	
-	function API_AppendUnitScript(scriptText) {
-		var s = document.createElement("script");
-		s.innerHTML = scriptText;
-		
-		document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
-	}
-	
-	function API_ClearUnitScripts() {
-		$("#UI_LibUnitPlaceholder").empty();
 	}
 	
 	function API_SetActiveTab(tabId) {

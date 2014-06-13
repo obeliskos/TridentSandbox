@@ -123,8 +123,8 @@ object inspector programmatically to display the contents of your own variable, 
 			<td>equivalent to pressing the &#39;Fullscreen Dev&#39; button</td>
 		</tr>
 		<tr>
-			<td>API_UserFullscreen()</td>
-			<td>this command zooms the users Output tabs fullscreen.</td>
+			<td>API_UserFullscreen(elem)</td>
+			<td>If no param is passed, this command zooms the users Main Output tab fullscreen.&nbsp; You can also pass the actual dom element you want 'fullscreened'</td>
 		</tr>
 		<tr>
 			<td>API_UserFullscreenExit()</td>
@@ -152,6 +152,7 @@ object inspector programmatically to display the contents of your own variable, 
 		</tr>
 	</tbody>
 </table>
+<br/>
 <table style="width:100%">
 	<tbody>
 		<tr>
@@ -188,6 +189,7 @@ object inspector programmatically to display the contents of your own variable, 
 		</tr>
 	</tbody>
 </table>
+<br/>
 <table style="width:100%">
 	<tbody>
 		<tr>
@@ -226,6 +228,15 @@ object inspector programmatically to display the contents of your own variable, 
 			<td>API_Restore_TridentDB()</td>
 			<td>You might call this API function as a Text Log Console command to bring up a file loader for loading a Trident Database backup file.  Upon selecting a file it will restore the database.</td>
 		</tr>
+	</tbody>
+</table>
+<br/>
+<table style="width:100%">
+	<tbody>
+		<tr>
+			<th>Unit Library Functions</th>
+			<th>Description (These are only available when used in a hosted or appcached environment.</th>
+		</tr>
 		<tr>
 			<td>API_LogMarkupUnits()</td>
 			<td>You might call this API function as a Text Log Console command to show a list of all of the markup units in the database.</td>
@@ -260,8 +271,12 @@ object inspector programmatically to display the contents of your own variable, 
 			<td>You might call this API function as a Text Log Console command to load the unit back into the Script editor, perhaps to further edit.</td>
 		</tr>
 		<tr>
-			<td>API_ImportScriptUnit(unitName)</td>
-			<td>You might call this API function within a real program to import the script into a 'known' area specifically intended for placing these scripts.  Using this mechanism they will also be subsequently 'cleared' when Trident Sandbox does its usual housekeeping / garbage collection. </td>
+			<td>API_ImportScriptUnit(unitName, callback)</td>
+			<td>You might call this API function within a real program to import the script into a 'known' area specifically intended for placing these scripts.  Passing optional callback, it will be called when script is 'ready'.&nbsp; Ready means i wait 200ms after i insert script to give browser a chance to parse... that should hopefully be enough time for most scripts.  If importing multiple scripts (not dependent on each other), you might just pass the callback on the last one.</td>
+		</tr>
+		<tr>
+			<td>API_ClearUnitScripts()</td>
+			<td>This method will clear the div where all your imported scripts are loaded.  They likely have already been attached to the window object so this will probably have no effect unless you clean up yourself or refresh page.</td>
 		</tr>
 	</tbody>
 </table>

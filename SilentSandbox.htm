@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="description" content="Trident Sandbox is an in-browser HTML/Javascript Scripting IDE that uses HTML 5 Application Cache functionality to run offline." />
 
-<!-- Uncomment this (if hosted) to allow Windows 8.x site 'pinning'
+<!-- Leaving this uncommented while running local fs in metro ie seemed to have issues
 <meta name="application-name" content="Trident Sandbox"/>
 <meta name="msapplication-TileColor" content="#1F7DD0"/>
 <meta name="msapplication-square70x70logo" content="images_ide/live_tile/Poseidon-Small70.png"/>
@@ -81,6 +81,10 @@ available for use by the sandbox app, add them here.
 <script src="libraries/codemirror/addon/fold/markdown-fold.js"></script>
 <script src="libraries/codemirror/addon/fold/comment-fold.js"></script>
 <script src="libraries/codemirror/addon/edit/closetag.js"></script>
+<link rel="stylesheet" href="libraries/codemirror/addon/dialog/dialog.css">
+<script src="libraries/codemirror/addon/dialog/dialog.js"></script>
+<script src="libraries/codemirror/addon/search/searchcursor.js"></script>
+<script src="libraries/codemirror/addon/search/search.js"></script>
 <link rel="stylesheet" href="libraries/codemirror/addon/fold/foldgutter.css" />
 <script src="libraries/nicEdit/nicEdit.js"></script>
 <script src="libraries/prettyprint/prettyprint.js"></script>
@@ -100,6 +104,9 @@ available for use by the sandbox app, add them here.
 <script src="libraries/filesaver/FileSaver.js"></script>
 <script src="libraries/tinymce/tinymce.min.js"></script>
 <script src="libraries/indexed.js"></script>
+<script src="libraries/moment.min.js"></script>
+<script src="libraries/babylon.js/babylon.1.11.js"></script>
+<script src="libraries/json-editor/jsoneditor.js"></script>
 <link rel="stylesheet" href="libraries/tinymce/skins/lightgray/skin.min.css">
 <link rel="stylesheet" href="libraries/textillate/animate.css">
 <link rel="stylesheet" href="libraries/MetroJs.Full.0.9.74/MetroJs.css">
@@ -199,12 +206,13 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.86;
+	var VAR_TRIDENT_VERSION = 1.87;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
 	var VAR_TRIDENT_ENV_TYPE = 'IDE'; // IDE, STANDALONE, SBL
 	var VAR_TRIDENT_DB = null;
+	var VAR_ForceOnlineSamples = true;
 
 	// possibly hash script and markup to determine if changes have been made 
 	var sb_markup_hash = null;
@@ -258,14 +266,13 @@ img.TridentImageButton:hover
 		API_ClearLog();
 		
 		document.title = "Trident Sandbox v" + VAR_TRIDENT_VERSION;
-		$("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + VAR_TRIDENT_VERSION + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\n-->");
+		$("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + VAR_TRIDENT_VERSION + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
 		
 		// ugly but lenient feature detection for Displaying Browse Samples button
 		// if served up from anywhere other than filesystem ... show
 		// if served up from filesystem and localStorage is available... show 
 		// Mozilla supports ajax calls under filesystem
 		if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB) {
-			$(".ui_browse_samples").show();
 			$(".ui_show_dashboard").show();
 			$(".ui_btn_launch").show();
 			$(".ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
@@ -275,15 +282,13 @@ img.TridentImageButton:hover
 			$("#sb_div_diagnostic").hide();
 		}
 
-		$("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + VAR_TRIDENT_VERSION + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\n-->");
-
 		// We are keeping track of whether the user has pending changes via a Crypto.JS hash on the markup and script
 		// This will now calculate the initial value based on our Welcome text above
 		sb_markup_hash = CryptoJS.SHA1($("#sb_txt_Markup").val()).toString();
 		sb_script_hash = CryptoJS.SHA1("").toString();
 		
 		// CHANGE THEME name Here look at the stylesheets above to get the name
-		var themeName = "twilight";
+		var themeName = "vibrant-ink";
 
 		// We are using xml mode for markup so that if we add style tag it wont mess up rendering
 		// hopefully in the future we can implement mixed rendering or add separate css
@@ -473,8 +478,8 @@ img.TridentImageButton:hover
 	{
 		sb_appcache_progress++;
 		
-		// hardcoding 284 total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/284) + "%)");
+		// hardcoding 288 total # files
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/288) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -717,6 +722,9 @@ img.TridentImageButton:hover
 					API_SetIndexedAppKey(app, key, val);
 				}
 				
+				// In case the restore contained new Trident Save Slots, refresh the list
+				sb_refresh_slots();
+				
 				alertify.success("Restore Completed");
 			};
 			reader.onerror = errorHandler;
@@ -764,19 +772,16 @@ img.TridentImageButton:hover
 			$("#sb_div_compile_standalone").hide();
 		}, 200);
 	}
-	
-	function sb_browse_samples() {
-	
-		if (typeof(EVT_CleanSandbox) == typeof(Function)) {
-			try {
-				EVT_CleanSandbox();
-			}
-			catch (err) {
-			}
-		}
 
+	function sb_browse_samples_action() {
+		var baseUrl = "";
+
+		if (VAR_ForceOnlineSamples) {
+			baseUrl = "http://www.obeliskos.com/TridentSandbox/";
+			alertify.log("Accessing Online Samples Browser");
+		}
 		setTimeout(function() {
-			var url = "samples/Hosted Samples Browser.prg";
+			var url = baseUrl + "samples/Hosted Samples Browser.prg";
 
 			jQuery.ajax({
 				type: "GET",
@@ -818,6 +823,37 @@ img.TridentImageButton:hover
 		}, 250);
 	}
 	
+	function sb_browse_samples() {
+	
+		if (typeof(EVT_CleanSandbox) == typeof(Function)) {
+			try {
+				EVT_CleanSandbox();
+			}
+			catch (err) {
+			}
+		}
+
+		// Let Local Filesystem version use samples browser as an 'online' only feature for convenience.  
+		// If running local filesystem ask them if they want to AJAX to online web samples, 
+		// otherwise attempt to ajax to local filesystem which works on firefox (and possibly others?)
+		if (!VAR_TRIDENT_HOSTED) {
+			alertify.confirm("Go online to access samples?", function (e) {
+					if (e) {
+						VAR_ForceOnlineSamples = true;
+						sb_browse_samples_action();
+					} else {
+						VAR_ForceOnlineSamples = false;
+						API_LogMessage("Since you chose not to go online you may encounter permissions errors attempting to load samples using this browser.  You can always use the file pickers to manually load each sample individually offline from your samples folder.");
+						sb_browse_samples_action();
+					}
+			});
+		}
+		else {
+			VAR_ForceOnlineSamples = false;
+			sb_browse_samples_action();
+		}
+	}
+	
 	function sb_refresh_slots(callback) {
 		// clear out slots select
 		$("#sb_sel_trident_slot").html("<option></option>");
@@ -847,7 +883,7 @@ img.TridentImageButton:hover
 				// in case editor toolbar wrapped or flattened due to wider/thinner save slot select
 				sb_fit_editors(); 
 
-				if (callback) callback();
+				if (typeof(callback) == "function") callback();
 			}
 		});
 	}
@@ -873,7 +909,7 @@ img.TridentImageButton:hover
 			editorMarkup.setValue(sandboxObject.htmlText);
 			editorScript.setValue(sandboxObject.scriptText);
 		
-			if (autoRun != null && autoRun) sb_run();
+			if (typeof(autoRun) != "undefined" && autoRun) sb_run();
 		});
 	}
 	
@@ -924,7 +960,7 @@ img.TridentImageButton:hover
 							$("#sb_sel_trident_slot").val(progNameString)
 						});
 						
-						if (callback) callback();
+						if (typeof(callback) == "function") callback();
 					}
 					catch(e) {
 						alertify.alert("Error encountered during save to TridentDB : " + e.message);
@@ -935,7 +971,7 @@ img.TridentImageButton:hover
 		else {
 			API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
 						
-			if (callback) callback();
+			if (typeof(callback) == "function") callback();
 		}
 	}
 	
@@ -1345,6 +1381,8 @@ function API_GetIndexedAppKeyById(id, callback, data) {
 	var store = transaction.objectStore("TridentSandboxKVP");
   	var request = store.get(id);
 
+	if (typeof(callback) != "function") API_LogMessage("Call to API_GetIndexedAppKeyById with invalid callback param");
+	
 	request.onsuccess = (function(data){
 		return function(e) { callback(e, data) };
 	})(data);   
@@ -1625,7 +1663,7 @@ function API_Restore_TridentDB() {
 		});
 	}
 	
-	function API_ImportScriptUnit(unitName) {
+	function API_ImportScriptUnit(unitName, callback) {
 		API_GetIndexedAppKey("SandboxScriptUnits", unitName, function(e) {
 			var res = e.target.result;
 			
@@ -1634,8 +1672,25 @@ function API_Restore_TridentDB() {
 				return;
 			}
 			
-			API_AppendUnitScript(res.val);
+			API_AppendUnitScript(res.val, callback);
 		});
+	}
+	
+	function API_AppendUnitScript(scriptText, callback) {
+		var s = document.createElement("script");
+		s.innerHTML = scriptText;
+		
+		document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
+		
+		if (typeof(callback) == "function") {
+			setTimeout(function() {
+				callback();
+			}, 200);
+		}
+	}
+	
+	function API_ClearUnitScripts() {
+		$("#UI_LibUnitPlaceholder").empty();
 	}
 	
 	// API/HELPER ROUTINES 
@@ -1736,17 +1791,6 @@ function API_Restore_TridentDB() {
 	
 	function API_ClearLog()	{
 		$("#UI_TxtLogText").val("");
-	}
-	
-	function API_AppendUnitScript(scriptText) {
-		var s = document.createElement("script");
-		s.innerHTML = scriptText;
-		
-		document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
-	}
-	
-	function API_ClearUnitScripts() {
-		$("#UI_LibUnitPlaceholder").empty();
 	}
 	
 	function API_SetActiveTab(tabId) {
@@ -2049,6 +2093,8 @@ function API_Restore_TridentDB() {
 	}
 	
 	function API_ShowPasswordDialog(callback) {
+		if (typeof(callback) != "function") API_LogMessage("Call to API_ShowPasswordDialog() with invalid callback param.");
+		
 		$("#UI_PasswordDialog").show();
 		$("#sb_password_text").focus();
 		$("#sb_password_ok").unbind("click");
@@ -2079,7 +2125,9 @@ function API_Restore_TridentDB() {
 				var cursor = e.target.result;
 				if(cursor) {
 					var currObject = cursor.value;
-					var keySize = currObject.val.length;
+					
+					// add app, key, appkey and val lengths
+					var keySize = currObject.app.length*2 + currObject.key.length*2 + currObject.val.length;
 					totalSizeTDB += keySize;
 					
 					cursor.continue();
@@ -2170,7 +2218,8 @@ function API_Restore_TridentDB() {
 						text: currObject.app + ";" + currObject.key
 					}));          
 				  
-					var keySize = currObject.val.length;
+					// add app, key, appkey and val lengths
+					var keySize = currObject.app.length*2 + currObject.key.length*2 + currObject.val.length;
 					totalSize += keySize;
 					
 					arrayTDB.push([currObject.key.slice(0,20), keySize]);
@@ -2447,8 +2496,8 @@ Theme: <select onchange="selectTheme()" id='selTheme' style='font-size:18px;'>
     <option>solarized light</option>
     <option>the-matrix</option>
     <option>tomorrow-night-eighties</option>
-    <option selected='selected'>twilight</option>
-    <option>vibrant-ink</option>
+    <option>twilight</option>
+    <option selected='selected'>vibrant-ink</option>
     <option>xq-dark</option>
     <option>xq-light</option>
 </select>
@@ -2465,12 +2514,12 @@ Pick a template to use for page generation : <input style='height:30px;width:180
 <div class="divWideButtons" style="display:inline">
 <button id="ui_gen_sa" class="ui_gen_sa" style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
 <button id="ui_show_dashboard" class="ui_show_dashboard" style='height:40px; display:none;' onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/> Storage Summary</button>
-<button id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px; display:none' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
+<button id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px;' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
 </div>
 <div class="divTinyButtons" style="display:inline">
 <button id="ui_gen_sa2" class="ui_gen_sa" style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/></button>
 <button id="ui_show_dashboard2" class="ui_show_dashboard" style='height:40px; display:none;' onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/></button>
-<button id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px; display:none' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/></button>
+<button id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px;' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/></button>
 </div>
 </td>
 <td>

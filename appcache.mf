@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 186
+#rev 187
 
 CACHE:
 TridentSandbox.htm
@@ -100,6 +100,10 @@ libraries/codemirror/theme/twilight.css
 libraries/codemirror/theme/vibrant-ink.css
 libraries/codemirror/theme/xq-dark.css
 libraries/codemirror/theme/xq-light.css
+libraries/codemirror/addon/dialog/dialog.css
+libraries/codemirror/addon/dialog/dialog.js
+libraries/codemirror/addon/search/searchcursor.js
+libraries/codemirror/addon/search/search.js
 libraries/nicEdit/nicEdit.js
 libraries/nicEdit/nicEditorIcons.gif
 libraries/tinymce/tinymce.min.js
@@ -137,7 +141,10 @@ libraries/textillate/jquery.lettering.js
 libraries/textillate/jquery.textillate.js
 libraries/textillate/animate.css
 libraries/filesaver/FileSaver.js
+libraries/moment.min.js
 libraries/indexed.js
+libraries/babylon.js/babylon.1.11.js
+libraries/json-editor/jsoneditor.js
 images_ide/cog.png
 images_ide/add.png
 images_ide/local.svg
@@ -239,7 +246,9 @@ sounds/ElectricalSweep.mp3
 samples/Ajax%20Test.prg
 samples/Alertify%20Demo.prg
 samples/Analog%20Clocks%20SVG.prg
+samples/Antikythera.prg
 samples/Browser%20UserAgent.prg
+samples/Babylon.JS%20Sample%20(WebGL).prg
 samples/Canvas%20Tiles.prg
 samples/CryptoJS.prg
 samples/CryptoJS%20File%20Hasher.prg
@@ -264,6 +273,7 @@ samples/IMDB%20Search.prg
 samples/jqPlot%20Demo.prg
 samples/jQuery%20UI%20Demo.prg
 samples/jQuery%20UI%20Menu.prg
+samples/JsonEditor%20Forms%20Sample.prg
 samples/Library%20Unit%20Management.prg
 samples/Loan%20Calculator.prg
 samples/Local%20Storage%20Usage.prg
@@ -283,6 +293,7 @@ samples/Trident%20Backup%20Restore.prg
 samples/Trident%20Binary%20Encryptor.prg
 samples/Trident%20DB%20Usage.prg
 samples/Trident%20Sandbox%20RSS%20Reader.prg
+samples/Trident%20Sandbox%20Radio%20x86.prg
 samples/Trident%20UI%20Demo.prg
 samples/WebGL%20Spinning%20Box.prg
 samples/WebGL%20Spinning%20Crate.prg

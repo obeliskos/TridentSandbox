@@ -5,7 +5,7 @@
 <link rel="stylesheet" type="text/css" href="docs.css" />
 </head>
 <body>
-Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ] [ <a href="MarkupAndScriptUnits.htm">Markup and Script Units</a> ] [ <a href="https://github.com/obeliskos/TridentSandbox" target="_blank">Github Site</a> ] [Email : <a href="mailto:admin@obeliskos.com">admin@obeliskos.com</a> ]
+Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ] [ <a href="MarkupAndScriptUnits.htm">Markup and Script Units</a> ] [Email : <a href="mailto:admin@obeliskos.com">admin@obeliskos.com</a> ] [ <a href="https://github.com/obeliskos/TridentSandbox/commits/master" target="_blank">Change Log</a> ]
 
 <h2>Welcome to Trident Sandbox</h2>
 
@@ -19,9 +19,7 @@ Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href=
 
 <p>To help simplify your ability to manipulate the sandbox, i have provided a set of API functions, user elements, and variables which can help you control the environment.</p>
 
-<p>A simple object inspector is provided which will allow you to examine variables in your program.  If you need more debugging capabilities, you can use the Internet Explorer script debugger to debug your scripts.  Since your code is dynamic you need to place a javascript command &#39;debugger;&#39; (no quotes) into a line of code in your script and then pressing F12 to open the Internet Explorer tools and find the tab with a bug icon picture on it to enable the script debugger... leaving the script debugger window open attempt your run your program and when it hits that line of code you can inspect variables, set other breakpoints, or access the javascript console.</p>
-
-<p>Trident Sandbox comes with a number of open source third-party javascript libraries which you can use within your programs. These libraries (as of Trident Sandbox version 1.75) include :</p>
+<p>Trident Sandbox comes with a number of open source third-party javascript libraries which you can use within your programs. These libraries (as of Trident Sandbox version 1.87) include :</p>
 
 <ul>
 	<li><a href="http://jquery.com/" target="_blank">jQuery</a> : like a query language for the html DOM. It is also needed by most of the other libraries.</li>
@@ -29,6 +27,7 @@ Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href=
 	<li><a href="http://www.trirand.com/blog/" target="_blank">jqGrid</a> : a popular versatile grid control</li>
 	<li><a href="http://www.jqplot.com/" target="_blank">jqPlot</a> : awesome charting library</li>
 	<li><a href="http://fabien-d.github.io/alertify.js/" target="_blank">Alertify.JS</a> : Simple way of dispaying message boxes or notifications.</li>
+	<li><a href="http://james.padolsey.com/javascript/prettyprint-for-javascript/" target="_blank">PrettyPrint.js</a> : This is what the Trident 'Inspect' function uses to dump an object to an html table</li>
 	<li><a href="https://code.google.com/p/crypto-js/" target="_blank">Crypto.JS</a> : Simple encryption capabilities</li>
 	<li><a href="http://code.google.com/p/dynatree/" target="_blank">Dynatree</a> : a hierarchical tree control</li>
 	<li><a href="http://threejs.org/" target="_blank">Three.JS</a> : Bare minimum distribution included, download the full zip file from their website. Allows higher level use of WebGL.</li>
@@ -43,6 +42,9 @@ Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href=
 	<li><a href="https://github.com/nosir/obelisk.js/" target="_blank">Obelisk.js</a> : Obelisk.js is a JavaScript Engine for building isometric pixel objects</li>
 	<li><a href="http://www.tinymce.com/" target="_blank">TinyMCE</a> : Javascript HTML WYSIWYG editor control </li> 
 	<li><a href="http://fluidbyte.net/indexed-query-inexeddb-like-mongo/" target="_blank">Indexed.js</a> : Mongo-like interface for IndexedDB.&nbsp; ...for if the Trident DB and/or loki.js does not fit your program's database needs</li> 
+	<li><a href="http://momentjs.com/" target="_blank">Moment.js</a> : A javascript date library for parsing, validating, manipulating, and formatting dates.</li>
+	<li><a href="http://www.babylonjs.com/" target="_blank">Babylon.js</a> : a complete JavaScript framework for building 3D games with HTML 5 and WebGL.</li>
+	<li><a href="https://github.com/jdorn/json-editor" target="_blank">jsoneditor.js</a> : JSON Editor takes a JSON Schema and uses it to generate an HTML form.</li>
 </ul>
 
 <p>If you need to add other javascript libraries you can put them alongside the others... in the libraries subfolder. Then edit the TridentSandbox.htm file and add script include tags (or stylesheet links) similar to the other libraries.</p>

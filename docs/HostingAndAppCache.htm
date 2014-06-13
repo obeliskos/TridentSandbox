@@ -34,9 +34,7 @@ In Internet Explorer, if you go into Tools/Internet Options/Security, you have Z
 then you can add the Trident Sandbox AppCache domain (http://www.obeliskos.com) to that zone.&nbsp; In order to do that you will have to disable the checkbox 'Require server verification (https:) for all sites in this zone' 
 since my AppCache site does not support SSL.&nbsp; Now, if the 'Trusted' Zone is highlighted click on 'Custom level...', scroll down to the 'Miscellaneous' section 
 and set the 'Access data sources across domains' option to 'Enable' for your data requests to work.&nbsp; It is important to not to apply this setting to the 'Internet' Zone for security purposes that would open 
-this feature to pretty much every site you visit.&nbsp; If you already have sites in your 'Trusted' zone you probably don't want to do this, and you should just do this temporarily when you need internet access not as a permanent policy. 
-Do not visit any untrusted sites while the setting is active.&nbsp; When you are done you can re-apply the https: required checkbox and set the 'Access data sources across domains' back to disabled.&nbsp; If you host Trident Sandbox 
-yourself on a server with https enabled and your site was the only site in the Trusted zone, then you could safely leave it enabled all of the time.&nbsp; That said, and all warnings duly noted, this workaround opens the possibly 
+this feature to pretty much every site you visit.&nbsp; If you already have sites in your 'Trusted' zone you probably don't want to do this.&nbsp; That said, and all warnings duly noted, this workaround opens the possibly 
 of implementing all sorts of creations which require internet ajax web requests -and- data storage capabilities.&nbsp; </p>
 
 <h3>Sandboxed Storage Note</h3>
