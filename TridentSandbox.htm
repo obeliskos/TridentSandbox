@@ -6,7 +6,7 @@
 <meta charset="utf-8">
 <meta name="description" content="Trident Sandbox is an in-browser HTML/Javascript Scripting IDE that uses HTML 5 Application Cache functionality to run offline." />
 
-<!-- Leaving this uncommented while running local fs in metro ie seemed to have issues
+<!-- Leaving this uncommented while running local fs in metro ie seemed to have issues 
 <meta name="application-name" content="Trident Sandbox"/>
 <meta name="msapplication-TileColor" content="#1F7DD0"/>
 <meta name="msapplication-square70x70logo" content="images_ide/live_tile/Poseidon-Small70.png"/>
@@ -206,7 +206,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.87;
+	var VAR_TRIDENT_VERSION = 1.88;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -479,7 +479,7 @@ img.TridentImageButton:hover
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/296) + "%)");
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/318) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic

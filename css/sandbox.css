@@ -30,7 +30,7 @@
 }
 
 #UI_PasswordDialog h3 {
-	background-color: #f95252;
+	background-color: #ff4040;
 	-webkit-border-radius: 20px 20px 0 0;
 	-moz-border-radius: 20px 20px 0 0;
 	border-radius: 20px 20px 0 0;
@@ -38,6 +38,9 @@
 	font-size: 20px;
 	padding: 14px 26px;
     margin:0px;
+	margin-left:3px;
+	margin-right:3px;
+	font-family:Verdana,Arial,Helvetica,sans-serif;
 }
 
 #UI_PasswordDialog h3 span[class*="fa"] {
@@ -56,6 +59,7 @@
 #UI_PasswordDialog fieldset p {
 	color: #777;
 	margin-bottom: 14px;
+	font-family: 3px;
 }
 
 #UI_PasswordDialog fieldset p:last-child {

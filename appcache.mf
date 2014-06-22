@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 187
+#rev 188
 
 CACHE:
 TridentSandbox.htm
@@ -109,12 +109,31 @@ libraries/nicEdit/nicEditorIcons.gif
 libraries/tinymce/tinymce.min.js
 libraries/tinymce/skins/lightgray/skin.min.css
 libraries/tinymce/plugins/moxiemanager/plugin.min.js
-libraries/tinymce/skins/lightgray/skin.min.css
 libraries/tinymce/skins/lightgray/content.min.css
 libraries/tinymce/skins/lightgray/fonts/tinymce.eot
 libraries/tinymce/skins/lightgray/fonts/tinymce.svg
 libraries/tinymce/skins/lightgray/fonts/tinymce.woff
 libraries/tinymce/skins/lightgray/fonts/tinymce.ttf
+libraries/tinymce/skins/lightgray/img/anchor.gif
+libraries/tinymce/skins/lightgray/img/loader.gif
+libraries/tinymce/skins/lightgray/img/object.gif
+libraries/tinymce/skins/lightgray/img/trans.gif
+libraries/tinymce/plugins/emoticons/img/smiley-cool.gif
+libraries/tinymce/plugins/emoticons/img/smiley-cry.gif
+libraries/tinymce/plugins/emoticons/img/smiley-embarassed.gif
+libraries/tinymce/plugins/emoticons/img/smiley-foot-in-mouth.gif
+libraries/tinymce/plugins/emoticons/img/smiley-frown.gif
+libraries/tinymce/plugins/emoticons/img/smiley-innocent.gif
+libraries/tinymce/plugins/emoticons/img/smiley-kiss.gif
+libraries/tinymce/plugins/emoticons/img/smiley-laughing.gif
+libraries/tinymce/plugins/emoticons/img/smiley-money-mouth.gif
+libraries/tinymce/plugins/emoticons/img/smiley-sealed.gif
+libraries/tinymce/plugins/emoticons/img/smiley-smile.gif
+libraries/tinymce/plugins/emoticons/img/smiley-surprised.gif
+libraries/tinymce/plugins/emoticons/img/smiley-tongue-out.gif
+libraries/tinymce/plugins/emoticons/img/smiley-undecided.gif
+libraries/tinymce/plugins/emoticons/img/smiley-wink.gif
+libraries/tinymce/plugins/emoticons/img/smiley-yell.gif
 libraries/prettyprint/prettyprint.js
 libraries/shortcut.js
 libraries/math.min.js
@@ -265,6 +284,7 @@ samples/Fullscreen%20API.prg
 samples/Geolocation%20Coordinates.prg
 samples/Geolocation%20GetMap.prg
 samples/Geolocation%20Track.prg
+samples/HieroCryptes%20Notepad.prg
 samples/Hosted%20Files%20Database.prg
 samples/Hosted%20Samples%20Browser.prg
 samples/HTML%205%20Starfield%20Fullscreen.prg
@@ -273,6 +293,7 @@ samples/IMDB%20Search.prg
 samples/jqPlot%20Demo.prg
 samples/jQuery%20UI%20Demo.prg
 samples/jQuery%20UI%20Menu.prg
+samples/JSON%20Databank.prg
 samples/JsonEditor%20Forms%20Sample.prg
 samples/Library%20Unit%20Management.prg
 samples/Loan%20Calculator.prg
@@ -286,6 +307,7 @@ samples/PixiJS%20Morph%20Demo.prg
 samples/Play%20Media.prg
 samples/Proper%20Cleanup%20Method.prg
 samples/SandboxIO.prg
+samples/SpeechSynthesisAPI%20Safari.prg
 samples/Springy%20Demo.prg
 samples/SVG%20Markup.prg
 samples/TinyMCE%20Demo.prg
