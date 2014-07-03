@@ -183,7 +183,7 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.88;
+	var VAR_TRIDENT_VERSION = 1.89;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -196,6 +196,11 @@ img.TridentImageButton:hover
 			document.body.innerHTML = "Trident Sandbox does not run in an IFRAME";
 			return;
 		}
+		
+		// Help user quickly identify errors in their code by displaying alert with msg, line and col
+		window.onerror = function(msg, url, line, col, error) {
+			alertify.error(msg + " (line " + line + " col " + col + ")");
+		};
 		
 		// Fix for IE 10 and possibly IE 11 (on 8.1 update 0)
 		// Needed for Crypto.JS to work properly with typearray lib
