@@ -41,6 +41,7 @@ available for use by the sandbox app, add them here.
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
 <script src="scripts/tridentlist.js"></script>
+<script src="scripts/workerpool.js"></script>
 <script src="libraries/alertify.js-0.3.11/lib/alertify.js"></script>
 <script src="libraries/cryptojs/components/core.js"></script>
 <script src="libraries/cryptojs/components/lib-typedarrays.js"></script>
@@ -206,7 +207,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.89;
+	var VAR_TRIDENT_VERSION = 1.90;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -446,6 +447,33 @@ img.TridentImageButton:hover
 				API_Inspect(e);
 			}
 			
+			// Detect Hash Param changes for loadslot/runslot; (compare to txtProgramName or SaveSlotSelect?)
+			window.onhashchange = function() {
+					var loadSlot = API_GetURLParameter("LoadSlot");
+					if (loadSlot != null && loadSlot != $("#txtProgramName").val()) {
+						sb_clean_sandbox();
+						
+						$("#sb_sel_trident_slot").val(loadSlot);
+						
+						// let sandbox finish cleaning then load
+						setTimeout(function() {
+							sb_load_slot();
+						}, 250);
+					}
+					else {
+						var runSlot = API_GetURLParameter("RunSlot");
+						if (runSlot != null && runSlot != $("#txtProgramName").val()) {
+							sb_clean_sandbox();
+						
+							$("#sb_sel_trident_slot").val(runSlot);
+
+						// let sandbox finish cleaning then run
+							setTimeout(function() {
+								sb_load_slot(true);
+							}, 250);
+						}
+					}
+			}
 		}
 		
 		// If served up from a website then we should bother to monitor possible appcache events
@@ -752,7 +780,13 @@ img.TridentImageButton:hover
 	}
 	
 	function sb_loadtemplate() {
-		$("#sb_div_compile_standalone").show();
+		alertify.confirm("This will un-hide a file picker you use to pick the the SandboxLoader.htm file at the root of your Trident Sandbox Installation.  Once you do this it will generate and prompt to save a standalone htm version of the program currently loaded.  Continue?", function (e) {
+			if (e) {
+				// user clicked "ok"
+				$("#sb_div_compile_standalone").show();
+			}
+		});
+	
 	}
 	
 	function sb_template_loaded(evt) {
@@ -760,8 +794,8 @@ img.TridentImageButton:hover
 		var htmlString = editorMarkup.getValue();
 		var scriptString = editorScript.getValue();
 		
-		templateString = templateString.replace("@TRIDENT_HTML@", htmlString);
-		templateString = templateString.replace("@TRIDENT_SCRIPT@", scriptString);
+		templateString = templateString.replace("<!--TRIDENT_HTML-->", htmlString);
+		templateString = templateString.replace("/*TRIDENT_SCRIPT*/", scriptString);
 	
 		if (typeof Blob == "undefined") {
 			alert('no blobs available (incompatible browser?)');
@@ -915,7 +949,7 @@ img.TridentImageButton:hover
 			editorMarkup.setValue(sandboxObject.htmlText);
 			editorScript.setValue(sandboxObject.scriptText);
 		
-			if (typeof(autoRun) != "undefined" && autoRun) sb_run();
+			if (typeof(autorun) != "undefined" && autorun) sb_run();
 		});
 	}
 	

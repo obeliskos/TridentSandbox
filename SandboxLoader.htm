@@ -34,6 +34,7 @@ available for use by the sandbox app, add them here.
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
 <script src="scripts/tridentlist.js"></script>
+<script src="scripts/workerpool.js"></script>
 <script src="libraries/alertify.js-0.3.11/lib/alertify.js"></script>
 <script src="libraries/cryptojs/components/core.js"></script>
 <script src="libraries/cryptojs/components/lib-typedarrays.js"></script>
@@ -183,7 +184,7 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.89;
+	var VAR_TRIDENT_VERSION = 1.90;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -196,6 +197,9 @@ img.TridentImageButton:hover
 			document.body.innerHTML = "Trident Sandbox does not run in an IFRAME";
 			return;
 		}
+		
+		// if loading from the web (not sa template), clear out the template placeholders
+		if (document.URL.indexOf("file://") == -1) $("#UI_MainPlaceholder").empty();
 		
 		// Help user quickly identify errors in their code by displaying alert with msg, line and col
 		window.onerror = function(msg, url, line, col, error) {
@@ -257,6 +261,11 @@ img.TridentImageButton:hover
 				API_Inspect(e);
 			}
 			
+			// Detect Hash Param changes for loadslot/runslot; 
+			window.onhashchange = function() {
+				// Probably better (cleaner) to just clean slate and force page reload
+				location.reload();
+			}
 		}
 		
 		$(window).resize(function() {
@@ -922,7 +931,12 @@ function API_Restore_TridentDB() {
 				<button id="sb_btn_user_datafile_cancel" onclick="$('#sb_div_userdatafile').hide()">Cancel</button>&nbsp;&nbsp;[Binary]
 			</div>
 			<div id='UI_LibUnitPlaceholder' style="display:none"></div>
-			<div id='UI_MainPlaceholder' style='background-color:white'></div>
+			<div id='UI_MainPlaceholder' style='background-color:white'>
+			<!--TRIDENT_HTML-->
+			<SCRIPT>
+				/*TRIDENT_SCRIPT*/
+			</SCRIPT>
+			</div>
 		</div>
 	</div>
 

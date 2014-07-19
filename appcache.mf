@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 189
+#rev 190
 
 CACHE:
 TridentSandbox.htm
@@ -7,6 +7,8 @@ SilentSandbox.htm
 SandboxLoader.htm
 css/sandbox.css
 scripts/tridentlist.js
+scripts/workerpool.js
+libraries/crypto_worker.js
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/animated-overlay.gif
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/ui-bg_flat_0_aaaaaa_40x100.png
@@ -269,9 +271,11 @@ samples/Antikythera.prg
 samples/Browser%20UserAgent.prg
 samples/Babylon.JS%20Sample%20(WebGL).prg
 samples/Canvas%20Tiles.prg
+samples/Crypto%20Album.prg
 samples/CryptoJS.prg
 samples/CryptoJS%20File%20Hasher.prg
 samples/CryptoJS%20Notepad.prg
+samples/CryptoWorker%20Demo.prg
 samples/CSS%20Transforms.prg
 samples/DigitalClock.prg
 samples/Drag%20Drop%20Thumbnailer.prg
