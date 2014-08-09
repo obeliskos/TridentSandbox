@@ -207,7 +207,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.90;
+	var VAR_TRIDENT_VERSION = 1.92;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -411,6 +411,11 @@ img.TridentImageButton:hover
 				API_LogMessage("TridentSandboxDB (indexedDB) opened.");
 				VAR_TRIDENT_DB = e.target.result;
 				
+				var skipautorun = API_GetURLParameter("SkipAutorun");
+				if (skipautorun == null) {
+					sb_run_autorun();
+				}
+				
 				// Now that not only is indexed db available but the Trident database is opened, handle url LoadSlot/RunSlot hash params
 				sb_refresh_slots(function() {
 				
@@ -437,6 +442,16 @@ img.TridentImageButton:hover
 								sb_load_slot(true);
 							}, 200);
 						}
+						else {
+							var runSample = API_GetURLParameter("RunSample");
+							if (runSample != null) {
+								sb_clean_sandbox();
+								
+								setTimeout(function() {
+									sb_run_sample(runSample);
+								}, 200);
+							}
+						}
 					}
 				
 				});
@@ -449,30 +464,40 @@ img.TridentImageButton:hover
 			
 			// Detect Hash Param changes for loadslot/runslot; (compare to txtProgramName or SaveSlotSelect?)
 			window.onhashchange = function() {
-					var loadSlot = API_GetURLParameter("LoadSlot");
-					if (loadSlot != null && loadSlot != $("#txtProgramName").val()) {
+				var loadSlot = API_GetURLParameter("LoadSlot");
+				if (loadSlot != null && loadSlot != $("#txtProgramName").val()) {
+					sb_clean_sandbox();
+					
+					$("#sb_sel_trident_slot").val(loadSlot);
+					
+					// let sandbox finish cleaning then load
+					setTimeout(function() {
+						sb_load_slot();
+					}, 250);
+				}
+				else {
+					var runSlot = API_GetURLParameter("RunSlot");
+					if (runSlot != null && runSlot != $("#txtProgramName").val()) {
 						sb_clean_sandbox();
-						
-						$("#sb_sel_trident_slot").val(loadSlot);
-						
-						// let sandbox finish cleaning then load
+					
+						$("#sb_sel_trident_slot").val(runSlot);
+
+					// let sandbox finish cleaning then run
 						setTimeout(function() {
-							sb_load_slot();
+							sb_load_slot(true);
 						}, 250);
 					}
 					else {
-						var runSlot = API_GetURLParameter("RunSlot");
-						if (runSlot != null && runSlot != $("#txtProgramName").val()) {
+						var runSample = API_GetURLParameter("RunSample");
+						if (runSample != null) {
 							sb_clean_sandbox();
-						
-							$("#sb_sel_trident_slot").val(runSlot);
-
-						// let sandbox finish cleaning then run
+							
 							setTimeout(function() {
-								sb_load_slot(true);
-							}, 250);
+								sb_run_sample(runSample);
+							}, 200);
 						}
 					}
+				}
 			}
 			
 		}
@@ -814,6 +839,54 @@ img.TridentImageButton:hover
 		}, 200);
 	}
 
+	// The intent behind this function is for the person hosting this app (or me for now) can put up samples dynamically between builds to share
+	// to public as sort of a published jsfiddle.  So it automates a not-frequently or official sample... so it is efficient way to for me to link to sample not
+	// necessary for user to bookmark for long term... if they want to keep the prog they should save it and use runslot for long term bookmarking.
+	// As such we will turn off caching to force server visit, this will bypass appcache due to extra url params jquery passes to ensure not cached.
+	function sb_run_sample(progname) {
+		progname = progname.replace("%20", " ");	// handle encoded spaces
+		progname = progname.replace(/[^a-zA-Z 0-9]+/g, ""); // whitelist alphanumeric
+		progname = "samples\\" + progname + ".prg";	// force extension
+		
+		jQuery.ajax({
+			type: "GET",
+			url: progname,
+			cache: false,
+			dataType: "json",
+
+			success: function (response) {
+				var sandboxObject = response;
+	
+				$("#sb_txt_ProgramName").val(sandboxObject.progName);
+
+				editorMarkup.setValue(sandboxObject.htmlText);
+				editorScript.setValue(sandboxObject.scriptText);
+				
+				sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+				sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+
+				// IE's HTML 5 file control seems to place a lock on the last loaded file which
+				// was interfering with the saving and overwriting of that same file.
+				// So I will reset it by destroying and recreating, allowing the GC to release
+				// any old file locks.
+				var control = $("#sb_file");
+				control.replaceWith( control = control.clone( true ) );
+			
+				// if editors dont reflect current source when we change back to a source visible window mode 
+				// then we may need to setTimeout on the following two lines to give editors a chance to update display 
+				API_SetWindowMode(3);
+				
+				sb_run();
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
+				API_LogMessage(xhr.status + " : " + xhr.statusText);
+				alertify.log(xhr.status + " : " + xhr.statusText);
+				alertify.log("See user log for more info");
+			}
+		});
+	}
+	
 	function sb_browse_samples_action() {
 		var baseUrl = "";
 
@@ -926,6 +999,16 @@ img.TridentImageButton:hover
 
 				if (typeof(callback) == "function") callback();
 			}
+		});
+	}
+	
+	function sb_run_autorun() {
+		API_GetIndexedAppKey("SandboxScriptUnits", "autorun", function(e) {
+			var res = e.target.result;
+			
+			if (res == null) return;  // no autorun script unit to run, so exit
+			
+			API_AppendUnitScript(res.val);
 		});
 	}
 	
@@ -1355,7 +1438,7 @@ img.TridentImageButton:hover
 			else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
 		} 
 		else {
-			var docElm = divCode;
+			var docElm = tblCode;
 			if (docElm.requestFullscreen) {
 				docElm.requestFullscreen();
 			} else if (docElm.msRequestFullscreen) {
@@ -1771,7 +1854,12 @@ function API_Restore_TridentDB() {
 		API_HideUserLoader();
 		API_ClearLog();
 		API_ClearHtmlLog();
-		API_ClearUnitScripts();
+		
+		// No longer clearing unit scripts, they are likely already attached to window 
+		// and i am establishing an autorun script which could affect ui or load other scripts to be used
+		// for the duration of the page load.
+		
+		//API_ClearUnitScripts();	
 
 		// main includes div with script so hopefully EVT_CleanSandbox has completed
 		setTimeout(function() {
@@ -2001,29 +2089,29 @@ function API_Restore_TridentDB() {
 	
 	function ToggleMaximize() {
 		var isCaptionVisible = $("#sb_div_caption").is(":visible");
-		var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
+		//var isLoaderVisible = $("#sb_div_mainloader").is(":visible");
 		
 		// If mode 3 (dev bar only), then transition to mode 1 (all visible)
-		if (isLoaderVisible == false) {
-			$("#sb_div_caption").show();
-			$("#sb_div_mainloader").show();
-		}
-		else {
+		//if (isLoaderVisible == false) {
+		//	$("#sb_div_caption").show();
+		//	$("#sb_div_mainloader").show();
+		//}
+		//else {
 			// if all are visible then switch to mode 2 (hide caption only)
 			if (isCaptionVisible) {
 				$("#sb_div_caption").hide();
 			}
 			// else was in mode 2 (loader+dev bar), switch to mode 3 (dev bar only)
 			else {
-				$("#sb_div_mainloader").hide();
+				$("#sb_div_caption").show();
 			}
-		}
+		//}
 		
 		sb_fit_editors();
 		sb_fit_log();
 	}
 	
-	function API_SetToolbarMode(showCaption, showLoader, showDevToolbar) {
+	function API_SetToolbarMode(showCaption, showLoader) {
 		if (showCaption) {
 			$("#sb_div_caption").show();
 		}
@@ -2036,13 +2124,6 @@ function API_Restore_TridentDB() {
 		}
 		else {
 			$("#sb_div_mainloader").hide();
-		}
-		
-		if (showDevToolbar) {
-			$("#sb_div_devtoolbar").show();
-		}
-		else {
-			$("#sb_div_devtoolbar").hide();
 		}
 		
 		sb_fit_log();
@@ -2060,6 +2141,7 @@ function API_Restore_TridentDB() {
 			$('#tdOutput').attr('width', '0%');
 			$('#tdCode').attr('width', '100%');
 			$('#divCode').show();
+			$('#tblCode').css('table-layout', '');
 		
 			$("#UI_TabsOutput").hide();
 			
@@ -2076,6 +2158,7 @@ function API_Restore_TridentDB() {
 			$('#tdCode').attr('width', '50%');
 			$('#tdOutput').attr('width', '50%');
 			$('#divCode').show();
+			$('#tblCode').css('table-layout', 'fixed');
 		
 			$("#UI_TabsOutput").show();
 			
@@ -2093,6 +2176,7 @@ function API_Restore_TridentDB() {
 			$('#tdCode').attr('width', '0%');
 			$('#tdOutput').attr('width', '100%');
 			$('#divCode').hide();
+			$('#tblCode').css('table-layout', '');
 			
 			$("#UI_TabsOutput").show();
 		}
@@ -2100,7 +2184,7 @@ function API_Restore_TridentDB() {
 	
 	function API_RestoreLayout() {
 		API_UserFullscreenExit();
-		API_SetToolbarMode(true, true, true);
+		API_SetToolbarMode(true, true);
 		API_SetWindowMode(2);
 	}
 	
@@ -2277,6 +2361,8 @@ function API_Restore_TridentDB() {
 					
 					$("#ui_chartTDBspin").hide();
 					
+					if (arrayTDB.length == 0) return;
+					
 					sb_dashboard.tdbplot = jQuery.jqplot ('ui_tdb_chartTridentUsage', [arrayTDB], 
 					{ 
 						seriesDefaults: {
@@ -2385,6 +2471,8 @@ function API_Restore_TridentDB() {
 			
 			$("#ui_ldb_spnTotalSize").text("Total Size of Local Storage : " + totalSize + " bytes (" + Math.round((totalSize/1024)/1024 *100)/100 + "MB)");
 
+			if (arrayLS.length == 0) return;
+			
 			// now (re) plot the data we just accumulated
 			sb_dashboard.lsplot = jQuery.jqplot ('ui_ldb_chartLocalUsage', [arrayLS], 
 			{ 
@@ -2490,10 +2578,10 @@ function API_Restore_TridentDB() {
 		</td>
 		<td>
 			<div class="divWideButtons" style="display:inline">
-			<h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An Internet Explorer 10/11 development sandbox' onclick="sb_toggle_header_font()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : Internet Explorer 10/11 dev sandbox</h1>
+			<h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An HTML / Javascript development sandbox' onclick="sb_toggle_header_font()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript dev sandbox</h1>
 			</div>
 			<div class="divTinyButtons" style="display:inline">
-			<h2 id='sb_header_caption2' title='Trident Sandbox : An Internet Explorer 10/11 development sandbox' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : IE 10/11 dev sandbox</h2>
+			<h3 id='sb_header_caption2' title='Trident Sandbox : An HTML / Javascript sandbox' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript sandbox</h3>
 			</div>
 		</td>
 		<td>
@@ -2503,14 +2591,17 @@ function API_Restore_TridentDB() {
 </table>
 </div>
 
-<div id="sb_div_mainloader" style="background-color:#9c9; border:0px; padding:2px">
+<div id="sb_div_mainloader" style="background-color:#aba; border:0px; padding:2px">
 <table width="100%" style="font-family:Tahoma">
 <tr>
 
+<td>
+Prog Name : 
+<input style='height:24px; width:160px; ' id='sb_txt_ProgramName' type='text' placeholder="Enter program name here" value=''/>
+<input style='height:30px;width:90px;' id='sb_file' type="file" name="fileloader" onchange="sb_load()" />
+</td>
 <td style="align:'right'">
-Load Filename : 
-<input style='height:30px;width:200px;' id='sb_file' type="file" name="fileloader" onchange="sb_load()" />&nbsp;
-Theme: <select onchange="selectTheme()" id='selTheme' style='font-size:18px;'>
+<select onchange="selectTheme()" id='selTheme' style='font-size:16px;'>
     <option selected>default</option>
     <option>3024-day</option>
     <option>3024-night</option>
@@ -2548,146 +2639,115 @@ Theme: <select onchange="selectTheme()" id='selTheme' style='font-size:18px;'>
 </td>
 <td style="vertical-align:middle">
 <div style="display:none" id="sb_div_compile_standalone">
-Pick a template to use for page generation : <input style='height:30px;width:180px;' id='sb_file_template' type="file" name="sb_file_template" onchange="sb_compile_template()" />
+Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_template' type="file" name="sb_file_template" onchange="sb_compile_template()" />
 <button style='height:30px;' onclick="$('#sb_div_compile_standalone').hide()">Cancel</button>
 </div>
 </td>
 <td align='center'>
 <div class="divWideButtons" style="display:inline">
-<button id="ui_gen_sa" class="ui_gen_sa" style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
-<button id="ui_show_dashboard" class="ui_show_dashboard" style='height:40px; display:none;' onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/> Storage Summary</button>
-<button id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px;' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
 </div>
 <div class="divTinyButtons" style="display:inline">
-<button id="ui_gen_sa2" class="ui_gen_sa" style='height:40px;' onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/></button>
-<button id="ui_show_dashboard2" class="ui_show_dashboard" style='height:40px; display:none;' onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/></button>
-<button id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" style='height:40px;' ><img src='images_ide/nixus/32x32/Tutorial-16.png'/></button>
 </div>
 </td>
 <td>
 <div class="divWideButtons" style="display:inline">
-<button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_new_program()"><img src='images_ide/add.png'/> New</button>
+<button style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
+<button style='height:40px; float:right' title="Clear Sandbox" onclick="sb_new_program()"><img src='images_ide/add.png'/> New</button>
+<button style='height:40px; float:right' id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
+<button style='height:40px; float:right; display:none;' id="ui_show_dashboard" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/> Storage Summary</button>
+<button style='height:40px; float:right' id="ui_gen_sa" class="ui_gen_sa" onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
 </div>
 <div class="divTinyButtons" style="display:inline">
-<button style='height:40px;float:right;' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/></button>
+<button style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
+<button style='height:40px; float:right' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/></button>
+<button style='height:40px; float:right' id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" ><img src='images_ide/nixus/32x32/Tutorial-16.png'/></button>
+<button style='height:40px; float:right; display:none;' id="ui_show_dashboard2" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/></button>
+<button style='height:40px; float:right' id="ui_gen_sa2" class="ui_gen_sa" onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/></button>
 </div>
 </td>
 </tr>
 </table>
 </div>
 
-<div style="background-color:#1F7DD0; font-family:Tahoma;" id="sb_div_metalFullscreen">
-<div id="sb_div_devtoolbar" style="background-color:#ccc; border-style:solid; border-width:0px; padding: 1px">
-<table width='100%'>
-<tr>
-<td>
-Program Name : 
-<input style='height:24px; width:200px; ' id='sb_txt_ProgramName' type='text' placeholder="Enter program name here" value=''/>
-</td>
-<td>
-<div class="divWideButtons" style="display:inline">
-<button id="ui_btn_run" style='height:40px; width:80px' onclick="sb_run()" title="Run your Program (Alt+R)"><img src='images_ide/run16.png'/> Run</button>
-<button class="ui_btn_launch" style='height:40px; width:100px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><img src='images_ide/application_go.png'/> Launch</button>
-<button style='height:40px;' onclick="sb_save()" title="Save your program (Alt+S)"><img src='images_ide/disk.png'/> Save</button>
-</div>
-<div class="divTinyButtons" style="display:inline">
-<button style='height:40px;' onclick="sb_run()" title="Run your Program (Alt+R)"><img src='images_ide/run16.png'/></button>
-<button class="ui_btn_launch" style='height:40px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><img src='images_ide/application_go.png'/></button>
-<button style='height:40px;' onclick="sb_save()" title="Save your program (Alt+S)"><img src='images_ide/disk.png'/></button>
-</div>
-</td>
-<td>
-<div class="divWideButtons" style="display:inline">
-<button style='height:40px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><img src='images_ide/new16.png'/> CLR</button>
-<button style='height:40px;' title="Fullscreen the Dev area" onclick="API_MetalFullscreen()"><img src='images_ide/zoom_in.png'/> Dev FS</button>
-<button style='height:40px;' title="Exit Fullscreen" onclick="API_UserFullscreenExit()"><img src='images_ide/zoom_out.png'/> Exit FS</button>
-</div>
-<div class="divTinyButtons" style="display:none">
-<button style='height:40px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><img src='images_ide/new16.png'/></button>
-<button style='height:40px;' title="Fullscreen the Dev area" onclick="API_MetalFullscreen()"><img src='images_ide/zoom_in.png'/></button>
-<button style='height:40px;' title="Exit Fullscreen" onclick="API_UserFullscreenExit()"><img src='images_ide/zoom_out.png'/></button>
-</div>
-</td>
-<td>
-	<div id="sb_radioset">
-		<input type="radio" id="sb_radio1" name="radio" onclick="API_SetWindowMode(1)"><label title="Code Only (Alt-1)"  for="sb_radio1">1</label>
-		<input type="radio" id="sb_radio2" name="radio" checked="checked" onclick="API_SetWindowMode(2)"><label title="Split 50/50 (Alt-2)"  for="sb_radio2">2</label>
-		<input type="radio" id="sb_radio3" name="radio" onclick="API_SetWindowMode(3)"><label title="Output Only (Alt-3)"  for="sb_radio3">3</label>
-	</div>
-</td>
-<td>
-	<button style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
-</td>
-</tr>
-</table>
-</div>
-<table style="width: 100%; table-layout:fixed">
-<tr>
-<td id="tdCode" width="50%" valign='top' style="padding: 0px">
-	<div id='divCode' style="display:none; background-color:#ccc; background: rgba(128, 128, 128, 0.0);">
-	<table style="width:100%; table-layout:fixed" cellpadding=0 cellspacing=0>
-	<tr><td>
-		<div id="ui_editor_toolbar" style="font-size:4px">
-		<button id="sb_btn_markup" style="height:28px" onclick="sb_toggle_markup()" title='Show Markup only (Alt+Q)'>Mkp</button> 
-		<button id="sb_btn_togglesplit" style="height:28px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'>Split</button> 
-		<button id="sb_btn_script" style="height:28px" onclick="sb_toggle_script()" title='Show Script only (Alt+W)'>Script</button>
-		<button id="sb_btn_fscode" style="height:28px" onclick="sb_fs_code()" title='Zoom the editors fullscreen'>FS Code</button>
-		<button id="sb_btn_inpect" style="height:28px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'>Inspect</button>
-		<div id='sb_div_ls_slots' style='display:none'>
-		<button style="height:28px" title='Load from selected TridentDB save slot' onclick='sb_load_slot()'>LoadDB</button>
-		<button style="height:28px" title='Save to selected TridentDB save slot' onclick='sb_save_slot()'>SaveDB</button>
-		<select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot' onchange="sb_load_slot()"></select>
-		<button style="height:28px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
+<table id="tblCode" style="width: 100%; table-layout:fixed">
+	<tr style="background-color:#bbb;"><td colspan="2">
+		<div id="ui_editor_toolbar" style="font-size:4px; display:inline-block">
+			<button id="sb_btn_markup" style="height:32px" onclick="sb_toggle_markup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> Mkp</button> 
+			<button id="sb_btn_togglesplit" style="height:32px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i> Split</button> 
+			<button id="sb_btn_script" style="height:32px" onclick="sb_toggle_script()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> Script</button>
+			<button id="sb_btn_inpect" style="height:32px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i> Inspect</button>
+			<div id='sb_div_ls_slots' style='display:none'>
+				<button style="height:32px" title='Load from selected TridentDB save slot' onclick='sb_load_slot()'>LoadDB</button>
+				<button style="height:32px" title='Save to selected TridentDB save slot' onclick='sb_save_slot()'>SaveDB</button>
+				<select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot' onchange="sb_load_slot()"></select>
+				<button style="height:32px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
+			</div>
 		</div>
+		&nbsp;
+		<div style="display:inline-block">
+		<button class="ui_btn_launch" style='height:32px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><i class="fa fa-external-link"></i> Launch</button>
+		<button style='height:32px;' onclick="sb_save()" title="Save your program (Alt+S)"><i class="fa fa-save"></i> Save</button>
+		<button id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i> FS Dev</button>
+		<button style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i> CLR</button>
+		<button id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4f4"></i> RUN</b></button>
+		</div>
+		&nbsp;
+		<div style="display:inline">
+			<button style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='API_SetWindowMode(1)'>1</button>
+			<button style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='API_SetWindowMode(2)'>2</button>
+			<button style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='API_SetWindowMode(3)'>3</button>
 		</div>
 	</td></tr>
-	<tr><td>
-		<div id="ui_div_markup" style="float:left; width:50%; padding-top:1px">
-		<textarea spellcheck='false' style='font-family="Lucida Console"' id='sb_txt_Markup' rows='24'></textarea>
+	<tr>
+	<td id="tdCode" width="50%" valign='top' style="padding: 0px">
+		<div id='divCode' style="display:none; background-color:#ccc; background: rgba(128, 128, 128, 0.0);">
+			<table style="width:100%; table-layout:fixed" cellpadding=0 cellspacing=0>
+			<tr><td>
+				<div id="ui_div_markup" style="float:left; width:50%; padding-top:1px">
+				<textarea spellcheck='false' style='font-family="Lucida Console"' id='sb_txt_Markup' rows='24'></textarea>
+				</div>
+				<div id="ui_div_script" style="float:left; width:50%; padding-top:1px">
+				<textarea spellcheck='false' style='font-family="Lucida Console"' id='sb_txt_Script' rows='24'></textarea>
+				</div>
+			</td></tr>
+			</table>
 		</div>
-		<div id="ui_div_script" style="float:left; width:50%; padding-top:1px">
-		<textarea spellcheck='false' style='font-family="Lucida Console"' id='sb_txt_Script' rows='24'></textarea>
-		</div>
-	</td></tr>
-	</table>
-	</div>
-	
-</td>
-<td id="tdOutput" valign='top' style="padding: 0px">
-	<div id="UI_TabsOutput">
-		<ul>
-			<li><a href="#UI_Tab_Main">Main Output</a></li>
-			<li><a href="#UI_Tab_Html">Log (HTML)</a></li>
-			<li><a href="#UI_Tab_Text">Log (Text)</a></li>
-		</ul>
-		<div id="UI_Tab_Main" style="overflow: auto;">
-			<div id='sb_div_userfile' style="display:none">
-				<input style='height:30px;width:400px;' id='sb_user_file' type="file" name="userfileloader" onchange="sb_user_load()" />
-				<button id="sb_btn_user_file_cancel" onclick="$('#sb_div_userfile').hide()">Cancel</button>&nbsp;&nbsp;[Text]
+	</td>
+	<td id="tdOutput" valign='top' style="padding: 0px">
+		<div id="UI_TabsOutput">
+			<ul>
+				<li><a href="#UI_Tab_Main">Main Output</a></li>
+				<li><a href="#UI_Tab_Html">Log (HTML)</a></li>
+				<li><a href="#UI_Tab_Text">Log (Text)</a></li>
+			</ul>
+			<div id="UI_Tab_Main" style="overflow: auto;">
+				<div id='sb_div_userfile' style="display:none">
+					<input style='height:30px;width:400px;' id='sb_user_file' type="file" name="userfileloader" onchange="sb_user_load()" />
+					<button id="sb_btn_user_file_cancel" onclick="$('#sb_div_userfile').hide()">Cancel</button>&nbsp;&nbsp;[Text]
+				</div>
+				<div id='sb_div_userdatafile' style="display:none; background-color:#cdc">
+					<input style='height:30px;width:400px;' id='sb_user_datafile' type="file" name="userdatafileloader" onchange="sb_user_dataload()" />
+					<button id="sb_btn_user_datafile_cancel" onclick="$('#sb_div_userdatafile').hide()">Cancel</button>&nbsp;&nbsp;[Binary]
+				</div>
+				<div id='UI_LibUnitPlaceholder' style="display:none"></div>
+				<div id='UI_MainPlaceholder' style='background-color:white'><br/><br/></div>
 			</div>
-			<div id='sb_div_userdatafile' style="display:none; background-color:#cdc">
-				<input style='height:30px;width:400px;' id='sb_user_datafile' type="file" name="userdatafileloader" onchange="sb_user_dataload()" />
-				<button id="sb_btn_user_datafile_cancel" onclick="$('#sb_div_userdatafile').hide()">Cancel</button>&nbsp;&nbsp;[Binary]
+			<div id="UI_Tab_Html" style="overflow: auto;">
+				<div id='UI_HtmlLogPlaceholder' style='background-color:white'><br/><br/></div>
 			</div>
-			<div id='UI_LibUnitPlaceholder' style="display:none"></div>
-			<div id='UI_MainPlaceholder' style='background-color:white'><br/><br/></div>
-		</div>
-		<div id="UI_Tab_Html" style="overflow: auto;">
-			<div id='UI_HtmlLogPlaceholder' style='background-color:white'><br/><br/></div>
-		</div>
-		<div id="UI_Tab_Text" style="background-color:#555">
-			<div id='sb_div_restorefile' style="display:none;color:#ccc">
-				<input style='height:30px;width:400px;' id='sb_restore_file' type="file" name="restorefileloader" onchange="sb_restore_load()" />
-				<button id="sb_btn_restore_file_cancel" onclick="$('#sb_div_restorefile').hide()">Cancel</button>&nbsp;&nbsp;[Pick Restore File]
-			</div>
-			<div id='sb_div_LogPlaceholder' style='background-color:#555;'>
-				<textarea id="UI_TxtLogText" spellcheck='false' rows='30' style="font-family: Lucida Console; height:100; width:100%; background-color:#333; color:#ccc">You need to allow blocked content for Trident Sandbox to initialize.</textarea><br/>
-				<input type='text' id='UI_TxtLogConsole' style="width:100%;height:30px; background-color:#333; color:#ccc" onKeyDown="{ if (event.keyCode==38) $('#UI_TxtLogConsole').val(sb_lastconsolecmd) }" onKeyPress="{ if (event.keyCode==13) sb_console_eval() }"/>
+			<div id="UI_Tab_Text" style="background-color:#555">
+				<div id='sb_div_restorefile' style="display:none;color:#ccc">
+					<input style='height:30px;width:400px;' id='sb_restore_file' type="file" name="restorefileloader" onchange="sb_restore_load()" />
+					<button id="sb_btn_restore_file_cancel" onclick="$('#sb_div_restorefile').hide()">Cancel</button>&nbsp;&nbsp;[Pick Restore File]
+				</div>
+				<div id='sb_div_LogPlaceholder' style='background-color:#555;'>
+					<textarea id="UI_TxtLogText" spellcheck='false' rows='30' style="font-family: Lucida Console; height:100; width:100%; background-color:#333; color:#ccc">You need to allow blocked content for Trident Sandbox to initialize.</textarea><br/>
+					<input type='text' id='UI_TxtLogConsole' style="width:100%;height:30px; background-color:#333; color:#ccc" onKeyDown="{ if (event.keyCode==38) $('#UI_TxtLogConsole').val(sb_lastconsolecmd) }" onKeyPress="{ if (event.keyCode==13) sb_console_eval() }"/>
+				</div>
 			</div>
 		</div>
-	</div>
-</td>
-</tr>
+	</td>
+	</tr>
 </table>
 </div>
 

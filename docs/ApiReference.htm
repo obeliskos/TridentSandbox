@@ -87,8 +87,8 @@ object inspector programmatically to display the contents of your own variable, 
 			<td>pass in 1 for Code only view, 2 for 50/50 split, or 3 for Output Only view</td>
 		</tr>
 		<tr>
-			<td>API_SetToolbarMode(showCaption, showLoader, showDevToolbar)</td>
-			<td>programmatically show/hide the three areas at the top of the screen. If you hide the dev toolbar you should save any pending changes your program first, and provide a means within your program of getting them back!</td>
+			<td>API_SetToolbarMode(showCaption, showLoader)</td>
+			<td>programmatically show/hide the top two areas at the top of the screen.</td>
 		</tr>
 		<tr>
 			<td>API_ClearOutput()</td>
@@ -275,11 +275,15 @@ object inspector programmatically to display the contents of your own variable, 
 			<td>You might call this API function within a real program to import the script into a 'known' area specifically intended for placing these scripts.  Passing optional callback, it will be called when script is 'ready'.&nbsp; Ready means i wait 200ms after i insert script to give browser a chance to parse... that should hopefully be enough time for most scripts.  If importing multiple scripts (not dependent on each other), you might just pass the callback on the last one.</td>
 		</tr>
 		<tr>
-			<td>API_ClearUnitScripts()</td>
-			<td>This method will clear the div where all your imported scripts are loaded.  They likely have already been attached to the window object so this will probably have no effect unless you clean up yourself or refresh page.</td>
+			<td>API_ClearUnitScripts() <b><i>Obsolete</i></b></td>
+			<td>This method will clear the div where all your imported scripts are loaded.&nbsp; Best practice now is to create an autoload script unit which imports any other scripts you may want... and those scripts stay for the life of the page load.&nbsp; If you really need to import a script within a prg file or save slot, you can use continue to use this function to clean global script placeholder in your sandbox cleanup event.</td>
 		</tr>
 	</tbody>
 </table>
+<br/>
+<label style="color:blue">
+<i>(Note: if you name a script unit <b>autorun</b>, Trident Sandbox will load it automatically when the main page is loaded unless a <b>SkipAutorun</b> hash param exists in the url bar)</i>
+</label>
 
 <h3>API Events / Callbacks</h3>
 <table style="width:100%">

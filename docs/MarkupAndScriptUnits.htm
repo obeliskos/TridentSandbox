@@ -25,10 +25,14 @@ Trident Sandbox to create real applications that have value in and of themselves
 significant more capabilities for growth and code structuring.&nbsp;&nbsp;You might want to build and test your code within a real Trident Sandbox program before saving portions as units since they 
 might be more complicated to debug.</p>
 
+<h3>Library Unit Management Utility</h3>
+<p>Currently I do not wish to clutter up the user interface with this added complexity, so i placed this in Samples/Utilities/Library Unit Management.&nbsp; From here you can create all of your script and html units.&nbsp;You can 
+create a script unit with the name <b>autorun</b> and it will execute immediately upon Trident Sandbox page load (unless a <b>SkipAutorun</b> hash param is added.&nbsp; From an autorun script 
+you can initialize the environment by loading other script units (via API_ImportScriptUnits) or perhaps add your own API functions or change the main page layout, etc.</p>
+
 <h3>Console Command Interface</h3>
-<p>Currently I do not wish to clutter up the user interface with this added complexity, and beginning users should not need it anyways.  If you use TridentSandbox enough to need more 
-organization to your code you can take the time to read this and the API reference to determine how to use this interface.&nbsp;&nbsp;Trident Sandbox has added some API functions to facilitate interaction with this 'Unit' library mechanism but unlike the other API functions, you will likely only use most of these functions 
-interactively via the Text Log Console command parser.&nbsp;&nbsp;</p>
+<p>There are a series of lower level API commands added to support library unit management, that may be more useful if you use this feature alot.&nbsp; Primarily they allow using loading into (and saving from) the syntax 
+highlighting editors.&nbsp;</p>
 
 <p>Example : You press 'New' to create a blank program, write some Markup into the Markup edit control, and then go to the Text Log console and type 
 API_SaveMarkupUnit('MyFirstMarkupUnit') and hit enter and Trident Sandbox will save your markup 'unit' to the TridentDB.&nbsp;&nbsp;Other functions exist to recall that unit as a string which you 
@@ -51,7 +55,7 @@ sb_load_slot() within the TridentSandbox.htm file itself).</p>
 </ul>
 
 <h3>Backing up and Restoring the Trident Database</h3>
-<p>While not limited to just the Markup and Script Unit libraries, new Console API functions have been added to let you back up and restore the entire Trident Database.  This indexed db app/key/value 
+<p>While not limited to just the Markup and Script Unit libraries, new Console API functions and a sample program (<b>Samples/Utilities/Trident BackupRestore</b>) have been added to let you back up and restore the entire Trident Database.  This indexed db app/key/value 
 database is used to store Trident Save slots, Markup and Script Unit libraries described above, as well as any app/key/values you may have stored for your own apps.</p>
 <p>At the console, you can type API_Backup_TridentDB("TDB-040514.backup") or just omit the filename for a default filename and a download prompt will appear for you to save this file to 
 your hard disk.  At a later point in time (perhaps an upgrade or to duplicate onto another machine), you can go to the console and type API_Restore_TridentDB().  This will display a file browser 
