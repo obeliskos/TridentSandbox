@@ -184,12 +184,16 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.91;
+	var VAR_TRIDENT_VERSION = 1.92;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
 	var VAR_TRIDENT_ENV_TYPE = 'SBL'; // IDE, STANDALONE, SBL
 	var VAR_TRIDENT_DB = null;
+	
+	var tridentVars = {
+		isAutorun: false
+	}
 
 	$(document).ready(function() {
 		// I dont want to allow this to run in an iframe
@@ -244,15 +248,30 @@ img.TridentImageButton:hover
 				API_LogMessage("TridentSandboxDB (indexedDB) opened.");
 				VAR_TRIDENT_DB = e.target.result;
 				
+				var skipautorun = API_GetURLParameter("SkipAutorun");
+				if (skipautorun == null) {
+					sb_run_autorun();
+				}
+				
 				var runSlot = API_GetURLParameter("RunSlot");
 				if (runSlot != null) {
 					sb_run_app(runSlot);
 				}
 				else {
-					API_LogMain("This page requires a hash param 'RunSlot' which equals the name of a Trident Save slot.");
-					API_LogMain("Example url : http://www.obeliskos.com/TridentSandbox/SandboxLoader.htm#RunSlot=CryptoNotepad");
-					API_LogMain("(where CryptoNotepad equals a program name contained in the trident save slots (drop down list above the editors)");
-					alertify.log("Missing RunSlot hash param");
+					var runSample = API_GetURLParameter("RunSample");
+					if (runSample != null) {
+						//sb_clean_sandbox();
+						
+						setTimeout(function() {
+							sb_run_sample(runSample);
+						}, 200);
+					}
+					else {
+						API_LogMain("This page requires a hash param 'RunSlot' which equals the name of a Trident Save slot.");
+						API_LogMain("Example url : http://www.obeliskos.com/TridentSandbox/SandboxLoader.htm#RunSlot=CryptoNotepad");
+						API_LogMain("(where CryptoNotepad equals a program name contained in the trident save slots (drop down list above the editors)");
+						alertify.log("Missing RunSlot hash param");
+					}
 				}
 			}
  
@@ -364,6 +383,18 @@ img.TridentImageButton:hover
 		}
 	}
 	
+	function sb_run_autorun() {
+		API_GetIndexedAppKey("SandboxScriptUnits", "autorun", function(e) {
+			var res = e.target.result;
+			
+			if (res == null) return;  // no autorun script unit to run, so exit
+			
+			tridentVars.isAutorun = true;
+			
+			API_AppendUnitScript(res.val);
+		});
+	}
+	
 	function sb_run_app(appName) { 
 		API_GetIndexedAppKey("SandboxSaveSlots", appName, function(e) {
 			var res = e.target.result;
@@ -390,7 +421,47 @@ img.TridentImageButton:hover
 				setTimeout(function() {
 					document.getElementById("UI_MainPlaceholder").appendChild(s);
 				}, 150);
-			}, 250);
+			}, (tridentVars.isAutorun)?600:250);		// if autorun script unit is involved, give it more time
+		});
+	}
+	
+	// The intent behind this function is for the person hosting this app (or me for now) can put up samples dynamically between builds to share
+	// to public as sort of a published jsfiddle.  So it automates a not-frequently or official sample... so it is efficient way to for me to link to sample not
+	// necessary for user to bookmark for long term... if they want to keep the prog they should save it and use runslot for long term bookmarking.
+	// As such we will turn off caching to force server visit, this will bypass appcache due to extra url params jquery passes to ensure not cached.
+	function sb_run_sample(progname) {
+		progname = progname.replace("%20", " ");	// handle encoded spaces
+		progname = progname.replace(/[^a-zA-Z 0-9]+/g, ""); // whitelist alphanumeric
+		progname = "samples\\" + progname + ".prg";	// force extension
+		
+		jQuery.ajax({
+			type: "GET",
+			url: progname,
+			cache: false,
+			dataType: "json",
+
+			success: function (response) {
+				var sandboxObject = response;
+	
+				$("#sb_txt_ProgramName").val(sandboxObject.progName);
+
+				$("#UI_MainPlaceholder").append(sandboxObject.htmlText);
+				
+				var s = document.createElement("script");
+				s.innerHTML = sandboxObject.scriptText;
+			
+				// give dom a chance to parse html into dom
+				setTimeout(function() {
+					document.getElementById("UI_MainPlaceholder").appendChild(s);
+				}, 350);
+				
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
+				API_LogMessage(xhr.status + " : " + xhr.statusText);
+				alertify.log(xhr.status + " : " + xhr.statusText);
+				alertify.log("See user log for more info");
+			}
 		});
 	}
 	

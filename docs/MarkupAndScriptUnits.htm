@@ -28,7 +28,10 @@ might be more complicated to debug.</p>
 <h3>Library Unit Management Utility</h3>
 <p>Currently I do not wish to clutter up the user interface with this added complexity, so i placed this in Samples/Utilities/Library Unit Management.&nbsp; From here you can create all of your script and html units.&nbsp;You can 
 create a script unit with the name <b>autorun</b> and it will execute immediately upon Trident Sandbox page load (unless a <b>SkipAutorun</b> hash param is added.&nbsp; From an autorun script 
-you can initialize the environment by loading other script units (via API_ImportScriptUnits) or perhaps add your own API functions or change the main page layout, etc.</p>
+you can initialize the environment by loading other script units (via API_ImportScriptUnits) or perhaps add your own API functions or change the main page layout, etc.&nbsp;If you utilize the autorun to import 
+scripts AND you utilize the launch command to run your apps then you may need to use setTimeout to delay your page initialization logic if it depends on the new scripts.&nbsp; SandboxLoader.htm 
+will also run your autorun script unit (unless you add the SkipAutorun hash param).&nbsp; If your autorun script and/or its imports take over 600ms you might need to add your own delay if your page 
+initialization logic depends on those library imports.</p>
 
 <h3>Console Command Interface</h3>
 <p>There are a series of lower level API commands added to support library unit management, that may be more useful if you use this feature alot.&nbsp; Primarily they allow using loading into (and saving from) the syntax 
