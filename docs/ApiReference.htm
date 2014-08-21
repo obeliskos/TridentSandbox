@@ -194,7 +194,7 @@ object inspector programmatically to display the contents of your own variable, 
 	<tbody>
 		<tr>
 			<th>Trident DB Functions</th>
-			<th>Description (These are only available when used in a hosted or appcached environment.</th>
+			<th>Description (These are only available when used in a hosted or appcached environment)</th>
 		</tr>
 		<tr>
 			<td>API_TransferSlot(slotId)</td>
@@ -231,11 +231,52 @@ object inspector programmatically to display the contents of your own variable, 
 	</tbody>
 </table>
 <br/>
+<p><i>Note: The above TridentDB Functions will eventually be obsoleted in favor of the new VAR_TRIDENT_API object interface.&nbsp; This new interface 
+decouples the TridentDb from just being an indexeddb keystore and allows also configuring keystore based on web services.&nbsp; The motivation is for me to use 
+TridentSandbox with a 'private keystore cloud' running on my home network, which i now do.&nbsp; Eventually I may provide code for a service implementation but you 
+can make your own for now or continue to use the (existing) indexeddb tridentdb key store.&nbsp; Script Units now utilize this new API internally, as do the Save Slots.</i></p>
+<table style="width:100%">
+	<tbody>
+		<tr>
+			<th>VAR_TRIDENT_API (Object/Class) Methods :</th>
+			<th>Description (Will eventually replace the above TridentDb interface; Available in hosted/appcached)</th>
+		</tr>
+		<tr>
+			<td>SwitchMode(mode)</td>
+			<td>Passing "trident" puts this into TridentDB mode, "service" put this into service mode.</td>
+		</tr>
+		<tr>
+			<td>GetAppKey(app, key, callback)</td>
+			<td>Used to retrieve an app/key, callback receives json object on success, null or id = 0 if not found.</td>
+		</tr>
+		<tr>
+			<td>GetAppKeyById(id, callback, data)</td>
+			<td>Retrieve a key by id, callback receives key object, null or an id of 0 if not found.</td>
+		</tr>
+		<tr>
+			<td>SetAppKey(app, key, val, callback)</td>
+			<td>Set an app key; callback is optional and receives obj with 'success' property value of true/false.</td>
+		</tr>
+		<tr>
+			<td>DeleteAppKey(id, callback)</td>
+			<td>Deletes an app key by id; callback is optional and receives obj with 'success' property value of true/false.</td>
+		</tr>
+		<tr>
+			<td>GetAppKeys(app, callback)</td>
+			<td>Retrieves list of all keys for a given app; returns array of objects with only 'id', 'app' and 'key' properties (no key val)</td>
+		</tr>
+		<tr>
+			<td>GetAllKeys(callback)</td>
+			<td>Retrieves unfiltered list of all keys; returns array of objects with only 'id', 'app' and 'key' properties (no key val)</td>
+		</tr>
+	</tbody>
+</table>
+<br/>
 <table style="width:100%">
 	<tbody>
 		<tr>
 			<th>Unit Library Functions</th>
-			<th>Description (These are only available when used in a hosted or appcached environment.</th>
+			<th>Description (These are only available when used in a hosted or appcached environment)</th>
 		</tr>
 		<tr>
 			<td>API_LogMarkupUnits()</td>

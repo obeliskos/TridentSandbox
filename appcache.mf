@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 192
+#rev 193
 
 CACHE:
 TridentSandbox.htm
@@ -7,6 +7,7 @@ SilentSandbox.htm
 SandboxLoader.htm
 css/sandbox.css
 scripts/tridentlist.js
+scripts/tridentdb.js
 scripts/workerpool.js
 libraries/crypto_worker.js
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css
@@ -315,6 +316,7 @@ samples/SpeechSynthesisAPI%20Safari.prg
 samples/Springy%20Demo.prg
 samples/SVG%20Markup.prg
 samples/TinyMCE%20Demo.prg
+samples/Trident%20API%20Demo.prg
 samples/Trident%20Backup%20Restore.prg
 samples/Trident%20Binary%20Encryptor.prg
 samples/Trident%20DB%20Usage.prg

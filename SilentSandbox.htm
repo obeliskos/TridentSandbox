@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<!--html-->
-<html> 
+<html>
 <head>
 <title>Trident Sandbox</title>
 <meta charset="utf-8">
@@ -41,6 +40,7 @@ available for use by the sandbox app, add them here.
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
 <script src="scripts/tridentlist.js"></script>
+<script src="scripts/tridentdb.js"></script>
 <script src="scripts/workerpool.js"></script>
 <script src="libraries/alertify.js-0.3.11/lib/alertify.js"></script>
 <script src="libraries/cryptojs/components/core.js"></script>
@@ -207,12 +207,13 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.92;
+	var VAR_TRIDENT_VERSION = 1.93;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
 	var VAR_TRIDENT_ENV_TYPE = 'IDE'; // IDE, STANDALONE, SBL
 	var VAR_TRIDENT_DB = null;
+	var VAR_TRIDENT_API = null;
 	var VAR_ForceOnlineSamples = true;
 
 	// possibly hash script and markup to determine if changes have been made 
@@ -389,7 +390,7 @@ img.TridentImageButton:hover
 			// If database doesnt exist yet or its version is lower than our version specified above (2nd param in line above)
 			openRequest.onupgradeneeded = function(e) {
 				var thisDB = e.target.result;
-								if (thisDB.objectStoreNames.contains("TridentSandboxKVP")) {
+				if (thisDB.objectStoreNames.contains("TridentSandboxKVP")) {
 					thisDB.deleteObjectStore("TridentSandboxKVP");
 				}
 				
@@ -411,6 +412,30 @@ img.TridentImageButton:hover
 				API_LogMessage("TridentSandboxDB (indexedDB) opened.");
 				VAR_TRIDENT_DB = e.target.result;
 				
+				// To be future-proof you can code against the new VAR_TRIDENT_API
+				// It lets you switch between old indexedDb TridentDatabase
+				// and a web service implementation to run on your own private 'cloud'
+				// You can switch between the two dynamically.
+				VAR_TRIDENT_API = new TridentDatabase(VAR_TRIDENT_DB, function() {
+					if (VAR_TRIDENT_API.mode == "trident") {
+						$("#sb_spn_indexeddb_status").text("Yes");
+					}
+					else {
+						$("#sb_spn_indexeddb_status").html("Yes <span style='font-family:Symbol'>Å</span>");
+					}
+					
+					sb_refresh_slots();	// when user changes from local to web, refresh slots
+					
+					if (typeof(EVT_TridentChanged) == "function") EVT_TridentChanged();
+				});
+				
+				if (VAR_TRIDENT_API.mode == "trident") {
+					$("#sb_spn_indexeddb_status").text("Yes");
+				}
+				else {
+					$("#sb_spn_indexeddb_status").html("Yes <span style='font-family:Symbol'>Å</span>");
+				}
+					
 				var skipautorun = API_GetURLParameter("SkipAutorun");
 				if (skipautorun == null) {
 					sb_run_autorun();
@@ -539,7 +564,7 @@ img.TridentImageButton:hover
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/322) + "%)");
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/324) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -779,7 +804,7 @@ img.TridentImageButton:hover
 					var key = keyArray[i].key;
 					var val = keyArray[i].val;
 
-					API_SetIndexedAppKey(app, key, val);
+					VAR_TRIDENT_API.SetAppKey(app, key, val);
 				}
 				
 				// In case the restore contained new Trident Save Slots, refresh the list
@@ -972,20 +997,12 @@ img.TridentImageButton:hover
 		// clear out slots select
 		$("#sb_sel_trident_slot").html("<option></option>");
 		
-		API_GetIndexedAppCursor('SandboxSaveSlots', function(e) {
-			var cursor = e.target.result;
-		  
-			if(cursor) {
-				var currObject = cursor.value;
-			  
-				$('#sb_sel_trident_slot').append($('<option>', {
-					value: currObject.key,
-					text: currObject.key
-				}));          
-			  
-				cursor.continue();
-			}
-			else {
+		VAR_TRIDENT_API.GetAppKeys("SandboxSaveSlots", function(result) {
+			if (result != null) {
+				for(var idx=0; idx < result.length; idx++) {
+					$("#sb_sel_trident_slot").append($("<option></option>").attr("value", result[idx].id).text(result[idx].key));
+				}
+				
 				var my_options = $("#sb_sel_trident_slot option");
 				my_options.sort(function(a,b) {
 					if (a.text > b.text) return 1;
@@ -999,31 +1016,27 @@ img.TridentImageButton:hover
 
 				if (typeof(callback) == "function") callback();
 			}
+			else {
+				alertify.error("check database configuration");
+			}
 		});
 	}
 	
 	function sb_run_autorun() {
-		API_GetIndexedAppKey("SandboxScriptUnits", "autorun", function(e) {
-			var res = e.target.result;
+        VAR_TRIDENT_API.GetAppKey("SandboxScriptUnits", "autorun", function (result) {
+			if (result == null || result.id == 0) return;
 			
-			if (res == null) return;  // no autorun script unit to run, so exit
-			
-			API_AppendUnitScript(res.val);
+			API_AppendUnitScript(result.val);
 		});
 	}
 	
 	function sb_load_slot_action(autorun) {
 		var selText = $("#sb_sel_trident_slot").find(":selected").text();
 		
-		API_GetIndexedAppKey("SandboxSaveSlots", selText, function(e) {
-			var res = e.target.result;
-			
-			if (res == null) {
-				alertify.error("No save at that slot");
-				return;
-			}
-			
-			var sandboxObject = JSON.parse(res.val);
+		if (selText == "") return;
+		
+        VAR_TRIDENT_API.GetAppKey("SandboxSaveSlots", selText, function (result) {
+			var sandboxObject = JSON.parse(result.val);
 		
 			sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
 			sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
@@ -1034,6 +1047,7 @@ img.TridentImageButton:hover
 			editorScript.setValue(sandboxObject.scriptText);
 
 			if (typeof(autorun) != "undefined" && autorun) sb_run();
+				
 		});
 	}
 	
@@ -1078,24 +1092,39 @@ img.TridentImageButton:hover
 			alertify.confirm("Are you sure you want to save into slot " + progNameString, function (e) {
 				if (e) {
 					try {
-						API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
-						sb_refresh_slots(function() {
-							// now that list is refreshed, make sure our (new?) program is selected
-							$("#sb_sel_trident_slot").val(progNameString)
+						//API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
+						VAR_TRIDENT_API.SetAppKey("SandboxSaveSlots", progNameString, json_text, function(result) {
+							if (result.success) {
+								sb_refresh_slots(function() {
+									// todo: make VAR_TRIDENT_API SetAppKey (both trident and service) return id so i could select by that
+									$("#sb_sel_trident_slot option").filter(function() {
+										return $(this).text() == progNameString; 
+									}).prop('selected', true);
+								});
+								
+								if (typeof(callback) == "function") callback();
+							}
+							else {
+								alertify.error("error calling SetKey()");
+							}
 						});
-						
-						if (typeof(callback) == "function") callback();
 					}
 					catch(e) {
-						alertify.alert("Error encountered during save to TridentDB : " + e.message);
+						alertify.error("Error encountered during save to TridentDB : " + e.message);
 					}
 				} 
 			});
 		}
 		else {
-			API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
-						
-			if (typeof(callback) == "function") callback();
+			VAR_TRIDENT_API.SetAppKey("SandboxSaveSlots", progNameString, json_text, function(result) {
+				if (result.success) {
+					alertify.success("saved");
+					if (typeof(callback) == "function") callback();
+				}
+				else {
+					alertify.error("Error encountered during save");
+				}
+			});
 		}
 	}
 	
@@ -1106,11 +1135,17 @@ img.TridentImageButton:hover
 		
 		alertify.confirm("Are you sure you want to delete Trident Program Slot : " + selText, function (e) {
 				if (e) {
-					API_GetIndexedAppKey("SandboxSaveSlots", selText, function(e) {
-						var res = e.target.result;
-						API_DelIndexedAppKey(res.id);
-						
-						sb_refresh_slots();
+				
+					VAR_TRIDENT_API.GetAppKey("SandboxSaveSlots", selText, function (result) {
+							
+						VAR_TRIDENT_API.DeleteAppKey(result.id, function(result) {
+							if (result) {
+								sb_refresh_slots();
+							}
+							else {
+								alertify.log("Error encountered during delete");
+							}
+						});
 					});
 				}
 				else {
@@ -1599,28 +1634,28 @@ function API_GetIndexedAppCursor(app, callback) {
 // This can allow end user running in hosted or appcached environment to use the TridentDB save slots as 'modules'
 // They can switch between programs using this API Call to stop the existing program and switch to (and run) a different save slot program
 // Since hosted, you can pass params between the two programs using local storage or TridentDB/indexed db.
-function API_TransferSlot(slotId) {
-	API_GetIndexedAppKey("SandboxSaveSlots", "ProgramSlot" + slotId, function(e) {
-		var res = e.target.result;
+//function API_TransferSlot(slotId) {
+//	API_GetIndexedAppKey("SandboxSaveSlots", "ProgramSlot" + slotId, function(e) {
+//		var res = e.target.result;
+//		
+//		if (res == null) {
+//			alertify.error("No save at that slot");
+//			return;
+//		}
 		
-		if (res == null) {
-			alertify.error("No save at that slot");
-			return;
-		}
-		
-		var sandboxObject = JSON.parse(res.val);
+//		var sandboxObject = JSON.parse(res.val);
 	
-		sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
-		sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+//		sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+//		sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
 	
-		$("#sb_txt_ProgramName").val(sandboxObject.progName);
+//		$("#sb_txt_ProgramName").val(sandboxObject.progName);
 
-		editorMarkup.setValue(sandboxObject.htmlText);
-		editorScript.setValue(sandboxObject.scriptText);
+//		editorMarkup.setValue(sandboxObject.htmlText);
+//		editorScript.setValue(sandboxObject.scriptText);
 	
-		sb_run();
-	});
-}
+//		sb_run();
+//	});
+//}
 
 function API_Backup_TridentDB(filename) {
 	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
@@ -1669,60 +1704,45 @@ function API_Restore_TridentDB() {
 // Initial Implementation will be invoking these functions via the Text Console calling these commands : 
 	function API_LogMarkupUnits() {
 		
-		var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
-		var store = transaction.objectStore("TridentSandboxKVP");
-		var index = store.index("app");
- 
-		// We want cursor to all values matching our (single) app param
-		var singleKeyRange = IDBKeyRange.only("SandboxMarkupUnits");
-
-		// To use one of the key ranges, pass it in as the first argument of openCursor()/openKeyCursor()
-		var cursor = index.openCursor(singleKeyRange);
- 
-		cursor.onsuccess = function(e) {
-			var cursor = e.target.result;
-
-			if(cursor) {
-				var currObject = cursor.value;
-				API_LogMessage(currObject.key);
-          
-				cursor.continue();
+		VAR_TRIDENT_API.GetAppKeys("SandboxMarkupUnits", function(result) {
+			for (var idx = 0; idx < result.length; idx++) {
+				API_LogMessage(result[idx].key);
 			}
-		};
+		});
 	}
 	
 	function API_SaveMarkupUnit(unitName) {
 		var htmlTextString = editorMarkup.getValue();
-		try {
-			API_SetIndexedAppKey("SandboxMarkupUnits", unitName, htmlTextString);
+		
+		VAR_TRIDENT_API.SetAppKey("SandboxMarkupUnits", unitName, htmlTextString, function(result) {
+			if (result.success) return true;
 			
-			return true;
-		}
-		catch(e) {
-			alertify.alert("Error encountered during save to local storage : " + e.message);
-
+			alertify.error("Error calling SetAppKey()");
 			return false;
-		}
+        });
 	}
 	
 	function API_LoadMarkupUnit(unitName) {
-		API_GetIndexedAppKey("SandboxMarkupUnits", unitName, function(e) {
-			var res = e.target.result;
-			
-			if (res == null) {
+	
+        VAR_TRIDENT_API.GetAppKey("SandboxMarkupUnits", unitName, function (result) {
+			if (result == null || result.id == 0) {
 				alertify.error("No markup unit by that name");
+				return false;
 			}
 			
-			sb_markup_hash = CryptoJS.SHA1(res.val).toString();
-			editorMarkup.setValue(res.val);
+			sb_markup_hash = CryptoJS.SHA1(result.val).toString();
+			editorMarkup.setValue(result.val);
 		});
 	}
 	
 	function API_GetMarkupUnit(unitName, callback) {
-		API_GetIndexedAppKey("SandboxMarkupUnits", unitName, function(e) {
-			var res = e.target.result;
+        VAR_TRIDENT_API.GetAppKey("SandboxMarkupUnits", unitName, function (result) {
+			if (result == null || result.id == 0) {
+				alertify.error("No markup unit by that name");
+				return false;
+			}
 			
-			callback(res.val);
+			callback(result.val);
 		});
 	}
 	
@@ -1737,66 +1757,46 @@ function API_Restore_TridentDB() {
 	
 	function API_LogScriptUnits() {
 		
-		var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
-		var store = transaction.objectStore("TridentSandboxKVP");
-		var index = store.index("app");
- 
-		// We want cursor to all values matching our (single) app param
-		var singleKeyRange = IDBKeyRange.only("SandboxScriptUnits");
-
-		// To use one of the key ranges, pass it in as the first argument of openCursor()/openKeyCursor()
-		var cursor = index.openCursor(singleKeyRange);
- 
-		cursor.onsuccess = function(e) {
-			var cursor = e.target.result;
-
-			if(cursor) {
-				var currObject = cursor.value;
-				API_LogMessage(currObject.key);
-          
-				cursor.continue();
+		VAR_TRIDENT_API.GetAppKeys("SandboxScriptUnits", function(result) {
+			for (var idx = 0; idx < result.length; idx++) {
+				API_LogMessage(result[idx].key);
 			}
-		};
-		
+		});
 	}
 	
 	function API_SaveScriptUnit(unitName) {
 		var scriptTextString = editorScript.getValue();
-		try {
-			API_SetIndexedAppKey("SandboxScriptUnits", unitName, scriptTextString);
+		
+		VAR_TRIDENT_API.SetAppKey("SandboxScriptUnits", unitName, scriptTextString, function(result) {
+			if (result.success) return true;
 			
-			return true;
-		}
-		catch(e) {
-			alertify.alert("Error encountered during save to local storage : " + e.message);
+			alertify.error("Error calling SetAppKey()");
 			return false;
-		}
+        });
 	}
 	
 	function API_LoadScriptUnit(unitName) {
-		API_GetIndexedAppKey("SandboxScriptUnits", unitName, function(e) {
-			var res = e.target.result;
-			
-			if (res == null) {
+	
+        VAR_TRIDENT_API.GetAppKey("SandboxScriptUnits", unitName, function (result) {
+			if (result == null || result.id == 0) {
 				alertify.error("No script unit by that name");
-				return;
+				return false;
 			}
 			
-			sb_script_hash = CryptoJS.SHA1(res.val).toString();
-			editorScript.setValue(res.val);
+			sb_script_hash = CryptoJS.SHA1(result.val).toString();
+			editorScript.setValue(result.val);
 		});
 	}
 	
 	function API_ImportScriptUnit(unitName, callback) {
-		API_GetIndexedAppKey("SandboxScriptUnits", unitName, function(e) {
-			var res = e.target.result;
-			
-			if (res == null) {
+	
+        VAR_TRIDENT_API.GetAppKey("SandboxScriptUnits", unitName, function (result) {
+			if (result == null || result.id == 0) {
 				alertify.error("No script unit by that name");
-				return;
+				return false;
 			}
 			
-			API_AppendUnitScript(res.val, callback);
+			API_AppendUnitScript(result.val, callback);
 		});
 	}
 	
@@ -2240,11 +2240,34 @@ function API_Restore_TridentDB() {
 			setTimeout(function() { sb_dashboard.calcSummaryUsageAction() }, 100);
 		},
 		
+		apiUseTrident: function() {
+			VAR_TRIDENT_API.SwitchMode("trident");
+			$("#ui_api_lblMode").text(VAR_TRIDENT_API.mode);
+		},
+		
+		apiUseService: function() {
+			VAR_TRIDENT_API.SwitchMode("service");
+			$("#ui_api_lblMode").text(VAR_TRIDENT_API.mode);
+		},
+		
+		apiSaveService: function() {
+			var svcLoc = $("#ui_api_txtService").val();
+			
+			if (svcLoc.indexOf("/", svcLoc.length - 1) == -1) svcLoc = svcLoc + "/";
+
+			VAR_TRIDENT_API.SetServiceLocation(svcLoc);
+			
+			$("#ui_api_txtService").val(VAR_TRIDENT_API.baseUrl);
+		},
+		
 		calcSummaryUsageAction: function() {
 			var totalSizeTDB = 0;
 
 			if (sb_dashboard.gaugeLS) { sb_dashboard.gaugeLS.destroy(); }
 			if (sb_dashboard.gaugeTDB) { sb_dashboard.gaugeTDB.destroy(); }
+			
+			$("#ui_api_lblMode").text(VAR_TRIDENT_API.mode);
+			$("#ui_api_txtService").val(VAR_TRIDENT_API.baseUrl);
 			
 			API_GetCursor(function(e) {
 				var cursor = e.target.result;
@@ -2537,6 +2560,17 @@ function API_Restore_TridentDB() {
 			buttons : {
 				Ok : function() { 
 					$(this).dialog( "destroy" );
+					
+					if (VAR_TRIDENT_API != null) {
+						if (VAR_TRIDENT_API.mode == "trident") {
+							$("#sb_spn_indexeddb_status").text("Yes");
+						}
+						else {
+							$("#sb_spn_indexeddb_status").html("Yes <span style='font-family:Symbol'>Å</span>");
+						}
+					}
+					
+					sb_refresh_slots();
 				}, 
 				Cancel : function() {
 					$(this).dialog( "destroy" );
@@ -2780,6 +2814,7 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 			<li><a href="#UI_Tab_Summary">Storage Summary</a></li>
 			<li><a href="#UI_Tab_LocalStorageUsage">LocalStorage Usage</a></li>
 			<li><a href="#UI_Tab_TridentDbUsage">TridentDB Usage</a></li>
+			<li><a href="#UI_Tab_TridentAPI">Trident API</a></li>
 		</ul>
 		<div id="UI_Tab_Summary" style="overflow: auto;">
 			<table>
@@ -2882,6 +2917,22 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 			</tr>
 			</table>
 			</div>
+		</div>
+		<div id="UI_Tab_TridentAPI">
+			<h3>Trident API Settings</h3>
+			<i>Note: I recommend you do not touch this, Use Trident DB for now.  It does work however if you want to review the service implementation in scripts/tridentdb.js</i><br/><br/>
+			<table>
+				<tr>
+					<td>Trident Mode :</td>
+					<td><label id="ui_api_lblMode"></label>
+				</tr>
+				<tr>
+					<td>Service Location :</td>
+					<td><input type="text" id="ui_api_txtService" style='height:30px; width:420px'/>&nbsp;<button style="height:40px; width:80px" onclick="sb_dashboard.apiSaveService()">Update</button>
+				</tr>
+			</table><br/>
+			<button style="height:40px; width:160px"  onclick="sb_dashboard.apiUseTrident()">Use Trident DB</button>
+			<button style="height:40px; width:200px"  onclick="sb_dashboard.apiUseService()">Use Trident Service</button>
 		</div>
 	</div>
 

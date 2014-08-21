@@ -34,6 +34,7 @@ available for use by the sandbox app, add them here.
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
 <script src="scripts/tridentlist.js"></script>
+<script src="scripts/tridentdb.js"></script>
 <script src="scripts/workerpool.js"></script>
 <script src="libraries/alertify.js-0.3.11/lib/alertify.js"></script>
 <script src="libraries/cryptojs/components/core.js"></script>
@@ -184,12 +185,13 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.92;
+	var VAR_TRIDENT_VERSION = 1.93;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
 	var VAR_TRIDENT_ENV_TYPE = 'SBL'; // IDE, STANDALONE, SBL
 	var VAR_TRIDENT_DB = null;
+	var VAR_TRIDENT_API = null;
 	
 	var tridentVars = {
 		isAutorun: false
@@ -247,6 +249,14 @@ img.TridentImageButton:hover
 			openRequest.onsuccess = function(e) {
 				API_LogMessage("TridentSandboxDB (indexedDB) opened.");
 				VAR_TRIDENT_DB = e.target.result;
+				
+				// To be future-proof you can code against the new VAR_TRIDENT_API
+				// It lets you switch between old indexedDb TridentDatabase
+				// and a web service implementation to run on your own private 'cloud'
+				// You can switch between the two dynamically.
+				VAR_TRIDENT_API = new TridentDatabase(VAR_TRIDENT_DB, function() {
+					if (typeof(EVT_TridentChanged) == "function") EVT_TridentChanged();
+				});
 				
 				var skipautorun = API_GetURLParameter("SkipAutorun");
 				if (skipautorun == null) {
@@ -384,27 +394,22 @@ img.TridentImageButton:hover
 	}
 	
 	function sb_run_autorun() {
-		API_GetIndexedAppKey("SandboxScriptUnits", "autorun", function(e) {
-			var res = e.target.result;
+        VAR_TRIDENT_API.GetAppKey("SandboxScriptUnits", "autorun", function (result) {
+			if (result == null || result.id == 0) return;
 			
-			if (res == null) return;  // no autorun script unit to run, so exit
-			
-			tridentVars.isAutorun = true;
-			
-			API_AppendUnitScript(res.val);
+			API_AppendUnitScript(result.val);
 		});
 	}
 	
 	function sb_run_app(appName) { 
-		API_GetIndexedAppKey("SandboxSaveSlots", appName, function(e) {
-			var res = e.target.result;
-			
-			if (res == null) {
+	
+        VAR_TRIDENT_API.GetAppKey("SandboxSaveSlots", appName, function (result) {
+			if (result == null || result.id == 0) {
 				alertify.error("No save at that slot");
 				return;
 			}
 			
-			var sandboxObject = JSON.parse(res.val);
+			var sandboxObject = JSON.parse(result.val);
 		
 			document.title = sandboxObject.progName;
 
@@ -689,10 +694,13 @@ function API_Restore_TridentDB() {
 	}
 	
 	function API_GetMarkupUnit(unitName, callback) {
-		API_GetIndexedAppKey("SandboxMarkupUnits", unitName, function(e) {
-			var res = e.target.result;
+        VAR_TRIDENT_API.GetAppKey("SandboxMarkupUnits", unitName, function (result) {
+			if (result == null || result.id == 0) {
+				alertify.error("No markup unit by that name");
+				return false;
+			}
 			
-			callback(res.val);
+			callback(result.val);
 		});
 	}
 	
@@ -705,30 +713,26 @@ function API_Restore_TridentDB() {
 	
 	function API_SaveScriptUnit(unitName) {
 		var scriptTextString = editorScript.getValue();
-		try {
-			API_SetIndexedAppKey("SandboxScriptUnits", unitName, scriptTextString);
+		
+		VAR_TRIDENT_API.SetAppKey("SandboxScriptUnits", unitName, scriptTextString, function(result) {
+			if (result.success) return true;
 			
-			return true;
-		}
-		catch(e) {
-			alertify.alert("Error encountered during save to local storage : " + e.message);
+			alertify.error("Error calling SetAppKey()");
 			return false;
-		}
+        });
 	}
 	
 	function API_LoadScriptUnit(unitName) {
 	}
 	
 	function API_ImportScriptUnit(unitName, callback) {
-		API_GetIndexedAppKey("SandboxScriptUnits", unitName, function(e) {
-			var res = e.target.result;
-			
-			if (res == null) {
+        VAR_TRIDENT_API.GetAppKey("SandboxScriptUnits", unitName, function (result) {
+			if (result == null || result.id == 0) {
 				alertify.error("No script unit by that name");
-				return;
+				return false;
 			}
 			
-			API_AppendUnitScript(res.val, callback);
+			API_AppendUnitScript(result.val, callback);
 		});
 	}
 	
