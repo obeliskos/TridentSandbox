@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<!--html -->
+<html> 
 <head>
 <title>Trident Sandbox</title>
 <meta charset="utf-8">
-<meta name="description" content="Trident Sandbox is an in-browser HTML/Javascript Scripting IDE that uses HTML 5 Application Cache functionality to run offline." />
+<meta name="description" content="Trident Sandbox is an in-browser HTML/Javascript Scripting IDE that runs offline using the HTML 5 Application Cache." />
 
 <!-- Leaving this uncommented while running local fs in metro ie seemed to have issues 
 <meta name="application-name" content="Trident Sandbox"/>
@@ -108,6 +109,7 @@ available for use by the sandbox app, add them here.
 <script src="libraries/moment.min.js"></script>
 <script src="libraries/babylon.js/babylon.1.11.js"></script>
 <script src="libraries/json-editor/jsoneditor.js"></script>
+<script src="libraries/d3/d3.min.js"></script>
 <link rel="stylesheet" href="libraries/tinymce/skins/lightgray/skin.min.css">
 <link rel="stylesheet" href="libraries/textillate/animate.css">
 <link rel="stylesheet" href="libraries/MetroJs.Full.0.9.74/MetroJs.css">
@@ -207,7 +209,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.93;
+	var VAR_TRIDENT_VERSION = 1.94;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -215,6 +217,13 @@ img.TridentImageButton:hover
 	var VAR_TRIDENT_DB = null;
 	var VAR_TRIDENT_API = null;
 	var VAR_ForceOnlineSamples = true;
+	var VAR_UI_Settings = {
+		header_text : "",
+		header_font : "",
+		editor_theme : "vibrant-ink",
+		error_alerts : true,
+		skip_autorun : false
+	}
 
 	// possibly hash script and markup to determine if changes have been made 
 	var sb_markup_hash = null;
@@ -229,6 +238,8 @@ img.TridentImageButton:hover
 		
 		// Help user quickly identify errors in their code by displaying alert with msg, line and col
 		window.onerror = function(msg, url, line, col, error) {
+			if (!VAR_UI_Settings.error_alerts) return;
+			
 			alertify.error(msg + " (line " + line + " col " + col + ")");
 			API_LogMessage(msg + " (line " + line + " col " + col + ")");
 		};
@@ -243,7 +254,7 @@ img.TridentImageButton:hover
 		$("#UI_TabsOutput").tabs();
 		$("#UI_TabsDashboard").tabs();
 		$("#sb_radioset").buttonset();
-		$('.tlt').textillate();
+		
 		//$('.tlt').textillate({ in: { effect: 'rollIn' } });
 		
 		$('#UI_TabsDashboard').on('tabsactivate', function(event, ui) {
@@ -350,16 +361,67 @@ img.TridentImageButton:hover
 			editorScript.setOption("theme", themeParam);
 		}
 		
+		var localsar = false;
+		var localrun = null;
+		
 		if (localStorage) {
-			var theme = localStorage["cmtheme"]; 
+			var theme = localStorage["editor-theme"]; 
 			if (theme != null && theme != "") {
+				VAR_UI_Settings.editor_theme = theme;
+				
 				$("#selTheme option").filter(function() {
 					return $(this).text() == theme; 
 				}).prop('selected', true);
-				localStorage["cmtheme"] = theme;
+				//localStorage["editor-theme"] = theme;
 				editorMarkup.setOption("theme", theme);
 				editorScript.setOption("theme", theme);
 			}
+			else {
+				localStorage["editor-theme"] = "vibrant-ink";
+			}
+			
+			var headerFont = localStorage["header-font"];
+			if (headerFont != null && headerFont != "") {
+				VAR_UI_Settings.header_font = headerFont;
+				
+				$('#sb_header_caption').css("font-family", headerFont);
+				$('#sb_header_caption2').css("font-family", headerFont);
+			}
+			else {
+				localStorage["header-font"] = "Heorot";
+			}
+			
+			var headerText = localStorage["header-text"];
+			if (headerText != null && headerText != "") {
+				VAR_UI_Settings.header_text = headerText;
+				
+				$('#sb_header_caption').text(headerText);
+				$('#sb_header_caption2').text(headerText);
+			}
+			else {
+				localStorage["header-text"] = $('#sb_header_caption').text();
+			}
+			
+			$('.tlt').textillate();	// need to run effect after text is set
+		
+			var sar = localStorage["skip-autorun"];
+			if (sar != null && sar != "") {
+				if (sar == "true") {
+					VAR_UI_Settings.skip_autorun = sar;
+					localsar = true;
+				}
+			}
+			else {
+				localStorage["skip-autorun"] = "false";
+			}
+			
+			var lr = localStorage["run-slot"];
+			if (lr != null && lr != "") {
+				localrun = lr;
+			}
+		}
+		else {
+			$('.tlt').textillate();
 		}
 		
 		sb_fit_log();
@@ -437,7 +499,7 @@ img.TridentImageButton:hover
 				}
 					
 				var skipautorun = API_GetURLParameter("SkipAutorun");
-				if (skipautorun == null) {
+				if (skipautorun == null && !localsar) {
 					sb_run_autorun();
 				}
 				
@@ -457,12 +519,13 @@ img.TridentImageButton:hover
 					}
 					else {
 						var runSlot = API_GetURLParameter("RunSlot");
-						if (runSlot != null) {
+						if (runSlot != null || localrun != null) {
 							sb_clean_sandbox();
 						
-							$("#sb_sel_trident_slot").val(runSlot);
+							if (localrun != null)	$("#sb_sel_trident_slot").val(localrun);
+							else					$("#sb_sel_trident_slot").val(runSlot);
 
-						// let sandbox finish cleaning then run
+							// let sandbox finish cleaning then run
 							setTimeout(function() {
 								sb_load_slot(true);
 							}, 200);
@@ -559,12 +622,27 @@ img.TridentImageButton:hover
 		
 	});
 	
+	function applyUiSettings() {
+		editorMarkup.setOption("theme", VAR_UI_Settings.editor_theme);
+		editorScript.setOption("theme", VAR_UI_Settings.editor_theme);
+	
+		if (VAR_UI_Settings.header_text != "") {
+			$('#sb_header_caption').text(VAR_UI_Settings.header_text);
+			$('#sb_header_caption2').text(VAR_UI_Settings.header_text);
+		}
+		
+		if (VAR_UI_Settings.header_font != "") {
+			$('#sb_header_caption').css("font-family", VAR_UI_Settings.header_font);
+			$('#sb_header_caption2').css("font-family", VAR_UI_Settings.header_font);
+		}
+	}
+	
 	function progressAC(e)
 	{
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/324) + "%)");
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/325) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -1177,10 +1255,14 @@ img.TridentImageButton:hover
 		var fontName = $('#sb_header_caption').css("font-family");
 		
 		if (fontName.indexOf('Heorot') != -1) {
-			$('#sb_header_caption').css("font-family", "Tahoma");
+			$('#sb_header_caption').css("font-family", "Sans");
+			$('#sb_header_caption2').css("font-family", "Sans");
+			if (localStorage) localStorage["header-font"] = "Sans";
 		}
 		else {
 			$('#sb_header_caption').css("font-family", "Heorot");
+			$('#sb_header_caption2').css("font-family", "Heorot");
+			if (localStorage) localStorage["header-font"] = "Heorot";
 		}
 	}
 	
@@ -1834,12 +1916,20 @@ function API_Restore_TridentDB() {
 	}
 	
 	function API_ClearOutput() {
+
+		// Null out old event handlers
+		EVT_WindowResize = null;
+		EVT_TridentChanged = null;
+		EVT_UserLoadCallback = null;
+		EVT_UserDataLoadCallback = null;
+		
 		// allow user to do any cleanup they might want to do
 		if (typeof(EVT_CleanSandbox) == typeof(Function)) {
 			try {
 				EVT_CleanSandbox();
 			}
 			catch (err) {
+				alertify.error("EVT_CleanSandbox: " + err);
 			}
 		}
 		
@@ -2201,7 +2291,7 @@ function API_Restore_TridentDB() {
 	function selectTheme() {
 		var theme = $("#selTheme option:selected").val();
 		if (localStorage) {
-			localStorage["cmtheme"] = theme;
+			localStorage["editor-theme"] = theme;
 		}
 
 		editorMarkup.setOption("theme", theme);
@@ -2350,60 +2440,69 @@ function API_Restore_TridentDB() {
 			
 			// clear array of [key,sizes]
 			var arrayTDB = [];
+			var tdbu_counter = null;
 
 			// repopulate the listbox while simultaneously building the arrayTDB data for plot
 			$("#ui_tdb_selTridentDB").html("");
 			
 			var totalSize = 0;
 
-			API_GetCursor(function(e) {
-				var cursor = e.target.result;
-				if(cursor) {
-					var currObject = cursor.value;
+			VAR_TRIDENT_API.GetAllKeys(function(result) {
+				tdbu_counter = result.length;
+			
+				for (var idx = 0; idx < result.length; idx++) {
+					VAR_TRIDENT_API.GetAppKeyById(result[idx].id, function (result) {
+						var currObject = result;
 				  
-					$('#ui_tdb_selTridentDB').append($('<option>', {
-						value: currObject.id,
-						text: currObject.app + ";" + currObject.key
-					}));          
+						$('#ui_tdb_selTridentDB').append($('<option>', {
+							value: currObject.id,
+							text: currObject.app + ";" + currObject.key
+						}));          
 				  
-					// add app, key, appkey and val lengths
-					var keySize = currObject.app.length*2 + currObject.key.length*2 + currObject.val.length;
-					totalSize += keySize;
+						var keySize = currObject.val.length + currObject.app.length + currObject.key.length;
+						if (VAR_TRIDENT_API.mode == "trident") {
+							keySize = currObject.app.length*2 + currObject.key.length*2 + currObject.val.length;
+						}
+						totalSize += keySize;
+						
+						arrayTDB.push([currObject.key.slice(0,20), keySize]);
+						//cursor.continue();
 					
-					arrayTDB.push([currObject.key.slice(0,20), keySize]);
-					cursor.continue();
-				}
-				else {
-					// if user left tab before we were ready to plot, then dont bother
-					if ($("#UI_TabsDashboard").tabs("option", "active") != 2) return;
-					
-					if (totalSize == 0) $("#ui_div_trident_usage").hide();
-					else $("#ui_div_trident_usage").show();
-				
-					$("#ui_tdb_spnTotalSize").text(totalSize + " bytes (" + Math.round((totalSize/1024)/1024 *100)/100 + "MB)");				
-					
-					$("#ui_chartTDBspin").hide();
-					
-					if (arrayTDB.length == 0) return;
-					
-					sb_dashboard.tdbplot = jQuery.jqplot ('ui_tdb_chartTridentUsage', [arrayTDB], 
-					{ 
-						seriesDefaults: {
-							// Make this a pie chart.
-							renderer: jQuery.jqplot.PieRenderer, 
-							rendererOptions: {
-								// Put data labels on the pie slices.
-								// By default, labels show the percentage of the slice.
-								showDataLabels: true
-								//dataLabels: ['label']
-							}
-						}, 
-						legend: { show:false, location: 'e' },
-						highlighter: {
-						  show: true,
-						  formatString:'%s', 
-						  tooltipLocation:'sw', 
-						  useAxesFormatters:false
+						//sbv.arrayLS.push([currObject.key.slice(0,20), keySize]);
+						
+						if (--tdbu_counter == 0) {
+							if ($("#UI_TabsDashboard").tabs("option", "active") != 2) return;
+							
+							if (totalSize == 0) $("#ui_div_trident_usage").hide();
+							else $("#ui_div_trident_usage").show();
+						
+							$("#ui_tdb_spnTotalSize").text(totalSize + " bytes (" + Math.round((totalSize/1024)/1024 *100)/100 + "MB) " + 
+								((VAR_TRIDENT_API.mode == 'trident')?"TridentMode":"ServiceMode"));				
+							
+							$("#ui_chartTDBspin").hide();
+							
+							if (arrayTDB.length == 0) return;
+							
+							sb_dashboard.tdbplot = jQuery.jqplot ('ui_tdb_chartTridentUsage', [arrayTDB], 
+							{ 
+								seriesDefaults: {
+									// Make this a pie chart.
+									renderer: jQuery.jqplot.PieRenderer, 
+									rendererOptions: {
+										// Put data labels on the pie slices.
+										// By default, labels show the percentage of the slice.
+										showDataLabels: true
+										//dataLabels: ['label']
+									}
+								}, 
+								legend: { show:false, location: 'e' },
+								highlighter: {
+								  show: true,
+								  formatString:'%s', 
+								  tooltipLocation:'sw', 
+								  useAxesFormatters:false
+								}
+							});
 						}
 					});
 				}
@@ -2414,35 +2513,30 @@ function API_Restore_TridentDB() {
 		deleteTridentKey : function() {
 			var objId = $("#ui_tdb_selTridentDB option:selected").val();
 
-			API_DelIndexedAppKey(parseInt(objId));
-
-			setTimeout(function () { sb_dashboard.calcTridentDbUsage() }, 300);
+			VAR_TRIDENT_API.DeleteAppKey(parseInt(objId), function(result) {
+				sb_dashboard.calcTridentDbUsage();
+			});
 		},
 		
 		selTdbChanged: function () {
 			var keyId = $("#ui_tdb_selTridentDB option:selected").val();
 
-			API_GetIndexedAppKeyById(parseInt(keyId), function(e) {
-				var res = e.target.result;
-				
-				if (res.app  == "TridentFiles") $("#ui_tdb_download").show();
+			VAR_TRIDENT_API.GetAppKeyById(parseInt(keyId), function(result) {
+				if (result.app  == "TridentFiles") $("#ui_tdb_download").show();
 				else $("#ui_tdb_download").hide();
 				
-				$("#ui_tdb_txtAppName").val(res.app);
-				$("#ui_tdb_txtKeyName").val(res.key);
-				$("#ui_tdb_txtKeySize").val(res.val.length + " bytes");
+				$("#ui_tdb_txtAppName").val(result.app);
+				$("#ui_tdb_txtKeyName").val(result.key);
+				$("#ui_tdb_txtKeySize").val(result.val.length + " bytes");
 			});
 		},
 		
 		downloadTridentFile: function() {
 			var objId = $("#ui_tdb_selTridentDB option:selected").val();
 
-			// user clicked "ok"
-			API_GetIndexedAppKeyById(parseInt(objId), function(e) {
-				var res = e.target.result;
-
-				var fileName = res.key.replace("TridentFiles;", "");
-				var dataURL = res.val;
+			VAR_TRIDENT_API.GetAppKeyById(parseInt(objId), function(result) {
+				var fileName = result.key.replace("TridentFiles;", "");
+				var dataURL = result.val;
 				API_SaveDataURL(fileName, dataURL);
 			});
 		},
@@ -2450,15 +2544,15 @@ function API_Restore_TridentDB() {
 		renameTridentKey: function() {
 			var objId = $("#ui_tdb_selTridentDB option:selected").val();
 
-			// user clicked "ok"
-			API_GetIndexedAppKeyById(parseInt(objId), function(e) {
-				var res = e.target.result;
-			
-				API_SetIndexedAppKey(res.app, $("#ui_tdb_txtKeyName").val(), res.val);
-				API_DelIndexedAppKey(parseInt(objId));
+			VAR_TRIDENT_API.GetAppKeyById(parseInt(objId), function(result) {
+				VAR_TRIDENT_API.SetAppKey(result.app, $("#ui_tdb_txtKeyName").val(), result.val, function(setres) {
+					if (setres.success) {
+						VAR_TRIDENT_API.DeleteAppKey(parseInt(objId), function(delres) {
+							sb_dashboard.calcTridentDbUsage();
+						});
+					}
+				});
 			});
-
-			setTimeout(function () { sb_dashboard.calcTridentDbUsage() }, 250);
 		},
 
 		calcLocalStorageUsage: function() {
@@ -2489,6 +2583,14 @@ function API_Restore_TridentDB() {
 				}));          
 			}
 			
+			var my_options = $("#ui_ldb_selLocalStorage option");
+			my_options.sort(function(a,b) {
+				if (a.text > b.text) return 1;
+				else if (a.text < b.text) return -1;
+				else return 0
+			})
+			$("#ui_ldb_selLocalStorage").empty().append( my_options );
+			
 			if (totalSize == 0) $("#ui_div_local_usage").hide();
 			else $("#ui_div_local_usage").show();
 			
@@ -2518,6 +2620,14 @@ function API_Restore_TridentDB() {
 				},
 				legend: { show:false, location: 'e' }
 			});
+		},
+		
+		saveLSKey : function() {
+			var key = $("#ui_ls_txtKeyName").val();
+			var val = $("#ui_ls_txtLocalStorageValue").text();
+			
+			localStorage[key] = val;
+			sb_dashboard.calcLocalStorageUsage();
 		},
 		
 		selectLSKey: function() {
@@ -2723,7 +2833,7 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 		<button style='height:32px;' onclick="sb_save()" title="Save your program (Alt+S)"><i class="fa fa-save"></i> Save</button>
 		<button id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i> FS Dev</button>
 		<button style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i> CLR</button>
-		<button id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4f4"></i> RUN</b></button>
+		<button id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
 		</div>
 		&nbsp;
 		<div style="display:inline">
@@ -2869,8 +2979,11 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 						</tr>
 						<tr>
 							<td>Value<br/>
-								<textarea rows='6' cols='65' id='ui_ls_txtLocalStorageValue'></textarea>
+								<textarea spellcheck='false' rows='3' cols='60' id='ui_ls_txtLocalStorageValue'></textarea>
 							</td>
+						</tr>
+						<tr>
+							<td><button class="minimal" onclick="sb_dashboard.saveLSKey()">Save</button></td>
 						</tr>
 						</table>
 						</div>
@@ -2890,7 +3003,6 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 				<td valign='top' style='padding-top:10px'>
 					<select id="ui_tdb_selTridentDB" size=11 onchange="sb_dashboard.selTdbChanged()"></select><br/>
 					<button style="height:40px;" onclick="sb_dashboard.deleteTridentKey()">Delete</button>
-					<button style="height:40px;" onclick="sb_dashboard.renameTridentKey()">Rename</button>
 					<button id="ui_tdb_download" style="height:40px; display:none;" onclick="sb_dashboard.downloadTridentFile()">Download</button>
 				</td>
 				<td valign='top' style='padding-top:10px'>
@@ -2909,6 +3021,11 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 					<tr>
 						<td>Size<br/>
 							<input type='text' id='ui_tdb_txtKeySize' style='width:220px'/>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button style="height:40px;" onclick="sb_dashboard.renameTridentKey()">Rename</button>
 						</td>
 					</tr>
 					</table>

@@ -133,7 +133,18 @@ TridentDatabase.prototype.GetAppKeyIndexed = function(app, key, callback) {
 
   	request.onsuccess = (function(usercallback) {
 		return function(e) {
-			if (typeof(usercallback) == "function") usercallback(e.target.result);
+			if (typeof(usercallback) == "function") {
+				var lres = e.target.result;
+				if (typeof(lres) == "undefined") lres = { id: 0, success: false };
+				
+				usercallback(lres);
+			}
+		}
+	})(callback);
+	
+	request.onerror = (function(usercallback) {
+		return function(e) {
+			if (typeof(usercallback) == "function") usercallback({ id: 0, success: false });
 		}
 	})(callback);
 }
@@ -247,7 +258,7 @@ TridentDatabase.prototype.SetAppKeyIndexedDb = function (app, key, val, callback
 		return function(e) {
 			if (typeof(usercallback) == "function") usercallback({ success: false });
 		}
-	});
+	})(callback);
 }
 
 TridentDatabase.prototype.SetAppKeyService = function (app, key, val, callback) {

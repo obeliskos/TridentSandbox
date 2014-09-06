@@ -100,6 +100,7 @@ available for use by the sandbox app, add them here.
 <script src="libraries/moment.min.js"></script>
 <script src="libraries/babylon.js/babylon.1.11.js"></script>
 <script src="libraries/json-editor/jsoneditor.js"></script>
+<script src="libraries/d3/d3.min.js"></script>
 <link rel="stylesheet" href="libraries/tinymce/skins/lightgray/skin.min.css">
 <link rel="stylesheet" href="libraries/textillate/animate.css">
 <link rel="stylesheet" href="libraries/MetroJs.Full.0.9.74/MetroJs.css">
@@ -185,7 +186,7 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.93;
+	var VAR_TRIDENT_VERSION = 1.94;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -259,6 +260,7 @@ img.TridentImageButton:hover
 				});
 				
 				var skipautorun = API_GetURLParameter("SkipAutorun");
+				if (localStorage && (localStorage["skip-autorun"] == "true")) skipautorun = true;
 				if (skipautorun == null) {
 					sb_run_autorun();
 				}

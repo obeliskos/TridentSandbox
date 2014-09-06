@@ -334,8 +334,16 @@ can make your own for now or continue to use the (existing) indexeddb tridentdb 
 			<th>Description</th>
 		</tr>
 		<tr>
+			<td>EVT_CleanSandbox()</td>
+			<td>If you create global variables which use up alot of memory, reference user interface elements, or utilize timers, etc. then you should probably clean up after you are done to ensure the cleanliness / stability of the sandbox environment.  Implement this method in your app to allow your program to clean up after itself.  Trident Sandbox will call this on subsequent runs or change of programs.  (See DesignGuide for more details).</td>
+		</tr>
+		<tr>
 			<td>EVT_WindowResize()</td>
 			<td>Implement this callback to be notified whenever the browser window is resized.</td>
+		</tr>
+		<tr>
+			<td>EVT_TridentChanged()</td>
+			<td>Part of the new Trident DB API; When the configuration settings change in the VAR_TRIDENT_API, you can implement this callback in your program to be notified.</td>
 		</tr>
 		<tr>
 			<td>EVT_UserLoadCallback(filestring, filename)</td>
@@ -344,10 +352,6 @@ can make your own for now or continue to use the (existing) indexeddb tridentdb 
 		<tr>
 			<td>EVT_UserDataLoadCallback(dataURL, filename)</td>
 			<td>When calling the API_ShowDataLoad() method above to load a binary file, you should implement this callback in your program to 'receive' a potentially loaded dataURL string.</td>
-		</tr>
-		<tr>
-			<td>EVT_CleanSandbox()</td>
-			<td>If you create global variables which use up alot of memory, reference user interface elements, or utilize timers, etc. then you should probably clean up after you are done to ensure the cleanliness / stability of the sandbox environment.  Implement this method in your app to allow your program to clean up after itself.  Trident Sandbox will call this on subsequent runs or change of programs.  (See DesignGuide for more details).</td>
 		</tr>
 	</tbody>
 </table>
