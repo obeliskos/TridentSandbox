@@ -1,5 +1,0 @@
-{
-  "progName": "Browser UserAgent",
-  "htmlText": "<h3>Get Browser User Agent</h3>\n<textarea id=\"txtUserAgent\" rows='10' cols='50'></textarea>\n",
-  "scriptText": "$(\"#txtUserAgent\").val(\"User-agent header sent: \" + navigator.userAgent); \n\n// Rough detection of supported Internet Explorer versions, for other browsers you will need to determine pattern\nvar isARM = (navigator.userAgent.indexOf(\"ARM;\") != -1);\nvar isIE10 = (navigator.userAgent.indexOf(\"MSIE 10.0;\") != -1); \nvar isIE11 = (navigator.userAgent.indexOf(\"Trident/7.0\") != -1) && (navigator.userAgent.indexOf(\"rv:11.0\") != -1);\nvar isFirefox = (navigator.userAgent.indexOf(\"Firefox\") != -1);\n\nif (isARM && isIE10) alertify.log(\"Appears you are on Windows RT 8.0\");\nif (isARM && isIE11) alertify.log(\"Appears you are on Windows RT 8.1\");\nif (!isARM && isIE10) alertify.log(\"Appears you are on x86 running IE10\");\nif (!isARM && isIE11) alertify.log(\"Appears you are on x86 running IE11\"); \nif (isFirefox) alertify.log(\"Appears you are using Firefox\");"
-}

@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 194
+#rev 195
 
 CACHE:
 TridentSandbox.htm
@@ -62,6 +62,12 @@ libraries/codemirror/mode/xml/xml.js
 libraries/codemirror/mode/javascript/javascript.js
 libraries/codemirror/mode/htmlmixed/htmlmixed.js
 libraries/codemirror/mode/css/css.js
+libraries/codemirror/mode/clike/clike.js
+libraries/codemirror/mode/markdown/markdown.js
+libraries/codemirror/mode/dtd/dtd.js
+libraries/codemirror/mode/coffeescript/coffeescript.js
+libraries/codemirror/mode/python/python.js
+libraries/codemirror/mode/cypher/cypher.js
 libraries/codemirror/addon/display/fullscreen.js
 libraries/codemirror/addon/display/fullscreen.css
 libraries/codemirror/lib/codemirror.css
@@ -266,28 +272,24 @@ docs/HostingAndAppCache.htm
 docs/MarkupAndScriptUnits.htm
 docs/Welcome.htm
 sounds/ElectricalSweep.mp3
-samples/Ajax%20Test.prg
 samples/Alertify%20Demo.prg
-samples/Analog%20Clocks%20SVG.prg
 samples/Antikythera.prg
-samples/Browser%20UserAgent.prg
 samples/Babylon.JS%20Sample%20(WebGL).prg
 samples/Canvas%20Tiles.prg
+samples/Clocks%20Example.prg
+samples/Codemirror%20demo.prg
 samples/Crypto%20Album.prg
 samples/CryptoJS.prg
 samples/CryptoJS%20File%20Hasher.prg
 samples/CryptoJS%20Notepad.prg
 samples/CryptoWorker%20Demo.prg
-samples/CSS%20Transforms.prg
 samples/D3%20sample.prg
-samples/DigitalClock.prg
 samples/Drag%20Drop%20Thumbnailer.prg
 samples/Dungeon%20Generator.prg
 samples/Dynamic%20Image%20Load.prg
 samples/Dynatree%20Demo.prg
 samples/EaselJS%20Demo.prg
 samples/Font%20Awesome.prg
-samples/Fullscreen%20API.prg
 samples/Geolocation%20Coordinates.prg
 samples/Geolocation%20GetMap.prg
 samples/Geolocation%20Track.prg
@@ -295,11 +297,9 @@ samples/HieroCryptes%20Notepad.prg
 samples/Hosted%20Files%20Database.prg
 samples/Hosted%20Samples%20Browser.prg
 samples/HTML%205%20Starfield%20Fullscreen.prg
-samples/HTML%205%20Starfield.prg
 samples/IMDB%20Search.prg
 samples/jqPlot%20Demo.prg
 samples/jQuery%20UI%20Demo.prg
-samples/jQuery%20UI%20Menu.prg
 samples/JSON%20Databank.prg
 samples/JsonEditor%20Forms%20Sample.prg
 samples/Library%20Unit%20Management.prg
@@ -310,14 +310,12 @@ samples/LokiJS%20Demo.prg
 samples/Metro%20Web%20Data%20Extraction.prg
 samples/MetroJS%20Demo.prg
 samples/ObeliskJS%20Demo.prg
-samples/Panorama%20Canvas.prg
 samples/PixiJS%20Morph%20Demo.prg
 samples/Play%20Media.prg
 samples/Proper%20Cleanup%20Method.prg
 samples/SandboxIO.prg
 samples/SpeechSynthesisAPI%20Safari.prg
 samples/Springy%20Demo.prg
-samples/SVG%20Markup.prg
 samples/TinyMCE%20Demo.prg
 samples/Trident%20API%20Demo.prg
 samples/Trident%20Backup%20Restore.prg

@@ -1,14 +1,13 @@
-Trident Sandbox
-==============
+# Trident Sandbox
 
-An In-Browser Scripting IDE for HTML5/Javascript
+## An In-Browser Scripting IDE for HTML5/Javascript
 
 ![trident preview](http://www.obeliskos.com/surface/trident_sandbox_193.png)
 
 This project is scripting environment which runs within a web browser.  It can run in several modes: 
-1) : Offline served up from your local file system
-2) : Hosted on a webserver
-3) : AppCached - Similar to #2 except the client caches the entire website and can run offline.  For internet explorer, this allows local storage and indexeddb which would not otherwise be available when running from your local filesystem. 
+* Offline served up from your local file system
+* Hosted on a webserver
+* AppCached - Similar to #2 except the client caches the entire website and can run offline.  For internet explorer, this allows local storage and indexeddb which would not otherwise be available when running from your local filesystem. 
 
 To test out this application you can visit my hosted instance at http://www.obeliskos.com/TridentSandbox ... this will automatically download the site (about 6 megs) into an 'application cache' so that the site continues to work when run offline.  Pay attention to the AppCache diagnostic messages (top left of page) to see the appcache status... is should say 'downloading' and then 'idle' when completely cached.  If it says idle you should be able to go offline and continue to use (bookmark the page to avoid erasing the appcache when you clean internet files).
 

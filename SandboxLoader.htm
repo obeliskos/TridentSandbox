@@ -67,6 +67,13 @@ available for use by the sandbox app, add them here.
 <script src="libraries/codemirror/mode/xml/xml.js"></script>
 <script src="libraries/codemirror/mode/javascript/javascript.js"></script>
 <script src="libraries/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<script src="libraries/codemirror/mode/css/css.js"></script>
+<script src="libraries/codemirror/mode/clike/clike.js"></script>
+<script src="libraries/codemirror/mode/markdown/markdown.js"></script>
+<script src="libraries/codemirror/mode/dtd/dtd.js"></script>
+<script src="libraries/codemirror/mode/coffeescript/coffeescript.js"></script>
+<script src="libraries/codemirror/mode/python/python.js"></script>
+<script src="libraries/codemirror/mode/cypher/cypher.js"></script>
 <script src="libraries/codemirror/addon/display/fullscreen.js"></script>
 <script src="libraries/codemirror/addon/fold/foldcode.js"></script>
 <script src="libraries/codemirror/addon/fold/foldgutter.js"></script>
@@ -186,7 +193,7 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.94;
+	var VAR_TRIDENT_VERSION = 1.95;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -197,6 +204,11 @@ img.TridentImageButton:hover
 	var tridentVars = {
 		isAutorun: false
 	}
+	
+	var VAR_UI_Settings = {
+		skip_autorun : false,
+		error_popups : true
+	}
 
 	$(document).ready(function() {
 		// I dont want to allow this to run in an iframe
@@ -205,11 +217,30 @@ img.TridentImageButton:hover
 			return;
 		}
 		
+		// Load up local storage settings
+		if (localStorage) {
+			var sar = localStorage["skip-autorun"];
+			if (sar != null && sar != "") {
+				if (sar == "true")	{ VAR_UI_Settings.skip_autorun = true; }
+				else 				{ VAR_UI_Settings.skip_autorun = false; }
+			}
+			else { localStorage["skip-autorun"] = "false"; }
+			
+			var errorPopups = localStorage["error-popups"];
+			if (errorPopups != null && errorPopups != "") 
+			{ 
+				VAR_UI_Settings.error_popups = (errorPopups == "true"); 
+			}
+			else { localStorage["error-popups"] = "true"; }
+		}
+			
 		// if loading from the web (not sa template), clear out the template placeholders
 		if (document.URL.indexOf("file://") == -1) $("#UI_MainPlaceholder").empty();
 		
 		// Help user quickly identify errors in their code by displaying alert with msg, line and col
 		window.onerror = function(msg, url, line, col, error) {
+			if (!VAR_UI_Settings.error_popups) return;
+			
 			alertify.error(msg + " (line " + line + " col " + col + ")");
 		};
 		
@@ -260,8 +291,7 @@ img.TridentImageButton:hover
 				});
 				
 				var skipautorun = API_GetURLParameter("SkipAutorun");
-				if (localStorage && (localStorage["skip-autorun"] == "true")) skipautorun = true;
-				if (skipautorun == null) {
+				if (skipautorun == null && !VAR_UI_Settings.skip_autorun) {
 					sb_run_autorun();
 				}
 				
@@ -818,7 +848,9 @@ function API_Restore_TridentDB() {
 			elem.msRequestFullscreen();
 		} else if (elem.mozRequestFullScreen) {
 			elem.mozRequestFullScreen();
-		} 
+		} else if (elem.webkitRequestFullscreen) {
+			elem.webkitRequestFullscreen();
+		}    
 	}
 	
 	function API_UserFullscreenExit() {
@@ -846,7 +878,9 @@ function API_Restore_TridentDB() {
 				docElm.msRequestFullscreen();
 			} else if (docElm.mozRequestFullScreen) {
 				docElm.mozRequestFullScreen();
-			} 
+			} else if (docElm.webkitRequestFullscreen) {
+				docElm.webkitRequestFullscreen();
+			}    
 		}    
 	}
 	

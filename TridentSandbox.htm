@@ -75,6 +75,12 @@ available for use by the sandbox app, add them here.
 <script src="libraries/codemirror/mode/javascript/javascript.js"></script>
 <script src="libraries/codemirror/mode/htmlmixed/htmlmixed.js"></script>
 <script src="libraries/codemirror/mode/css/css.js"></script>
+<script src="libraries/codemirror/mode/clike/clike.js"></script>
+<script src="libraries/codemirror/mode/markdown/markdown.js"></script>
+<script src="libraries/codemirror/mode/dtd/dtd.js"></script>
+<script src="libraries/codemirror/mode/coffeescript/coffeescript.js"></script>
+<script src="libraries/codemirror/mode/python/python.js"></script>
+<script src="libraries/codemirror/mode/cypher/cypher.js"></script>
 <script src="libraries/codemirror/addon/display/fullscreen.js"></script>
 <script src="libraries/codemirror/addon/fold/foldcode.js"></script>
 <script src="libraries/codemirror/addon/fold/foldgutter.js"></script>
@@ -209,7 +215,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.94;
+	var VAR_TRIDENT_VERSION = 1.95;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -221,8 +227,8 @@ img.TridentImageButton:hover
 		header_text : "",
 		header_font : "",
 		editor_theme : "vibrant-ink",
-		error_alerts : true,
-		skip_autorun : false
+		skip_autorun : false,
+		error_popups : true
 	}
 
 	// possibly hash script and markup to determine if changes have been made 
@@ -238,7 +244,7 @@ img.TridentImageButton:hover
 		
 		// Help user quickly identify errors in their code by displaying alert with msg, line and col
 		window.onerror = function(msg, url, line, col, error) {
-			if (!VAR_UI_Settings.error_alerts) return;
+			if (!VAR_UI_Settings.error_popups) return;
 			
 			alertify.error(msg + " (line " + line + " col " + col + ")");
 			API_LogMessage(msg + " (line " + line + " col " + col + ")");
@@ -413,6 +419,14 @@ img.TridentImageButton:hover
 			}
 			else {
 				localStorage["skip-autorun"] = "false";
+			}
+			
+			var errorPopups = localStorage["error-popups"];
+			if (errorPopups != null && errorPopups != "") {
+				VAR_UI_Settings.error_popups = (errorPopups == "true");
+			}
+			else {
+				localStorage["error-popups"] = "true";
 			}
 			
 			var lr = localStorage["run-slot"];
@@ -642,7 +656,7 @@ img.TridentImageButton:hover
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/327) + "%)");
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/324) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -1562,8 +1576,9 @@ img.TridentImageButton:hover
 				docElm.msRequestFullscreen();
 			} else if (docElm.mozRequestFullScreen) {
 				docElm.mozRequestFullScreen();
-			} 
-		}    
+			} else if (docElm.webkitRequestFullscreen)
+				docElm.webkitRequestFullscreen();
+			}    
 	}
 	
 	// function to inspect a variable/expression highlighted in a script or markup editor
@@ -2038,7 +2053,9 @@ function API_Restore_TridentDB() {
 			elem.msRequestFullscreen();
 		} else if (elem.mozRequestFullScreen) {
 			elem.mozRequestFullScreen();
-		} 
+		} else if (elem.webkitRequestFullscreen) {
+			elem.webkitRequestFullscreen();
+		}    
 	}
 	
 	function API_UserFullscreenExit() {
