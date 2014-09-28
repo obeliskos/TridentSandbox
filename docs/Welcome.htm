@@ -13,12 +13,25 @@ Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href=
 
 <p>Trident Sandbox was developed to turn your browser into a scripting IDE.&nbsp; It was originally created for SurfaceRT devices running Internet Explorer 10/11 to provide an on-device development option for creating simple apps without using the AppStore.&nbsp; Fortunately, Internet Explorer 11 is fairly standards compliant, and TridentSandbox attempts to be browser agnostic as much as possible.&nbsp; It is named after the <a href="http://en.wikipedia.org/wiki/Trident_(layout_engine)" target="_blank">Trident</a> rendering engine within Internet Explorer browsers.&nbsp; Internet Explorer 11 uses Trident engine version 7 (IE 10 uses Trident 6). Trident 6 added the HTML 5 <a href="http://www.html5rocks.com/en/tutorials/file/dndfiles/" target="_blank">File API</a> which allows loading and saving files to local filesystem.&nbsp; Trident 7 added HTML 5 Fullscreen API and WebGL (among other changes).&nbsp; These capabilities along with a number of open source third-party javascript libraries allow the interactive creation of HTML 5 based applications.&nbsp; Although it was inspired by similar online web tools like <a href="http://jsfiddle.net/" target="_blank">jsfiddle</a>, Trident Sandbox is intended to be run primarily from the local filesystem or AppCached for offline use.</p>
 
+<h3>WinJS</h3>
+<p>TridentSandbox now includes a new framework called <a href="http://dev.windows.com/en-us/develop/winjs" target="_blank">WinJS</a> which provides several touch-friendly UI controls.&nbsp; To further assist app development, 
+it provides a <a href="http://msdn.microsoft.com/en-us/library/windows/apps/hh700339.aspx" target="_blank">Promise framework</a>, a <a href="http://msdn.microsoft.com/en-us/library/windows/apps/dn301978.aspx" target="_blank">javascript job scheduler</a>, <a href="http://msdn.microsoft.com/en-us/library/windows/apps/hh700358.aspx" target="_blank">data binding</a>, etc.&nbsp; This library was originally designed to assist in creating Microsoft AppStore apps written in javascript, but this 
+library has been open sourced and positioned to run in cross-browser (non appstore) environments.&nbsp; There may still be many areas where the UI controls still 'work best' in Internet Explorer, but they are still in <a href="https://github.com/winjs/winjs" target="_blank">active development on GitHub</a> and are continuing to fix bugs.&nbsp; 
+It adds value to Trident Sandbox by enabling you to create apps that are more touch-friendly and act more like 'apps'.&nbsp; I now have a 'WinJS' and the older 'Regular' versions of TridentSandbox.  Both actually include the WinJS library, 
+but the WinJS version also includes the stylesheet which is needed for the UI controls.&nbsp; WinJS version is now preferred 
+and depending on cross browser support testing it might even become the default.&nbsp; If you're inclined to read to learn more, 
+you might read the 'WinJS Controls' section of the <a href="http://aka.ms/611111pdf" target="_blank">free 30meg microsoft ebook here</a></p>
+
+<h3>SPA</h3>
 <p>There is a pattern of web development called <a href="http://en.wikipedia.org/wiki/Single-page_application" target="_blank">Single Page Application (SPA)</a> in which you attempt to create a web page that changes dynamically vs going from page to page to page. This pattern most closely resembles what goes on in a Trident Sandbox app... you are still on the same page when you run different programs, you are just dynamically building up and tearing down DOM elements from the hierarchical Document Object Model. Your applications are not sandboxed because of the Trident Sandbox main page, they are sandboxed because of Internet Explorer. You can&#39;t accidentally change the main page&#39;s contents on disk but you can change how it looks/act in the current load of that page. Because of this you may and probably will accidentally mess up the main page from time to time, in which case a reload of the main page will restore to a fresh slate.</p>
 
+<h3>Layout</h3>
 <p>The User Area where the (currently) three tabs : Main Output, Log (HTML), and Log (Text) are located is an attempt to create a flexible enough environment to handle simple programs as well as more complicated ones. In theory the main output would be used for mostly static HTML closely resembling what is defined in your Markup area. The Log (HTML) can be used either as a log screen (supporting HTML styling) or you can use it for your own dynamically rendered web pages. You can dynamically create textboxes, list boxes, buttons, canvas objects, media object, dump a large chart there, etc. The Log (Text) tab is where you might log pure text messages... it contains a scrollable textarea and has easy API interface.</p>
 
+<h3>API</h3>
 <p>To help simplify your ability to manipulate the sandbox, i have provided a set of API functions, user elements, and variables which can help you control the environment.</p>
 
+<h3>Libraries</h3>
 <p>Trident Sandbox comes with a number of open source third-party javascript libraries which you can use within your programs. These libraries (as of Trident Sandbox version 1.87) include :</p>
 
 <ul>
@@ -46,6 +59,7 @@ Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href=
 	<li><a href="http://www.babylonjs.com/" target="_blank">Babylon.js</a> : a complete JavaScript framework for building 3D games with HTML 5 and WebGL.</li>
 	<li><a href="https://github.com/jdorn/json-editor" target="_blank">jsoneditor.js</a> : JSON Editor takes a JSON Schema and uses it to generate an HTML form.</li>
 	<li><a href="http://d3js.org/" target="_blank">d3.js</a> : Javascript visualization library.</li>
+	<li><a href="http://dev.windows.com/en-us/develop/winjs" target="_blank">WinJS</a> : Microsoft javascript library for creating browser 'apps'.</li>
 </ul>
 
 <p>If you need to add other javascript libraries you can put them alongside the others... in the libraries subfolder. Then edit the TridentSandbox.htm file and add script include tags (or stylesheet links) similar to the other libraries.</p>

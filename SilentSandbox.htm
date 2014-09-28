@@ -215,7 +215,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.95;
+	var VAR_TRIDENT_VERSION = 1.96;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -1283,6 +1283,16 @@ img.TridentImageButton:hover
 	function sb_new_program() {
 		if (VAR_WindowMode == 3) API_SetWindowMode(2);
 		sb_clean_sandbox();
+	}
+	
+	function API_SetDarkTheme() {
+		API_SetBackgroundColor("#444");
+		$("#UI_MainPlaceholder").css("color", "#fff");
+	}
+	
+	function API_SetLightTheme() {
+		API_SetBackgroundColor("#fff");
+		$("#UI_MainPlaceholder").css("color", "#000");
 	}
 	
 	// Clear Environment  

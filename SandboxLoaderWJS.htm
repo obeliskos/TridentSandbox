@@ -33,6 +33,9 @@ available for use by the sandbox app, add them here.
 <script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
+<script src="libraries/winjs/js/WinJS.min.js"></script>
+<script src="libraries/winjs/js/en-US/ui.strings.js"></script>
+<link rel="stylesheet" type="text/css" href="libraries/winjs/css/ui-dark.css"/>
 <script src="scripts/tridentlist.js"></script>
 <script src="scripts/tridentdb.js"></script>
 <script src="scripts/workerpool.js"></script>
@@ -197,7 +200,7 @@ img.TridentImageButton:hover
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
-	var VAR_TRIDENT_ENV_TYPE = 'SBL'; // IDE, STANDALONE, SBL
+	var VAR_TRIDENT_ENV_TYPE = 'SBL WJS'; // IDE, STANDALONE, SBL
 	var VAR_TRIDENT_DB = null;
 	var VAR_TRIDENT_API = null;
 	
@@ -434,7 +437,8 @@ img.TridentImageButton:hover
 	}
 	
 	function sb_run_app(appName) { 
-	
+		API_SetDarkTheme();
+		
         VAR_TRIDENT_API.GetAppKey("SandboxSaveSlots", appName, function (result) {
 			if (result == null || result.id == 0) {
 				alertify.error("No save at that slot");

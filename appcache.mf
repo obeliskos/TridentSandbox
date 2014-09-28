@@ -1,15 +1,20 @@
 CACHE MANIFEST
-#rev 195
+#rev 196
 
 CACHE:
 TridentSandbox.htm
+TridentSandboxWJS.htm
 SilentSandbox.htm
 SandboxLoader.htm
+SandboxLoaderWJS.htm
 css/sandbox.css
 scripts/tridentlist.js
 scripts/tridentdb.js
 scripts/workerpool.js
 libraries/crypto_worker.js
+libraries/winjs/js/WinJS.min.js
+libraries/winjs/js/en-US/ui.strings.js
+libraries/winjs/css/ui-dark.css
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/animated-overlay.gif
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/ui-bg_flat_0_aaaaaa_40x100.png
@@ -253,6 +258,12 @@ images_ide/nixus/32x32/Back.png
 images_ide/nixus/32x32/Up.png
 images_ide/nixus/32x32/Down.png
 images/tiles.png
+images/fruits/60Banana.png
+images/fruits/60Lemon.png
+images/fruits/60Mint.png
+images/fruits/60Orange.png
+images/fruits/60Strawberry.png
+images/fruits/60Vanilla.png
 fonts/heorot.ttf
 libraries/jqplot/jquery.jqplot.css
 libraries/dynatree/skin/ui.dynatree.css
@@ -321,11 +332,19 @@ samples/Trident%20API%20Demo.prg
 samples/Trident%20Backup%20Restore.prg
 samples/Trident%20Binary%20Encryptor.prg
 samples/Trident%20DB%20Usage.prg
-samples/Trident%20Sandbox%20RSS%20Reader.prg
 samples/Trident%20Sandbox%20Radio%20x86.prg
 samples/Trident%20UI%20Demo.prg
 samples/WebGL%20Spinning%20Box.prg
 samples/WebGL%20Spinning%20Crate.prg
+samples/WinJS%20AppBar.prg
+samples/WinJS%20FlipView.prg
+samples/WinJS%20Hub.prg
+samples/WinJS%20ListView.prg
+samples/WinJS%20Menu.prg
+samples/WinJS%20NavBar.prg
+samples/WinJS%20Pivot.prg
+samples/WinJS%20Promises.prg
+samples/WinJS%20Scheduler.prg
 libraries/web_worker_demo.js
 
 NETWORK:

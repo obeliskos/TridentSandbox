@@ -17,7 +17,13 @@
 
 <!--	TRIDENT SANDBOX : A 'jsfiddle-like' sandbox for Internet Explorer 10/11
 		GitHub development at : https://github.com/obeliskos/TridentSandbox
-
+		
+		This is the WinJS version of Trident Sandbox.  WinJS is an open source Microsoft web 
+		framework for creating tablet/touch web applications that behave similar to apps.
+		
+		Although all versions have access to the WinJS javascript file, this version also includes 
+		their stylesheet which may affect your styles but help when styling their controls.
+		
 		This original intent of this is for use on Windows RT tablets, but it can be used on any
 		computer running Internet Explorer 10/11 and possibly other browsers.
 		
@@ -41,6 +47,8 @@ available for use by the sandbox app, add them here.
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
 <script src="libraries/winjs/js/WinJS.min.js"></script>
+<script src="libraries/winjs/js/en-US/ui.strings.js"></script>
+<link rel="stylesheet" type="text/css" href="libraries/winjs/css/ui-dark.css"/>
 <script src="scripts/tridentlist.js"></script>
 <script src="scripts/tridentdb.js"></script>
 <script src="scripts/workerpool.js"></script>
@@ -188,11 +196,100 @@ a.TridentLink:visited
     color: #FFFF99;
 }
 
+a.TridentLinkSmall:link
+{
+    color: #FFFF99;
+    text-decoration: none;
+	font-size: 14pt;
+}
+
+a.TridentLinkSmall:hover
+{
+    text-decoration: underline;
+    color: #FFFF99;
+}
+
+a.TridentLinkSmall:visited
+{
+    color: #FFFF99;
+}
+
 img.TridentImageButton:hover
 {
 	style.opacity:0.6;
 }
-		
+	
+button.TridentButton
+{
+	background-color: #ddd;
+	color: #000;
+	min-width:10px;
+	letter-spacing: 0em;
+}
+
+button.TridentButton:hover
+{
+	background-color: #fff;
+	color: #000;
+}
+
+button.ui_btn_launch
+{
+	background-color: #ddd;
+	color: #000;
+	min-width:10px;
+}
+
+button.ui_btn_launch:hover
+{
+	background-color: #fff;
+	color: #000;
+}
+
+button.ui_show_dashboard
+{
+	background-color: #ddd;
+	color: #000;
+	min-width:10px;
+}
+
+button.ui_show_dashboard:hover
+{
+	background-color: #fff;
+	color: #000;
+}
+
+button.ui_browse_samples
+{
+	background-color: #ddd;
+	color: #000;
+	min-width:10px;
+}
+
+button.ui_browse_samples:hover
+{
+	background-color: #fff;
+	color: #000;
+}
+
+button.ui_gen_sa
+{
+	background-color: #ddd;
+	color: #000;
+	min-width:10px;
+}
+
+button.ui_gen_sa:hover
+{
+	background-color: #fff;
+	color: #000;
+}
+
+div.UI_MainPlaceholder 
+{
+	background-color: #444;
+}
+
 </style>
 
 <script>
@@ -220,7 +317,7 @@ img.TridentImageButton:hover
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
-	var VAR_TRIDENT_ENV_TYPE = 'IDE'; // IDE, STANDALONE, SBL
+	var VAR_TRIDENT_ENV_TYPE = 'IDE WJS'; // IDE, STANDALONE, SBL
 	var VAR_TRIDENT_DB = null;
 	var VAR_TRIDENT_API = null;
 	var VAR_ForceOnlineSamples = true;
@@ -292,7 +389,7 @@ img.TridentImageButton:hover
 		$("#divCode").css("display", "block");
 		API_ClearLog();
 		
-		document.title = "Trident Sandbox v" + VAR_TRIDENT_VERSION;
+		document.title = "Trident Sandbox WJS v" + VAR_TRIDENT_VERSION;
 		$("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + VAR_TRIDENT_VERSION + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
 		
 		// ugly but lenient feature detection for Displaying Browse Samples button
@@ -399,7 +496,7 @@ img.TridentImageButton:hover
 				localStorage["header-font"] = "Heorot";
 			}
 			
-			var headerText = localStorage["header-text"];
+			var headerText = localStorage["header-text-wjs"];
 			if (headerText != null && headerText != "") {
 				VAR_UI_Settings.header_text = headerText;
 				
@@ -407,7 +504,7 @@ img.TridentImageButton:hover
 				$('#sb_header_caption2').text(headerText);
 			}
 			else {
-				localStorage["header-text"] = $('#sb_header_caption').text();
+				localStorage["header-text-wjs"] = $('#sb_header_caption').text();
 			}
 			
 			$('.tlt').textillate();	// need to run effect after text is set
@@ -1336,7 +1433,7 @@ img.TridentImageButton:hover
 		$("#sb_password_ok").unbind("click");
 		
 		// clear source code
-		var markupText = "<h3>My Sandbox Program</h3>\r\n";
+		var markupText = "<h3>My Sandbox WinJS Program</h3>\r\n";
 		var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n}\r\n\r\nfunction EVT_CleanSandbox()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n}\r\n";
 
 		editorMarkup.setValue(markupText);
@@ -1422,12 +1519,12 @@ img.TridentImageButton:hover
 			// ideally we would target progName instead of _blank to reuse existing window
 			// but due to hash params they dont refresh correctly and need full reload
 			// if you need to side by side dev you will just save in ide and manually refresh sandbox loader page
-			window.open('SandboxLoader.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
+			window.open('SandboxLoaderWJS.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
 			return;
 		}
 		
 		sb_save_slot(function() {
-			window.open('SandboxLoader.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
+			window.open('SandboxLoaderWJS.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
 		});
 	}
 	
@@ -1480,6 +1577,8 @@ img.TridentImageButton:hover
 			if (isCaptionVisible) used += ($("#sb_div_caption").height());
 			if (isLoaderVisible) used += ($("#sb_div_mainloader").height() + 4);
 		}
+		
+		used += $("#UI_TxtLogConsole").height() + 4 + 14; // 14 compensate for padding?
 		
 		$("#UI_TxtLogText").height($(window).height() - used);
 	}
@@ -1990,14 +2089,16 @@ function API_Restore_TridentDB() {
 			}
 		}
 		
-		document.title = "Trident Sandbox v" + VAR_TRIDENT_VERSION;
+		document.title = "Trident Sandbox WJS v" + VAR_TRIDENT_VERSION;
 	
 		// clear any old passwords and password handlers
 		$("#sb_password_text").val("");
 		$("#sb_password_ok").unbind("click");
 		$("#sb_div_restorefile").hide();
 		
-		API_SetBackgroundColor("#fff");
+		API_SetBackgroundColor("#444");
+		$("#UI_MainPlaceholder").css("color", "white");
+		
 		API_HideUserLoader();
 		API_ClearLog();
 		API_ClearHtmlLog();
@@ -2753,7 +2854,7 @@ function API_Restore_TridentDB() {
 
 </script>
 </head>
-<body bgcolor="#1F7DD0">
+<body bgcolor="#1F7DD0" style="background-color:#1F7DD0">
 
 <div id="sb_div_caption" style="border:0px solid #333; padding:0px 0px; background:#777;align:center;">
 <table width="100%" cellpadding="0" cellspacing="0">
@@ -2761,7 +2862,7 @@ function API_Restore_TridentDB() {
 		<td valign='top'>
 			<div style="float:left"><img src='images_ide/poseidon.png' /></div>
 			<div style="float:left; padding:0px;" id="sb_div_diagnostic">
-				<table style="border:1px solid; background-color:#ccc;">
+				<table style="border:1px solid; background-color:#ccc; color:#000">
 					<tr>
 						<td>
 						<div class="divWideButtons" style="display:inline">Local Storage : </div>
@@ -2781,15 +2882,17 @@ function API_Restore_TridentDB() {
 		</td>
 		<td>
 			<div class="divWideButtons" style="display:inline">
-			<h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An HTML / Javascript development sandbox' onclick="sb_toggle_header_font()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript dev sandbox</h1>
+			<h2 class="tlt" id='sb_header_caption' title='Trident Sandbox (WinJS version)' onclick="sb_toggle_header_font()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox with WinJS framework</h2>
 			</div>
 			<div class="divTinyButtons" style="display:inline">
-			<h3 id='sb_header_caption2' title='Trident Sandbox : An HTML / Javascript sandbox' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript sandbox</h3>
+			<h3 id='sb_header_caption2' title='Trident Sandbox (WinJS version)' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0px 0px 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox with WinJS framework</h3>
 			</div>
 		</td>
 		<td>
-			<div><a class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-family:'heorot'" href="docs/Welcome.htm" target="_blank">HELP</a>
-			<br/><a class="TridentLink" title="Click here to run the WinJS version" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-size:16px; font-family:'heorot'" href="TridentSandboxWJS.htm">WinJS version</a></div>
+			<div>
+				<a class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-family:'heorot'" href="docs/Welcome.htm" target="_blank">HELP</a>&nbsp;
+				<a class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-size:16px; font-family:'heorot'" href="http://dev.windows.com/en-us/develop/winjs" target="_blank">WinJS Info</a><br/>
+				<a class="TridentLink" title="Click here to run the normal version" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-size:16px; font-family:'heorot'" href="TridentSandbox.htm">Regular version</a></div>
 		</td>
 	</tr>
 </table>
@@ -2802,7 +2905,7 @@ function API_Restore_TridentDB() {
 <td>
 Prog Name : 
 <input style='height:24px; width:160px; ' id='sb_txt_ProgramName' type='text' placeholder="Enter program name here" value=''/>
-<input style='height:30px;width:90px;' id='sb_file' type="file" name="fileloader" onchange="sb_load()" />
+<input style='height:30px;width:110px;' id='sb_file' type="file" name="fileloader" onchange="sb_load()" />
 </td>
 <td style="align:'right'">
 <select onchange="selectTheme()" id='selTheme' style='font-size:16px;'>
@@ -2855,15 +2958,15 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 </td>
 <td>
 <div class="divWideButtons" style="display:inline">
-<button style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
-<button style='height:40px; float:right' title="Clear Sandbox" onclick="sb_new_program()"><img src='images_ide/add.png'/> New</button>
+<button class="TridentButton" style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
+<button class="TridentButton" style='height:40px; float:right' title="Clear Sandbox" onclick="sb_new_program()"><img src='images_ide/add.png'/> New</button>
 <button style='height:40px; float:right' id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
 <button style='height:40px; float:right; display:none;' id="ui_show_dashboard" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/> Storage Summary</button>
 <button style='height:40px; float:right' id="ui_gen_sa" class="ui_gen_sa" onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
 </div>
 <div class="divTinyButtons" style="display:inline">
-<button style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
-<button style='height:40px; float:right' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/></button>
+<button class="TridentButton" style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
+<button class="TridentButton" style='height:40px; float:right' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/></button>
 <button style='height:40px; float:right' id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" ><img src='images_ide/nixus/32x32/Tutorial-16.png'/></button>
 <button style='height:40px; float:right; display:none;' id="ui_show_dashboard2" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/></button>
 <button style='height:40px; float:right' id="ui_gen_sa2" class="ui_gen_sa" onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/></button>
@@ -2876,27 +2979,27 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 <table id="tblCode" style="width: 100%; table-layout:fixed">
 	<tr style="background-color:#bbb;"><td colspan="2">
 		<div id="ui_editor_toolbar" style="font-size:4px; display:inline-block">
-			<button id="sb_btn_markup" style="height:32px" onclick="sb_toggle_markup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> Mkp</button> 
-			<button id="sb_btn_togglesplit" style="height:32px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i> Split</button> 
-			<button id="sb_btn_script" style="height:32px" onclick="sb_toggle_script()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> Script</button>
-			<button id="sb_btn_inpect" style="height:32px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i> Inspect</button>
+			<button class="TridentButton" id="sb_btn_markup" style="height:32px" onclick="sb_toggle_markup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> Mkp</button> 
+			<button class="TridentButton" id="sb_btn_togglesplit" style="height:32px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i> Split</button> 
+			<button class="TridentButton" id="sb_btn_script" style="height:32px" onclick="sb_toggle_script()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> Script</button>
+			<button class="TridentButton" id="sb_btn_inpect" style="height:32px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i> Inspect</button>
 			<div id='sb_div_ls_slots' style='display:none'>
-				<button style="height:32px" title='Load from selected TridentDB save slot' onclick='sb_load_slot()'>LoadDB</button>
-				<button style="height:32px" title='Save to selected TridentDB save slot' onclick='sb_save_slot()'>SaveDB</button>
+				<button class="TridentButton" style="height:32px" title='Load from selected TridentDB save slot' onclick='sb_load_slot()'>LoadDB</button>
+				<button class="TridentButton" style="height:32px" title='Save to selected TridentDB save slot' onclick='sb_save_slot()'>SaveDB</button>
 				<select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot' onchange="sb_load_slot()"></select>
-				<button style="height:32px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
+				<button class="TridentButton" style="height:32px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
 			</div>
 			<div style="display:inline-block">
 			<button class="ui_btn_launch" style='height:32px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><i class="fa fa-external-link"></i> Launch</button>
-			<button style='height:32px;' onclick="sb_save()" title="Save your program (Alt+S)"><i class="fa fa-save"></i> Save</button>
-			<button id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i> FS Dev</button>
-			<button style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i> CLR</button>
-			<button id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
+			<button class="TridentButton" style='height:32px;' onclick="sb_save()" title="Save your program (Alt+S)"><i class="fa fa-save"></i> Save</button>
+			<button class="TridentButton" id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i> FS Dev</button>
+			<button class="TridentButton" style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i> CLR</button>
+			<button class="TridentButton" id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
 			</div>
 			<div style="display:inline">
-				<button style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='API_SetWindowMode(1)'>1</button>
-				<button style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='API_SetWindowMode(2)'>2</button>
-				<button style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='API_SetWindowMode(3)'>3</button>
+				<button class="TridentButton" style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='API_SetWindowMode(1)'>1</button>
+				<button class="TridentButton" style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='API_SetWindowMode(2)'>2</button>
+				<button class="TridentButton" style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='API_SetWindowMode(3)'>3</button>
 			</div>
 		</div>
 	</td></tr>
@@ -2932,7 +3035,7 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 					<button id="sb_btn_user_datafile_cancel" onclick="$('#sb_div_userdatafile').hide()">Cancel</button>&nbsp;&nbsp;[Binary]
 				</div>
 				<div id='UI_LibUnitPlaceholder' style="display:none"></div>
-				<div id='UI_MainPlaceholder' style='background-color:white'><br/><br/></div>
+				<div class="UI_MainPlaceholder" id='UI_MainPlaceholder' style='background-color:#444;min-height:300px'><br/><br/></div>
 			</div>
 			<div id="UI_Tab_Html" style="overflow: auto;">
 				<div id='UI_HtmlLogPlaceholder' style='background-color:white'><br/><br/></div>
@@ -3020,7 +3123,7 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 					</td>
 					<td valign='top' style='padding-top:10px'>
 						<select id="ui_ldb_selLocalStorage" size=10 onchange="sb_dashboard.selectLSKey()"></select><br/>
-						<button style="height:40px; width:100px" onclick="sb_dashboard.deleteLSKey()">Delete</button>
+						<button class="minimal" style="height:40px; width:100px" onclick="sb_dashboard.deleteLSKey()">Delete</button>
 					</td>
 					<td valign='top' style='padding-top:10px'>
 						<div style="background-color:#f0f0f0; padding: 15px">
@@ -3060,8 +3163,8 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 				</td>
 				<td valign='top' style='padding-top:10px'>
 					<select id="ui_tdb_selTridentDB" size=11 onchange="sb_dashboard.selTdbChanged()"></select><br/>
-					<button style="height:40px;" onclick="sb_dashboard.deleteTridentKey()">Delete</button>
-					<button id="ui_tdb_download" style="height:40px; display:none;" onclick="sb_dashboard.downloadTridentFile()">Download</button>
+					<button class="minimal" onclick="sb_dashboard.deleteTridentKey()">Delete</button>
+					<button class="minimal" id="ui_tdb_download" style="display:none;" onclick="sb_dashboard.downloadTridentFile()">Download</button>
 				</td>
 				<td valign='top' style='padding-top:10px'>
 					<div style='background-color:#f0f0f0; padding: 15px'>
@@ -3083,7 +3186,7 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 					</tr>
 					<tr>
 						<td>
-							<button style="height:40px;" onclick="sb_dashboard.renameTridentKey()">Rename</button>
+							<button class="minimal" onclick="sb_dashboard.renameTridentKey()">Rename</button>
 						</td>
 					</tr>
 					</table>
@@ -3106,8 +3209,8 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 					<td><input type="text" id="ui_api_txtService" style='height:30px; width:420px'/>&nbsp;<button style="height:40px; width:80px" onclick="sb_dashboard.apiSaveService()">Update</button>
 				</tr>
 			</table><br/>
-			<button style="height:40px; width:160px"  onclick="sb_dashboard.apiUseTrident()">Use Trident DB</button>
-			<button style="height:40px; width:200px"  onclick="sb_dashboard.apiUseService()">Use Trident Service</button>
+			<button class="minimal" style="width:200px;height:40px" onclick="sb_dashboard.apiUseTrident()">Use Trident DB</button>
+			<button class="minimal" style="width:220px"  onclick="sb_dashboard.apiUseService()">Use Trident Service</button>
 		</div>
 	</div>
 
