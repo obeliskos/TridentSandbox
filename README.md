@@ -6,7 +6,7 @@
 
 This project is an offline browser-app development environment which itself runs within a web browser.  It utilizes HTML 5 appcache functionality to allow offline use.
 
-You can use this environment by visiting http://www.obeliskos.com/TridentSandbox/SandboxLoaderWJS.htm#RunApp=SandboxLanding
+You can use this environment by visiting http://www.obeliskos.com/TridentSandbox
 
 Visiting this page will automatically download the site (about 8 megs) into an 'application cache' (you may need to approve storage), so that the site continues to work when run offline.  Pay attention to the AppCache diagnostic messages (top left of page) to see the appcache status... is should say 'downloading' and then 'idle' when completely cached.  You can bookmark the page to avoid erasing the appcache when you clean internet files.
 
