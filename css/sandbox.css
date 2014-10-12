@@ -1,3 +1,45 @@
+a.TridentLink:link
+{
+    color: #FFFF99;
+    text-decoration: none;
+	font-size: 20pt;
+}
+
+a.TridentLink:hover
+{
+    text-decoration: underline;
+    color: #FFFF99;
+}
+
+a.TridentLink:visited
+{
+    color: #FFFF99;
+}
+
+a.TridentLinkSmall:link
+{
+    color: #FFFF99;
+    text-decoration: none;
+	font-size: 14pt;
+}
+
+a.TridentLinkSmall:hover
+{
+    text-decoration: underline;
+    color: #FFFF99;
+}
+
+a.TridentLinkSmall:visited
+{
+    color: #FFFF99;
+}
+
+img.TridentImageButton:hover
+{
+	style.opacity:0.6;
+}
+		
+
 /* ---------- Password Dialog ---------- */
 
 #UI_PasswordDialog {

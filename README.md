@@ -4,27 +4,39 @@
 
 ![trident preview](http://www.obeliskos.com/surface/trident_sandbox_193.png)
 
-This project is scripting environment which runs within a web browser.  It can run in several modes: 
-* Offline served up from your local file system
-* Hosted on a webserver
-* AppCached - Similar to #2 except the client caches the entire website and can run offline.  For internet explorer, this allows local storage and indexeddb which would not otherwise be available when running from your local filesystem. 
+This project is an offline browser-app development environment which itself runs within a web browser.  It utilizes HTML 5 appcache functionality to allow offline use.
 
-To test out this application you can visit my hosted instance at http://www.obeliskos.com/TridentSandbox ... this will automatically download the site (about 6 megs) into an 'application cache' so that the site continues to work when run offline.  Pay attention to the AppCache diagnostic messages (top left of page) to see the appcache status... is should say 'downloading' and then 'idle' when completely cached.  If it says idle you should be able to go offline and continue to use (bookmark the page to avoid erasing the appcache when you clean internet files).
+You can use this environment by visiting http://www.obeliskos.com/TridentSandbox/SandboxLoaderWJS.htm#RunApp=SandboxLanding
 
-You can also Download the zip to your local filesystem.  If you are on Windows 8/8.1/RT you should right click the downloaded zip file and unblock it before extracting it.  To run TridentSandbox you can then double click or drag and drop the TridentSandbox.htm file into your web browser, enable scripts, and bookmark for easier access.
+Visiting this page will automatically download the site (about 8 megs) into an 'application cache' (you may need to approve storage), so that the site continues to work when run offline.  Pay attention to the AppCache diagnostic messages (top left of page) to see the appcache status... is should say 'downloading' and then 'idle' when completely cached.  You can bookmark the page to avoid erasing the appcache when you clean internet files.
 
-This application is similar to jsfiddle and can be somewhat used as such, however this project aims to turn this scripting environment into a framework/ecosystem of its own.  Programs which you create can be exported into a single .PRG file which can be loaded on other TridentSandbox environments (on possibly different operating systems and browsers) to become a somewhat useful application engine.
+This environment provides an IDE for creating and editing apps which run within your browser.  Those apps may utilize the TridentSandbox javascript API library and included third party javascript libraries and can be saved to the browser's indexed db storage (via the environment's TridentDatabase).  The environment provides Markup and Script editors... style tags should go in the HTML area.
 
-Currently the environment allows the user to code in single Markup and Script editors... CSS was not included for screen real estate purposes but might be added later.  As a workaround you might embed STYLE tags into the markup area.
-
-This project aims to utilize the newer HTML 5 interfaces such as File API, Fullscreen API, LocalStorage/IndexedDB as well as newer ECMA 5/6 constructs to fully explore and experiment with their integration into a sanboxed ecosystem. 
-
-As its name somewhat indicates, its original purpose was specifically for Internet Explorer 10/11.  I have tested this on Firefox and utilize polyfill FileSaver.js to handle saving of programs as well as feature detection for Fullscreen API.  Firefox does not seem to allow you to save to a specific location, so you might want to store your own programs in local storage.  Chrome or other browsers can try it out on their own browsers to see how well it works.  Although i do not intend to test other browsers on my own, it would be nice to support as many as can be possible. 
-
-Additional capabilities above and beyond a typical 'fiddle' type website include are that i provide a simple javascript API which you can use to leverage and manipulate the enviroment for more functionality.  For example i have API calls for playing sounds (using HTML 5 audio), controlling environment layout (maximizing output area, fullscreen, logging text), and (where available) Trident Sandbox creates an app-key-value database in indexed db for storing programs and user keys based on an app/key/value selection (where app could be their prg name). 
-
-Within the folder structure i am including some useful third party libraries and some sample .prg files to load and experiment with.  
+This project aims to utilize the newer HTML 5 interfaces such as File API, Fullscreen API, LocalStorage/IndexedDB as well as newer ECMA 5/6 constructs to fully explore and experiment with their integration into a sandboxed app ecosystem. 
 
 Trident Sandbox makes use of its own app/key/value indexeddb object store (when available) for storing programs, library units, and user data.  This 'Trident Database' now supports a web service mode you can use if you configure and implement the web services needed.
 
-This sandboxed ide currently does not utilize iframes, it functions more like a Single Page Application which builds up and tears down HTML dom elements (divs) within an Output area of the main page.  
+
+Copyright (c) 2014, David Easterday (admin@obeliskos.com)
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

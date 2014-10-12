@@ -170,29 +170,6 @@ body {
 	margin: 0;
 }
 
-a.TridentLink:link
-{
-    color: #FFFF99;
-    text-decoration: none;
-	font-size: 20pt;
-}
-
-a.TridentLink:hover
-{
-    text-decoration: underline;
-    color: #FFFF99;
-}
-
-a.TridentLink:visited
-{
-    color: #FFFF99;
-}
-
-img.TridentImageButton:hover
-{
-	style.opacity:0.6;
-}
-		
 </style>
 
 <script>
@@ -216,7 +193,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.96;
+	var VAR_TRIDENT_VERSION = 1.97;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -465,6 +442,10 @@ img.TridentImageButton:hover
 			if (typeof(EVT_WindowResize) == typeof(Function)) EVT_WindowResize();
 		});
 		
+		if (!indexedDB) {
+			$("#sb_help_link").prop("href", "docs/Welcome.htm");
+		}
+		
 		// Check for indexed db support and set up new TridentSandbox DB with simple app/key/value Object Store (Table) for internal and api use
 		// For good tutorial on indexedDB, see http://code.tutsplus.com/tutorials/working-with-indexeddb--net-34673
 		if (indexedDB) {
@@ -555,13 +536,24 @@ img.TridentImageButton:hover
 							}, 200);
 						}
 						else {
-							var runSample = API_GetURLParameter("RunSample");
+							var runSample = API_GetURLParameter("RunApp");
 							if (runSample != null) {
 								sb_clean_sandbox();
 								
 								setTimeout(function() {
-									sb_run_sample(runSample);
+									sb_run_app(runSample);
 								}, 200);
+							}
+							else {
+								var editProgram = API_GetURLParameter("EditApp");
+								
+								if (editProgram != null) {
+									sb_clean_sandbox();
+									
+									setTimeout(function() {
+										sb_edit_app(editProgram);
+									}, 200);
+								}
 							}
 						}
 					}
@@ -600,13 +592,24 @@ img.TridentImageButton:hover
 						}, 250);
 					}
 					else {
-						var runSample = API_GetURLParameter("RunSample");
+						var runSample = API_GetURLParameter("RunApp");
 						if (runSample != null) {
 							sb_clean_sandbox();
 							
 							setTimeout(function() {
-								sb_run_sample(runSample);
+								sb_run_app(runSample);
 							}, 200);
+						}
+						else {
+							var editProgram = API_GetURLParameter("EditApp");
+							
+							if (editProgram != null) {
+								sb_clean_sandbox();
+								
+								setTimeout(function() {
+									sb_edit_app(editProgram);
+								}, 200);
+							}
 						}
 					}
 				}
@@ -666,7 +669,7 @@ img.TridentImageButton:hover
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/344) + "%)");
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/350) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -970,9 +973,9 @@ img.TridentImageButton:hover
 	// to public as sort of a published jsfiddle.  So it automates a not-frequently or official sample... so it is efficient way to for me to link to sample not
 	// necessary for user to bookmark for long term... if they want to keep the prog they should save it and use runslot for long term bookmarking.
 	// As such we will turn off caching to force server visit, this will bypass appcache due to extra url params jquery passes to ensure not cached.
-	function sb_run_sample(progname) {
+	function sb_run_app(progname) {
 		progname = progname.replace("%20", " ");	// handle encoded spaces
-		progname = progname.replace(/[^a-zA-Z 0-9]+/g, ""); // whitelist alphanumeric
+		progname = progname.replace(/[^a-zA-Z 0-9\-]+/g, ""); // whitelist alphanumeric
 		progname = "samples\\" + progname + ".prg";	// force extension
 		
 		jQuery.ajax({
@@ -984,7 +987,7 @@ img.TridentImageButton:hover
 			success: function (response) {
 				var sandboxObject = response;
 	
-				$("#sb_txt_ProgramName").val(sandboxObject.progName);
+				$("#sb_txt_ProgramName").val(sandboxObject.progName + " Copy");
 
 				editorMarkup.setValue(sandboxObject.htmlText);
 				editorScript.setValue(sandboxObject.scriptText);
@@ -1004,6 +1007,44 @@ img.TridentImageButton:hover
 				API_SetWindowMode(3);
 				
 				sb_run();
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
+				API_LogMessage(xhr.status + " : " + xhr.statusText);
+				alertify.log(xhr.status + " : " + xhr.statusText);
+				alertify.log("See user log for more info");
+			}
+		});
+	}
+	
+	// apps may link to main page with #EditApp= hash param to 'fork' an appcache app into trident save slot
+	// in general i am working toward methods using appcache calling things apps and methods using trident calling them slots
+	function sb_edit_app(appname) {
+		appname = appname.replace("%20", " ");	// handle encoded spaces
+		appname = appname.replace(/[^a-zA-Z 0-9\-]+/g, ""); // whitelist alphanumeric
+		appname = "samples\\" + appname + ".prg";	// force extension
+		
+		jQuery.ajax({
+			type: "GET",
+			url: appname,
+			cache: false,
+			dataType: "json",
+
+			success: function (response) {
+				var sandboxObject = response;
+	
+				$("#sb_txt_ProgramName").val(sandboxObject.progName + " Copy");
+
+				editorMarkup.setValue(sandboxObject.htmlText);
+				editorScript.setValue(sandboxObject.scriptText);
+				
+				sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+				sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+
+				var control = $("#sb_file");
+				control.replaceWith( control = control.clone( true ) );
+			
+				API_SetWindowMode(2);
 			},
 			error: function (xhr, ajaxOptions, thrownError) {
 				API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
@@ -2125,7 +2166,9 @@ function API_Restore_TridentDB() {
 				docElm.msRequestFullscreen();
 			} else if (docElm.mozRequestFullScreen) {
 				docElm.mozRequestFullScreen();
-			} 
+			} else if (docElm.webkitRequestFullscreen) {
+				docElm.webkitRequestFullscreen();
+			}
 		}    
 	}
 	
@@ -2788,7 +2831,7 @@ function API_Restore_TridentDB() {
 			</div>
 		</td>
 		<td>
-			<div><a class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-family:'heorot'" href="docs/Welcome.htm" target="_blank">HELP</a>
+			<div><a id="sb_help_link" class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-family:'heorot'" href="SandboxLoaderWJS.htm" target="_blank">HELP</a>
 			<br/><a class="TridentLink" title="Click here to run the WinJS version" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-size:16px; font-family:'heorot'" href="TridentSandboxWJS.htm">WinJS version</a></div>
 		</td>
 	</tr>

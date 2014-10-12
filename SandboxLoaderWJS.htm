@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <!--html-->
-<html> 
+<html manifest="appcache.mf"> 
 <head>
 <title>Trident Sandbox</title>
 <!-- 
-<meta name="application-name" content="Trident Sandbox v1.6"/>
+<meta name="application-name" content="Trident Sandbox"/>
 <meta name="msapplication-TileColor" content="#1F96CF"/>
 <meta name="msapplication-square70x70logo" content="/images_ide/live_tile/Poseidon-Small70.png"/>
 <meta name="msapplication-square150x150logo" content="/images_ide/live_tile/Poseidon-Normal150.png"/>
@@ -12,15 +12,15 @@
 <meta name="msapplication-square310x310logo" content="/images_ide/live_tile/Poseidon-Square310.jpg"/>
 -->
 
-<!--	TRIDENT SANDBOX : A 'jsfiddle-like' sandbox for Internet Explorer 10/11
+<!--	TRIDENT SANDBOX Loader (WinJS Version) : 
 		GitHub development at : https://github.com/obeliskos/TridentSandbox
 
-		This original intent of this is for use on Windows RT tablets, but it can be used on any
-		computer running Internet Explorer 10/11 and possibly other browsers.
+		This page is used as a minimal run-time environment for running saved programs.
+		It has no IDE other than what your program provides, it is otherwise a blank page with 
+		the full TridentSandbox runtime environment available for your programs.
 		
-		It makes use of the FILE API which still seems to be somewhat browser specific, so to work 
-		on other browsers you might need to change the I/O interface functions to work.  
-		
+		You pass url parameters to this page, such as #RunSlot= or #RunApp= to indicate for the
+		loader to load a Trident Save Slot (indexeddb) or a sample app via ajax (to the appcache).
 -->
 
 <!-- 
@@ -164,30 +164,6 @@ body {
 	margin: 0;
 }
 
-a.TridentLink:link
-{
-    color: #FFFF99;
-    text-decoration: none;
-	font-size: 20pt;
-}
-
-a.TridentLink:hover
-{
-    text-decoration: underline;
-    color: #FFFF99;
-}
-
-a.TridentLink:visited
-{
-    color: #FFFF99;
-}
-
-img.TridentImageButton:hover
-{
-	style.opacity:0.6;
-}
-
-		
 </style>
 
 <script>
@@ -196,7 +172,7 @@ img.TridentImageButton:hover
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = 1.96;
+	var VAR_TRIDENT_VERSION = 1.97;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -218,6 +194,24 @@ img.TridentImageButton:hover
 		if(location.href != top.location.href) {
 			document.body.innerHTML = "Trident Sandbox does not run in an IFRAME";
 			return;
+		}
+		
+		// If served up from a website then we should bother to monitor possible appcache events
+		// for diagnostics.  If not appcaching the events will just not fire.
+		if (document.URL.indexOf("file://") == -1) {
+			VAR_TRIDENT_HOSTED = true;
+
+			// Determine if we are connecting or running from an appcache site
+			var appCache = window.applicationCache;
+			if (window.applicationCache) {
+					appCache.addEventListener('error', logACEvent, false);
+					appCache.addEventListener('checking', logACEvent, false);
+					appCache.addEventListener('noupdate', logACEvent, false);
+					appCache.addEventListener('downloading', logACEvent, false);
+					appCache.addEventListener('progress', progressAC, false);
+					appCache.addEventListener('updateready', logACEvent, false);
+					appCache.addEventListener('cached', logACEvent, false);
+			}
 		}
 		
 		// Load up local storage settings
@@ -300,22 +294,21 @@ img.TridentImageButton:hover
 				
 				var runSlot = API_GetURLParameter("RunSlot");
 				if (runSlot != null) {
-					sb_run_app(runSlot);
+					sb_run_slot(runSlot);
 				}
 				else {
-					var runSample = API_GetURLParameter("RunSample");
+					var runSample = API_GetURLParameter("RunApp");
 					if (runSample != null) {
-						//sb_clean_sandbox();
-						
 						setTimeout(function() {
-							sb_run_sample(runSample);
+							sb_run_app(runSample);
 						}, 200);
 					}
 					else {
-						API_LogMain("This page requires a hash param 'RunSlot' which equals the name of a Trident Save slot.");
-						API_LogMain("Example url : http://www.obeliskos.com/TridentSandbox/SandboxLoader.htm#RunSlot=CryptoNotepad");
-						API_LogMain("(where CryptoNotepad equals a program name contained in the trident save slots (drop down list above the editors)");
-						alertify.log("Missing RunSlot hash param");
+						sb_run_app("SandboxLanding");
+						//API_LogMain("This page requires a 'RunSlot' param which equals the name of a Trident Save slot.");
+						//API_LogMain("Example url : http://www.obeliskos.com/TridentSandbox/SandboxLoader.htm#RunSlot=CryptoNotepad");
+						//API_LogMain("(where CryptoNotepad equals a program name contained in the trident save slots (drop down list above the editors)");
+						//alertify.log("Missing RunSlot or RunApp hash param");
 					}
 				}
 			}
@@ -340,6 +333,78 @@ img.TridentImageButton:hover
 		
 	});
 	
+	function progressAC(e)
+	{
+		sb_appcache_progress++;
+		
+		// hardcoding total # files
+		$("#sb_spn_ac_progress").text("(" + Math.floor(sb_appcache_progress*100/350) + "%)");
+	}
+	
+	// Helper method for appcache diagnostic
+	function logACEvent(e)
+	{
+		VAR_TRIDENT_APPCACHED = true;  // if any of the events fire we will assume it is successful and running in appcached mode
+		$("#divAppCache").show();
+		
+		// Update diagnostic panel
+		var statusString = getACStatus();
+		if (statusString == "Idle") {
+			setTimeout(function() {
+				$("#divAppCache").hide(500);
+			}, 1000);
+		}
+		
+		$("#sb_spn_ac_status").text(statusString);
+		
+		if (statusString == "Update ready") {
+			$("#sb_spn_ac_progress").text(""); 
+			setTimeout(function() {
+				sb_prompt_update();
+			}, 200);
+		}
+	}
+
+	// Helper method for appcache diagnostics, this event will be fired whenever appcache status changes
+	function getACStatus()
+	{
+		try{
+			var sCacheStatus = "Not supported";
+			if (window.applicationCache) 
+			{
+				var oAppCache = window.applicationCache;
+				switch ( oAppCache.status ) 
+				{
+					case oAppCache.UNCACHED : sCacheStatus = "Not cached"; break;
+					case oAppCache.IDLE : sCacheStatus = "Idle"; $("#sb_spn_ac_progress").text(""); break;
+					case oAppCache.CHECKING : sCacheStatus = "Checking"; break;
+					case oAppCache.DOWNLOADING : sCacheStatus = "Downloading Environment"; break; 
+					case oAppCache.UPDATEREADY : sCacheStatus = "Update ready"; break;
+					case oAppCache.OBSOLETE : sCacheStatus = "Obsolete"; break;
+					default : sCacheStatus = "Unexpected Status ( " + oAppCache.status.toString() + ")"; break;
+				}
+			}
+			return sCacheStatus;
+		}
+		catch (e)
+		{
+			alertify.log(e);
+			API_LogMessage(e);
+		}
+	}
+	
+	function sb_prompt_update() {
+		alertify.confirm("An update exists to your app environment.  Do you want to install it and reload this page?", function (e) {
+    		if (e) {
+        		// user clicked "ok"
+              	applicationCache.swapCache();
+				location.reload(); 
+    		} else {
+        		// user clicked "cancel"
+            }
+		});
+	}
+
 	function errorHandler(evt) {
 		alertify.error('load error');
 	}
@@ -436,7 +501,9 @@ img.TridentImageButton:hover
 		});
 	}
 	
-	function sb_run_app(appName) { 
+	// runs a program from a trident save slot
+	// allows launch command on main page to work and allows for bookmark-able launched apps
+	function sb_run_slot(appName) { 
 		API_SetDarkTheme();
 		
         VAR_TRIDENT_API.GetAppKey("SandboxSaveSlots", appName, function (result) {
@@ -466,13 +533,11 @@ img.TridentImageButton:hover
 		});
 	}
 	
-	// The intent behind this function is for the person hosting this app (or me for now) can put up samples dynamically between builds to share
-	// to public as sort of a published jsfiddle.  So it automates a not-frequently or official sample... so it is efficient way to for me to link to sample not
-	// necessary for user to bookmark for long term... if they want to keep the prog they should save it and use runslot for long term bookmarking.
-	// As such we will turn off caching to force server visit, this will bypass appcache due to extra url params jquery passes to ensure not cached.
-	function sb_run_sample(progname) {
+	// runs a program from appcache
+	// allows url friendly linking to sample apps
+	function sb_run_app(progname) {
 		progname = progname.replace("%20", " ");	// handle encoded spaces
-		progname = progname.replace(/[^a-zA-Z 0-9]+/g, ""); // whitelist alphanumeric
+		progname = progname.replace(/[^a-zA-Z 0-9\-]+/g, ""); // whitelist alphanumeric
 		progname = "samples\\" + progname + ".prg";	// force extension
 		
 		jQuery.ajax({
@@ -488,6 +553,8 @@ img.TridentImageButton:hover
 
 				$("#UI_MainPlaceholder").append(sandboxObject.htmlText);
 				
+				document.title = sandboxObject.progName;
+				
 				var s = document.createElement("script");
 				s.innerHTML = sandboxObject.scriptText;
 			
@@ -495,7 +562,6 @@ img.TridentImageButton:hover
 				setTimeout(function() {
 					document.getElementById("UI_MainPlaceholder").appendChild(s);
 				}, 350);
-				
 			},
 			error: function (xhr, ajaxOptions, thrownError) {
 				API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
@@ -1043,8 +1109,12 @@ function API_Restore_TridentDB() {
 	
 </script>
 </head>
-<body>
+<body style="background-color:#444; color:#fff">
 
+	<div id="divAppCache" style="display:none; position:absolute; top: 1em; right: 1em; padding: 12px;">
+		<span id="sb_spn_ac_status"></span>&nbsp;
+		<span id="sb_spn_ac_progress"></span>
+	</div>
 	<div id="UI_TabsOutput" style="font-family:Tahoma">
 		<div id="UI_Tab_Main">
 			<div id='sb_div_userfile' style="display:none">

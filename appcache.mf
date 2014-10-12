@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 196
+#rev 197
 
 CACHE:
 TridentSandbox.htm
@@ -15,6 +15,7 @@ libraries/crypto_worker.js
 libraries/winjs/js/WinJS.min.js
 libraries/winjs/js/en-US/ui.strings.js
 libraries/winjs/css/ui-dark.css
+libraries/winjs/css/ui-light.css
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/animated-overlay.gif
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/ui-bg_flat_0_aaaaaa_40x100.png
@@ -285,6 +286,7 @@ docs/Welcome.htm
 sounds/ElectricalSweep.mp3
 samples/Alertify%20Demo.prg
 samples/Antikythera.prg
+samples/Antikythera-WJS.prg
 samples/Babylon.JS%20Sample%20(WebGL).prg
 samples/Canvas%20Tiles.prg
 samples/Clocks%20Example.prg
@@ -305,6 +307,7 @@ samples/Geolocation%20Coordinates.prg
 samples/Geolocation%20GetMap.prg
 samples/Geolocation%20Track.prg
 samples/HieroCryptes%20Notepad.prg
+samples/HieroCryptes-WJS.prg
 samples/Hosted%20Files%20Database.prg
 samples/Hosted%20Samples%20Browser.prg
 samples/HTML%205%20Starfield%20Fullscreen.prg
@@ -312,6 +315,7 @@ samples/IMDB%20Search.prg
 samples/jqPlot%20Demo.prg
 samples/jQuery%20UI%20Demo.prg
 samples/JSON%20Databank.prg
+samples/JSONDatabank-WJS.prg
 samples/JsonEditor%20Forms%20Sample.prg
 samples/Library%20Unit%20Management.prg
 samples/Loan%20Calculator.prg
@@ -323,7 +327,9 @@ samples/MetroJS%20Demo.prg
 samples/ObeliskJS%20Demo.prg
 samples/PixiJS%20Morph%20Demo.prg
 samples/Play%20Media.prg
+samples/ProgramClipboard.prg
 samples/Proper%20Cleanup%20Method.prg
+samples/SandboxLanding.prg
 samples/SandboxIO.prg
 samples/SpeechSynthesisAPI%20Safari.prg
 samples/Springy%20Demo.prg

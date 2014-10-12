@@ -40,6 +40,7 @@ available for use by the sandbox app, add them here.
 <script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
+<script src="libraries/winjs/js/WinJS.min.js"></script>
 <script src="scripts/tridentlist.js"></script>
 <script src="scripts/tridentdb.js"></script>
 <script src="scripts/workerpool.js"></script>
@@ -169,29 +170,6 @@ body {
 	margin: 0;
 }
 
-a.TridentLink:link
-{
-    color: #FFFF99;
-    text-decoration: none;
-	font-size: 20pt;
-}
-
-a.TridentLink:hover
-{
-    text-decoration: underline;
-    color: #FFFF99;
-}
-
-a.TridentLink:visited
-{
-    color: #FFFF99;
-}
-
-img.TridentImageButton:hover
-{
-	style.opacity:0.6;
-}
-		
 </style>
 
 <script>
@@ -215,7 +193,7 @@ img.TridentImageButton:hover
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.96;
+	var VAR_TRIDENT_VERSION = 1.97;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -228,7 +206,8 @@ img.TridentImageButton:hover
 		header_font : "",
 		editor_theme : "vibrant-ink",
 		skip_autorun : false,
-		error_popups : true
+		error_popups : true,
+		pend_changes_warn : true
 	}
 
 	// possibly hash script and markup to determine if changes have been made 
@@ -429,6 +408,14 @@ img.TridentImageButton:hover
 				localStorage["error-popups"] = "true";
 			}
 			
+			var pcWarn = localStorage["pend-changes-warn"];
+			if (pcWarn != null && pcWarn != "") {
+				VAR_UI_Settings.pend_changes_warn = (pcWarn == "true");
+			}
+			else {
+				localStorage["pend-changes-warn"] = "true";
+			}
+			
 			var lr = localStorage["run-slot"];
 			if (lr != null && lr != "") {
 				localrun = lr;
@@ -454,6 +441,10 @@ img.TridentImageButton:hover
 			// by implementing this callback
 			if (typeof(EVT_WindowResize) == typeof(Function)) EVT_WindowResize();
 		});
+		
+		if (!indexedDB) {
+			$("#sb_help_link").prop("href", "docs/Welcome.htm");
+		}
 		
 		// Check for indexed db support and set up new TridentSandbox DB with simple app/key/value Object Store (Table) for internal and api use
 		// For good tutorial on indexedDB, see http://code.tutsplus.com/tutorials/working-with-indexeddb--net-34673
@@ -545,13 +536,24 @@ img.TridentImageButton:hover
 							}, 200);
 						}
 						else {
-							var runSample = API_GetURLParameter("RunSample");
+							var runSample = API_GetURLParameter("RunApp");
 							if (runSample != null) {
 								sb_clean_sandbox();
 								
 								setTimeout(function() {
-									sb_run_sample(runSample);
+									sb_run_app(runSample);
 								}, 200);
+							}
+							else {
+								var editProgram = API_GetURLParameter("EditApp");
+								
+								if (editProgram != null) {
+									sb_clean_sandbox();
+									
+									setTimeout(function() {
+										sb_edit_app(editProgram);
+									}, 200);
+								}
 							}
 						}
 					}
@@ -590,13 +592,24 @@ img.TridentImageButton:hover
 						}, 250);
 					}
 					else {
-						var runSample = API_GetURLParameter("RunSample");
+						var runSample = API_GetURLParameter("RunApp");
 						if (runSample != null) {
 							sb_clean_sandbox();
 							
 							setTimeout(function() {
-								sb_run_sample(runSample);
+								sb_run_app(runSample);
 							}, 200);
+						}
+						else {
+							var editProgram = API_GetURLParameter("EditApp");
+							
+							if (editProgram != null) {
+								sb_clean_sandbox();
+								
+								setTimeout(function() {
+									sb_edit_app(editProgram);
+								}, 200);
+							}
 						}
 					}
 				}
@@ -629,7 +642,7 @@ img.TridentImageButton:hover
 			var htmlHash = CryptoJS.SHA1(editorMarkup.getValue()).toString();
 			var scriptHash = CryptoJS.SHA1(editorScript.getValue()).toString();
 			
-			if (htmlHash != sb_markup_hash || scriptHash != sb_script_hash) {
+			if ((htmlHash != sb_markup_hash || scriptHash != sb_script_hash) && VAR_UI_Settings.pend_changes_warn) {
 				return 'You have unsaved changes, are you sure you want to leave this page?';
 			}
 		};
@@ -656,7 +669,7 @@ img.TridentImageButton:hover
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/324) + "%)");
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/350) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -960,9 +973,9 @@ img.TridentImageButton:hover
 	// to public as sort of a published jsfiddle.  So it automates a not-frequently or official sample... so it is efficient way to for me to link to sample not
 	// necessary for user to bookmark for long term... if they want to keep the prog they should save it and use runslot for long term bookmarking.
 	// As such we will turn off caching to force server visit, this will bypass appcache due to extra url params jquery passes to ensure not cached.
-	function sb_run_sample(progname) {
+	function sb_run_app(progname) {
 		progname = progname.replace("%20", " ");	// handle encoded spaces
-		progname = progname.replace(/[^a-zA-Z 0-9]+/g, ""); // whitelist alphanumeric
+		progname = progname.replace(/[^a-zA-Z 0-9\-]+/g, ""); // whitelist alphanumeric
 		progname = "samples\\" + progname + ".prg";	// force extension
 		
 		jQuery.ajax({
@@ -974,7 +987,7 @@ img.TridentImageButton:hover
 			success: function (response) {
 				var sandboxObject = response;
 	
-				$("#sb_txt_ProgramName").val(sandboxObject.progName);
+				$("#sb_txt_ProgramName").val(sandboxObject.progName + " Copy");
 
 				editorMarkup.setValue(sandboxObject.htmlText);
 				editorScript.setValue(sandboxObject.scriptText);
@@ -994,6 +1007,44 @@ img.TridentImageButton:hover
 				API_SetWindowMode(3);
 				
 				sb_run();
+			},
+			error: function (xhr, ajaxOptions, thrownError) {
+				API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
+				API_LogMessage(xhr.status + " : " + xhr.statusText);
+				alertify.log(xhr.status + " : " + xhr.statusText);
+				alertify.log("See user log for more info");
+			}
+		});
+	}
+	
+	// apps may link to main page with #EditApp= hash param to 'fork' an appcache app into trident save slot
+	// in general i am working toward methods using appcache calling things apps and methods using trident calling them slots
+	function sb_edit_app(appname) {
+		appname = appname.replace("%20", " ");	// handle encoded spaces
+		appname = appname.replace(/[^a-zA-Z 0-9\-]+/g, ""); // whitelist alphanumeric
+		appname = "samples\\" + appname + ".prg";	// force extension
+		
+		jQuery.ajax({
+			type: "GET",
+			url: appname,
+			cache: false,
+			dataType: "json",
+
+			success: function (response) {
+				var sandboxObject = response;
+	
+				$("#sb_txt_ProgramName").val(sandboxObject.progName + " Copy");
+
+				editorMarkup.setValue(sandboxObject.htmlText);
+				editorScript.setValue(sandboxObject.scriptText);
+				
+				sb_markup_hash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+				sb_script_hash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+
+				var control = $("#sb_file");
+				control.replaceWith( control = control.clone( true ) );
+			
+				API_SetWindowMode(2);
 			},
 			error: function (xhr, ajaxOptions, thrownError) {
 				API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
@@ -1059,6 +1110,7 @@ img.TridentImageButton:hover
 		if (typeof(EVT_CleanSandbox) == typeof(Function)) {
 			try {
 				EVT_CleanSandbox();
+				EVT_CleanSandbox = null;
 			}
 			catch (err) {
 			}
@@ -1281,6 +1333,28 @@ img.TridentImageButton:hover
 	}
 	
 	function sb_new_program() {
+		var htmlHash = CryptoJS.SHA1(editorMarkup.getValue()).toString();
+		var scriptHash = CryptoJS.SHA1(editorScript.getValue()).toString();
+		
+		if (VAR_UI_Settings.pend_changes_warn) {
+			if (htmlHash != sb_markup_hash || scriptHash != sb_script_hash) {
+				alertify.confirm("You have pending changes, are you sure?", function (e) {
+					// user clicked "ok"
+					if (e) { 
+						if (VAR_WindowMode == 3) API_SetWindowMode(2);
+						sb_clean_sandbox();
+						return;
+					}
+				});
+				return ;
+			}
+			else {
+				if (VAR_WindowMode == 3) API_SetWindowMode(2);
+				sb_clean_sandbox();
+				return;
+			}
+		}
+		
 		if (VAR_WindowMode == 3) API_SetWindowMode(2);
 		sb_clean_sandbox();
 	}
@@ -1446,7 +1520,6 @@ img.TridentImageButton:hover
 		if (isCaptionVisible||isLoaderVisible||isDevbarVisible) {
 			if (isCaptionVisible) used += ($("#sb_div_caption").height());
 			if (isLoaderVisible) used += ($("#sb_div_mainloader").height() + 4);
-			if (isDevbarVisible) used += ($("#sb_div_devtoolbar").height()) + 4;
 		}
 		
 		$("#UI_TxtLogText").height($(window).height() - used);
@@ -1484,7 +1557,6 @@ img.TridentImageButton:hover
 		if (isCaptionVisible||isLoaderVisible||isDevbarVisible) {
 			if (isCaptionVisible) used += ($("#sb_div_caption").height());
 			if (isLoaderVisible) used += ($("#sb_div_mainloader").height() + 4);
-			if (isDevbarVisible) used += ($("#sb_div_devtoolbar").height()) + 4;
 		}
 		
 		switch (editorMode) {
@@ -1952,6 +2024,7 @@ function API_Restore_TridentDB() {
 		if (typeof(EVT_CleanSandbox) == typeof(Function)) {
 			try {
 				EVT_CleanSandbox();
+				EVT_CleanSandbox = null;
 			}
 			catch (err) {
 				alertify.error("EVT_CleanSandbox: " + err);
@@ -2093,7 +2166,9 @@ function API_Restore_TridentDB() {
 				docElm.msRequestFullscreen();
 			} else if (docElm.mozRequestFullScreen) {
 				docElm.mozRequestFullScreen();
-			} 
+			} else if (docElm.webkitRequestFullscreen) {
+				docElm.webkitRequestFullscreen();
+			}
 		}    
 	}
 	
@@ -2756,7 +2831,8 @@ function API_Restore_TridentDB() {
 			</div>
 		</td>
 		<td>
-			<div><a class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-family:'heorot'" href="docs/Welcome.htm" target="_blank">HELP</a></div>
+			<div><a id="sb_help_link" class="TridentLink" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-family:'heorot'" href="SandboxLoaderWJS.htm" target="_blank">HELP</a>
+			<br/><a class="TridentLink" title="Click here to run the WinJS version" style="text-shadow: 0px 0px 7px rgba(0,0,0,0.75); font-size:16px; font-family:'heorot'" href="TridentSandboxWJS.htm">WinJS version</a></div>
 		</td>
 	</tr>
 </table>
@@ -2853,20 +2929,18 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 				<select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot' onchange="sb_load_slot()"></select>
 				<button style="height:32px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
 			</div>
-		</div>
-		&nbsp;
-		<div style="display:inline-block">
-		<button class="ui_btn_launch" style='height:32px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><i class="fa fa-external-link"></i> Launch</button>
-		<button style='height:32px;' onclick="sb_save()" title="Save your program (Alt+S)"><i class="fa fa-save"></i> Save</button>
-		<button id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i> FS Dev</button>
-		<button style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i> CLR</button>
-		<button id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
-		</div>
-		&nbsp;
-		<div style="display:inline">
-			<button style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='API_SetWindowMode(1)'>1</button>
-			<button style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='API_SetWindowMode(2)'>2</button>
-			<button style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='API_SetWindowMode(3)'>3</button>
+			<div style="display:inline-block">
+			<button class="ui_btn_launch" style='height:32px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><i class="fa fa-external-link"></i> Launch</button>
+			<button style='height:32px;' onclick="sb_save()" title="Save your program (Alt+S)"><i class="fa fa-save"></i> Save</button>
+			<button id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i> FS Dev</button>
+			<button style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i> CLR</button>
+			<button id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
+			</div>
+			<div style="display:inline">
+				<button style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='API_SetWindowMode(1)'>1</button>
+				<button style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='API_SetWindowMode(2)'>2</button>
+				<button style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='API_SetWindowMode(3)'>3</button>
+			</div>
 		</div>
 	</td></tr>
 	<tr>
