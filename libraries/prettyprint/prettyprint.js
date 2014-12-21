@@ -337,10 +337,16 @@ var prettyPrint = (function(){
 				innerHTML:  util.shorten(text) + ' <b style="visibility:hidden;">[+]</b>',
 				title: title,
 				onmouseover: function() {
-					this.getElementsByTagName('b')[0].style.visibility = 'visible';
+          var el = this.getElementsByTagName('b')[0];
+          if (el) {
+            el.style.visibility = 'visible';
+          }
 				},
 				onmouseout: function() {
-					this.getElementsByTagName('b')[0].style.visibility = 'hidden';
+          var el = this.getElementsByTagName('b')[0];
+          if (el) {
+            el.style.visibility = 'hidden';
+          }
 				},
 				onclick: function() {
 					this.style.display = 'none';

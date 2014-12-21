@@ -42,7 +42,7 @@ If you want to integrate other third party (or your own) javascript libraries to
 available for use by the sandbox app, add them here.  
 -->
 
-<script src="libraries/jquery/jquery-2.1.0.js"></script>
+<script src="libraries/jquery/jquery-2.1.0.min.js"></script>
 <script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
@@ -61,7 +61,6 @@ available for use by the sandbox app, add them here.
 <script src="libraries/cryptojs/rollups/aes.js"></script>
 <script src="libraries/cryptojs/rollups/md5.js"></script>
 <script src="libraries/cryptojs/rollups/hmac-sha1.js"></script>
-<script src="libraries/localStorageDB/localstoragedb.min.js"></script>
 <script src="libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js"></script>
 <script src="libraries/jqGrid-4.5.4/js/i18n/grid.locale-en.js"></script>
 <script src="libraries/three.min.js"></script>
@@ -79,6 +78,8 @@ available for use by the sandbox app, add them here.
 <script src="libraries/jqplot/plugins/jqplot.meterGaugeRenderer.min.js"></script>
 <script src="libraries/jqplot/plugins/jqplot.highlighter.min.js"></script>
 <script src="libraries/loki-js/lokijs.js"></script>
+<script src="libraries/loki-js/lokiIndexedAdapter.js"></script>
+<script src="libraries/loki-js/lokiTridentAdapter.js"></script>
 <script src="libraries/codemirror/lib/codemirror.js"></script>
 <script src="libraries/codemirror/mode/xml/xml.js"></script>
 <script src="libraries/codemirror/mode/javascript/javascript.js"></script>
@@ -103,16 +104,13 @@ available for use by the sandbox app, add them here.
 <script src="libraries/codemirror/addon/search/searchcursor.js"></script>
 <script src="libraries/codemirror/addon/search/search.js"></script>
 <link rel="stylesheet" href="libraries/codemirror/addon/fold/foldgutter.css" />
-<script src="libraries/nicEdit/nicEdit.js"></script>
 <script src="libraries/prettyprint/prettyprint.js"></script>
 <script src="libraries/shortcut.js"></script>
 <script src="libraries/MetroJs.Full.0.9.74/MetroJs.js"></script>
-<script src="libraries/math.min.js"></script>
-<script src="libraries/easeljs/easeljs-0.7.1.min.js"></script>
+<script src="libraries/easeljs/easeljs-0.8.0.min.js"></script>
 <script src="libraries/pixi.js/pixi.js"></script>
 <script src="libraries/springy/springy.js"></script>
 <script src="libraries/springy/springyui.js"></script>
-<script src="libraries/nedb/nedb.min.js"></script>
 <script src="libraries/obeliskjs/obelisk.js"></script>
 <script src="libraries/buckets/buckets-minified.js"></script>
 <script src="libraries/textillate/jquery.fittext.js"></script>
@@ -122,9 +120,9 @@ available for use by the sandbox app, add them here.
 <script src="libraries/tinymce/tinymce.min.js"></script>
 <script src="libraries/indexed.js"></script>
 <script src="libraries/moment.min.js"></script>
-<script src="libraries/babylon.js/babylon.1.11.js"></script>
 <script src="libraries/json-editor/jsoneditor.js"></script>
 <script src="libraries/d3/d3.min.js"></script>
+<script src="libraries/babylon.js/babylon.1.14.js"></script>
 <link rel="stylesheet" href="libraries/tinymce/skins/lightgray/skin.min.css">
 <link rel="stylesheet" href="libraries/textillate/animate.css">
 <link rel="stylesheet" href="libraries/MetroJs.Full.0.9.74/MetroJs.css">
@@ -238,6 +236,20 @@ button.ui_gen_sa
 	min-width:10px;
 }
 
+button.ui_mode_desktop
+{
+	background-color: #ddd;
+	color: #000;
+	min-width:35px;
+}
+
+button.ui_mode_mobile
+{
+	background-color: #ddd;
+	color: #000;
+	min-width:35px;
+}
+
 button.ui_gen_sa:hover
 {
 	background-color: #fff;
@@ -272,7 +284,7 @@ div.UI_MainPlaceholder
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
 	var VAR_WindowMode = 2;
-	var VAR_TRIDENT_VERSION = 1.97;
+	var VAR_TRIDENT_VERSION = 1.99;
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -429,6 +441,11 @@ div.UI_MainPlaceholder
 		var localrun = null;
 		
 		if (localStorage) {
+      var ideMode = localStorage["ide-mode"];
+      if (ideMode === 'mobile') {
+        sb_mode_mobile();
+      }
+      
 			var theme = localStorage["editor-theme"]; 
 			if (theme != null && theme != "") {
 				VAR_UI_Settings.editor_theme = theme;
@@ -749,7 +766,7 @@ div.UI_MainPlaceholder
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/350) + "%)");
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/286) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -1495,6 +1512,16 @@ div.UI_MainPlaceholder
 	// This implementation works with DOM to add the script element after 
 	// appending the html
 	function sb_run() {
+    // Make Output visible
+    if ($("#divMobileWindowMode").is(":visible")) {
+      API_SetMobileMode(3);
+    }
+    else {
+      if (VAR_WindowMode == 1) {
+        API_SetWindowMode(2);
+      }
+    }
+    
 		API_ClearOutput();
 		
 		var markupString = editorMarkup.getValue();
@@ -2458,6 +2485,63 @@ function API_Restore_TridentDB() {
 		}
 	}
 	
+	// Determines whether the Code or the Output areas get full width or if they split 50/50
+	function API_SetMobileMode(mode) {
+		
+		// Code Only
+		if (mode == 1) {
+			VAR_WindowMode = mode;
+			showMarkup = true;
+			showScript = false;
+			$('#tdOutput').attr('width', '0%');
+			$('#tdCode').attr('width', '100%');
+			$('#divCode').show();
+			$('#tblCode').css('table-layout', '');
+		
+			$("#UI_TabsOutput").hide();
+      
+      editorMode = EditorModeEnum.Markup;
+      sb_fit_editors();
+			
+			$('.CodeMirror').each(function(i, el){
+				el.CodeMirror.refresh();
+			});
+		}
+		
+		// Show Code and Output areas
+		if (mode == 2) {
+			VAR_WindowMode = mode;
+			showMarkup = false;
+			showScript = true;
+			$('#tdOutput').attr('width', '0%');
+			$('#tdCode').attr('width', '100%');
+			$('#divCode').show();
+			$('#tblCode').css('table-layout', '');
+		
+			$("#UI_TabsOutput").hide();
+      
+      editorMode = EditorModeEnum.Script;
+      sb_fit_editors();
+			
+			$('.CodeMirror').each(function(i, el){
+				el.CodeMirror.refresh();
+			});
+		}
+		
+		// Show Output only
+		if (mode == 3) {
+			VAR_WindowMode = mode;
+			showMarkup = true;
+			showScript = true;
+			$('#tdCode').attr('width', '0%');
+			$('#tdOutput').attr('width', '100%');
+			$('#divCode').hide();
+			$('#tblCode').css('table-layout', '');
+			
+			$("#UI_TabsOutput").show();
+		}
+	}
+  
 	function API_RestoreLayout() {
 		API_UserFullscreenExit();
 		API_SetToolbarMode(true, true);
@@ -2875,6 +2959,32 @@ function API_Restore_TridentDB() {
 		});
 	}
 	
+  function sb_mode_mobile(persist) {
+    if (localStorage && persist) {
+      localStorage['ide-mode'] = 'mobile';
+    }
+    
+    $("#divMobileWindowMode").css('display', 'inline');
+    $("#divDesktopEditorMode").hide();
+    $("#divDesktopWindowMode").hide();
+    
+    API_SetMobileMode(1);
+  }
+
+  function sb_mode_desktop() {
+    if (localStorage) {
+      localStorage['ide-mode'] = 'desktop';
+    }
+    
+    $("#divMobileWindowMode").hide();
+    $("#divDesktopEditorMode").show();
+    $("#divDesktopWindowMode").show();
+    
+    API_SetWindowMode(2);
+		editorMode = EditorModeEnum.Split;
+		sb_fit_editors();
+  }
+	
 // END API/HELPER ROUTINES
 
 
@@ -2882,7 +2992,7 @@ function API_Restore_TridentDB() {
 </head>
 <body bgcolor="#1F7DD0" style="background-color:#1F7DD0">
 
-<div id="sb_div_caption" style="border:0px solid #333; padding:0px 0px; background:#777;align:center;">
+<div id="sb_div_caption" style="border:0px solid #333; padding:0px 0px; background:#556;align:center;">
 <table width="100%" cellpadding="0" cellspacing="0">
 	<tr>
 		<td valign='top'>
@@ -2923,14 +3033,14 @@ function API_Restore_TridentDB() {
 </table>
 </div>
 
-<div id="sb_div_mainloader" style="background-color:#aba; border:0px; padding:2px">
+<div id="sb_div_mainloader" style="background-color:#999; border:0px; padding:2px">
 <table width="100%" style="font-family:Tahoma">
 <tr>
 
 <td>
 Prog Name : 
 <input style='height:24px; width:160px; ' id='sb_txt_ProgramName' type='text' placeholder="Enter program name here" value=''/>
-<input style='height:30px;width:110px;' id='sb_file' type="file" name="fileloader" onchange="sb_load()" />
+<input style='height:30px; width:110px; color:transparent;' id='sb_file' type="file" name="fileloader" onchange="sb_load()" />
 </td>
 <td style="align:'right'">
 <select onchange="selectTheme()" id='selTheme' style='font-size:16px;'>
@@ -2983,18 +3093,22 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 </td>
 <td>
 <div class="divWideButtons" style="display:inline">
-<button class="TridentButton" style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
-<button class="TridentButton" style='height:40px; float:right' title="Clear Sandbox" onclick="sb_new_program()"><img src='images_ide/add.png'/> New</button>
-<button style='height:40px; float:right' id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" ><img src='images_ide/nixus/32x32/Tutorial-16.png'/> Samples Browser</button>
-<button style='height:40px; float:right; display:none;' id="ui_show_dashboard" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/> Storage Summary</button>
-<button style='height:40px; float:right' id="ui_gen_sa" class="ui_gen_sa" onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/> Generate S/A</button>
+<button class="TridentButton" style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
+<button class="TridentButton" style='height:40px; float:right' title="New Program" onclick="sb_new_program()"><i class="fa fa-plus-circle fa-2x"></i></button>
+<button style='height:40px; float:right' id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
+<button style='height:40px; float:right; display:none;' id="ui_show_dashboard" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
+<button style='height:40px; float:right' id="ui_gen_sa" class="ui_gen_sa" onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
+<button style='height:40px; float:right' id="ui_mode_desktop" class="ui_mode_desktop" title='Desktop Mode' onclick="sb_mode_desktop()"><i class="fa fa-desktop fa-2x"></i></button>
+<button style='height:40px; width:40px; float:right' id="ui_mode_mobile" class="ui_mode_mobile" title='Mobile Mode' onclick="sb_mode_mobile(true)"><i class="fa fa-mobile fa-2x"></i></button>
 </div>
 <div class="divTinyButtons" style="display:inline">
-<button class="TridentButton" style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><img src="images_ide/nixus/32x32/Options.png"/></button>
-<button class="TridentButton" style='height:40px; float:right' title="Clear Sandbox" onclick="sb_clean_sandbox()"><img src='images_ide/add.png'/></button>
-<button style='height:40px; float:right' id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" ><img src='images_ide/nixus/32x32/Tutorial-16.png'/></button>
-<button style='height:40px; float:right; display:none;' id="ui_show_dashboard2" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><img src='images_ide/chart_pie.png'/></button>
-<button style='height:40px; float:right' id="ui_gen_sa2" class="ui_gen_sa" onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><img src='images_ide/cog.png'/></button>
+<button class="TridentButton" style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
+<button class="TridentButton" style='height:40px; float:right' title="New Program" onclick="sb_clean_sandbox()"><i class="fa fa-plus-circle"></i></button>
+<button style='height:40px; float:right' id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
+<button style='height:40px; float:right; display:none;' id="ui_show_dashboard2" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i> </button>
+<button style='height:40px; float:right' id="ui_gen_sa2" class="ui_gen_sa" onclick='sb_loadtemplate()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
+<button style='height:40px; float:right' id="ui_mode_desktop" class="ui_mode_desktop" title='Desktop Mode' onclick="sb_mode_desktop()"><i class="fa fa-desktop fa-2x"></i></button>
+<button style='height:40px; width:40px; float:right' id="ui_mode_mobile" class="ui_mode_mobile" title='Mobile Mode' onclick="sb_mode_mobile(true)"><i class="fa fa-mobile fa-2x"></i></button>
 </div>
 </td>
 </tr>
@@ -3004,24 +3118,36 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 <table id="tblCode" style="width: 100%; table-layout:fixed">
 	<tr style="background-color:#bbb;"><td colspan="2">
 		<div id="ui_editor_toolbar" style="font-size:4px; display:inline-block">
-			<button class="TridentButton" id="sb_btn_markup" style="height:32px" onclick="sb_toggle_markup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> Mkp</button> 
-			<button class="TridentButton" id="sb_btn_togglesplit" style="height:32px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i> Split</button> 
-			<button class="TridentButton" id="sb_btn_script" style="height:32px" onclick="sb_toggle_script()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> Script</button>
-			<button class="TridentButton" id="sb_btn_inpect" style="height:32px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i> Inspect</button>
+      <div id="divDesktopEditorMode" style="display:inline">
+			  <button class="TridentButton" id="sb_btn_markup" style="height:32px" onclick="sb_toggle_markup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i></button> 
+			  <button class="TridentButton" id="sb_btn_togglesplit" style="height:32px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i></button> 
+			  <button class="TridentButton" id="sb_btn_script" style="height:32px" onclick="sb_toggle_script()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i></button>
+        &nbsp;&nbsp;
+      </div>
+      <div id="divMobileWindowMode" style="display:none">
+        <button class="TridentButton" style="height:32px" onclick="API_SetMobileMode(1)" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> 1</button> 
+        <button class="TridentButton" style="height:32px" onclick="API_SetMobileMode(2)" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> 2</button>
+        <button class="TridentButton" style="height:32px" onclick="API_SetMobileMode(3)" title='Show Output only (Alt+O)'><i class="fa fa-film"></i> 3</button>
+        &nbsp;&nbsp;
+      </div>
+			<button class="TridentButton" id="sb_btn_inpect" style="height:32px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i></button>
 			<div id='sb_div_ls_slots' style='display:none'>
-				<button class="TridentButton" style="height:32px" title='Load from selected TridentDB save slot' onclick='sb_load_slot()'>LoadDB</button>
-				<button class="TridentButton" style="height:32px" title='Save to selected TridentDB save slot' onclick='sb_save_slot()'>SaveDB</button>
+				<button class="TridentButton" style="height:32px" title='Load from selected TridentDB save slot' onclick='sb_load_slot()'><i class="fa fa-arrow-up"></i> <i class="fa fa-database"></i></button>
+				<button class="TridentButton" style="height:32px" title='Save to selected TridentDB save slot' onclick='sb_save_slot()'><i class="fa fa-arrow-down"></i> <i class="fa fa-database"></i></button>
 				<select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot' onchange="sb_load_slot()"></select>
-				<button class="TridentButton" style="height:32px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'>DelDB</button>
+				<button class="TridentButton" style="height:32px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'><i class="fa fa-remove"></i> <i class="fa fa-database"></i></button>
+        &nbsp;&nbsp;
 			</div>
 			<div style="display:inline-block">
-			<button class="ui_btn_launch" style='height:32px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><i class="fa fa-external-link"></i> Launch</button>
-			<button class="TridentButton" style='height:32px;' onclick="sb_save()" title="Save your program (Alt+S)"><i class="fa fa-save"></i> Save</button>
-			<button class="TridentButton" id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i> FS Dev</button>
-			<button class="TridentButton" style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i> CLR</button>
-			<button class="TridentButton" id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
+			  <button class="ui_btn_launch" style='height:32px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><i class="fa fa-database"></i> <i class="fa fa-external-link"></i></button>
+			  <button class="TridentButton" style='height:32px;' onclick="sb_save()" title="Save your program (Alt+S)"><i class="fa fa-save"></i></button>
+			  <button class="TridentButton" id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i></button>
+			  <button class="TridentButton" style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i></button>
+        &nbsp;&nbsp;
+			  <button class="TridentButton" id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
+        &nbsp;&nbsp;
 			</div>
-			<div style="display:inline">
+			<div id='divDesktopWindowMode' style="display:inline">
 				<button class="TridentButton" style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='API_SetWindowMode(1)'>1</button>
 				<button class="TridentButton" style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='API_SetWindowMode(2)'>2</button>
 				<button class="TridentButton" style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='API_SetWindowMode(3)'>3</button>
@@ -3224,6 +3350,7 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 		<div id="UI_Tab_TridentAPI">
 			<h3>Trident API Settings</h3>
 			<i>Note: I recommend you do not touch this, Use Trident DB for now.  It does work however if you want to review the service implementation in scripts/tridentdb.js</i><br/><br/>
+			<div style='background-color:#f0f0f0; padding: 15px'>
 			<table>
 				<tr>
 					<td>Trident Mode :</td>
@@ -3231,9 +3358,10 @@ Pick a template to use : <input style='height:30px;width:90px;' id='sb_file_temp
 				</tr>
 				<tr>
 					<td>Service Location :</td>
-					<td><input type="text" id="ui_api_txtService" style='height:30px; width:420px'/>&nbsp;<button style="height:40px; width:80px" onclick="sb_dashboard.apiSaveService()">Update</button>
+					<td><input type="text" id="ui_api_txtService" style='height:30px; width:420px'/>&nbsp;<button class="minimal" style="height:40px; width:80px" onclick="sb_dashboard.apiSaveService()">Update</button>
 				</tr>
-			</table><br/>
+			</table>
+      </div><br/>
 			<button class="minimal" style="width:200px;height:40px" onclick="sb_dashboard.apiUseTrident()">Use Trident DB</button>
 			<button class="minimal" style="width:220px"  onclick="sb_dashboard.apiUseService()">Use Trident Service</button>
 		</div>

@@ -1,10 +1,10 @@
 # Obelisk.js
 
-Obelisk.js is a JavaScript Engine for building isometric pixel objects.
+Obelisk.js is a JavaScript library for building isometric pixel objects.
 
-With the simple and flexible API provided by it, you can easily add isometric pixel element like brick, cube, pyramid onto HTML5 canvas. Obelisk.js strictly follows the pixel neat pattern: lines with 1:2 pixel dot arrangement, leading to an angle of 22.6 degrees. 
+With the simple and flexible API provided by it, you can easily add isometric pixel element like brick, cube, pyramid, slope onto HTML5 canvas. Obelisk.js strictly follows the pixel neat pattern: lines with 1:2 pixel dot arrangement, leading to an angle of 22.6 degrees.
 
-You should know this is not for vector isometric graphics drawing. In fact it is not using any canvas graphic drawing API at all, instead, it manipulates all the things in pixel level to obtain typical pixel arrangement. Just try it out to pixelate something. Have fun.
+Also you should know obelisk.js is not for vector isometric graphics drawing. In fact it is not using any canvas graphic drawing API, instead, it manipulates all the things in pixel level to obtain precise pixel arrangement. Just try it out to pixelate something. Have fun.
 
 <img width="112" height="109" src="http://nosir.github.io/obelisk.js/images/logo.png"/>
 
@@ -24,6 +24,7 @@ User Contributed:
 - Conway's Game of Life: http://codepen.io/safx/full/Ewcym by [@safxdev](https://twitter.com/safxdev)
 - Node Server-side Image Rendering with [node-canvas](https://github.com/learnboost/node-canvas): [Github Project URL](https://github.com/pose/node-obelisk-example) by [@pose](https://github.com/pose)
 - Animations with Angular.js: [Github Project URL](https://github.com/Wildhoney/ngObelisk) by [@Wildhoney](https://github.com/Wildhoney)
+- Perlin Noise Map: http://codepen.io/slobaum/pen/zhmFL by [@slobaum](https://twitter.com/slobaum)
 
 
 ## Getting started
@@ -52,8 +53,24 @@ var cube = new obelisk.Cube(dimension, color, true);
 // render cube primitive into view
 pixelView.renderObject(cube);
 ```
-For more details, check the tutorial part 1: [To build the first cube](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-1%3A-To-build-the-first-cube) or [try the code yourself](http://jsfiddle.net/nosir/ygWEW/)
+For more details, check the tutorial [part 1](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-1%3A-To-build-the-first-cube): To build the first cube, or [try the code yourself](http://jsfiddle.net/nosir/ygWEW/)
 
+## Tutorials
+Step by step:
+- Part 1: [To build the first cube](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-1%3A-To-build-the-first-cube)
+- Part 2: [Coordinate system](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-2%3A-Coordinate-system)
+- Part 3: [Primitives](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-3%3A-Primitives)
+- Part 4: [Color](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-4%3A-Color)
+- Part 5: [Dimension](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-5%3A-Dimension)
+
+Sample code for building all primitives:
+- Cube: http://jsfiddle.net/nosir/ygWEW/
+- Pyramid : http://jsfiddle.net/nosir/ZVURu/
+- Brick: http://jsfiddle.net/nosir/6MuVr/
+- SideX, SideY: http://jsfiddle.net/nosir/bLsew/
+- SlopeNorth, SlopeEast, SlopeSouth, SlopeEast: http://jsfiddle.net/nosir/28B9G/
+
+## Advanced Usage
 ### Node.js
 
 Also you can use it in your Node.js canvas project
@@ -89,27 +106,19 @@ canvas.createPNGStream().pipe(fs.createWriteStream('./figure.png'));
 
 For more details, check the [Node.js Canvas example](https://github.com/pose/node-obelisk-example).
 
-## Tutorials
-Step by step:
-- Part 1: [To build the first cube](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-1%3A-To-build-the-first-cube)
-- Part 2: [Coordinate system](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-2%3A-Coordinate-system)
-- Part 3: [Primitives](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-3%3A-Primitives)
-- Part 4: [Color](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-4%3A-Color)
-- Part 5: [Dimension](https://github.com/nosir/obelisk.js/wiki/Tutorial-Part-5%3A-Dimension)
+### Browserify
 
-Sample code for building all primitives:
-- Cube: http://jsfiddle.net/nosir/ygWEW/
-- Pyramid : http://jsfiddle.net/nosir/ZVURu/
-- Brick: http://jsfiddle.net/nosir/6MuVr/
-- SideX & SideY: http://jsfiddle.net/nosir/bLsew/
+obelisk.js can also be used from a [browserify](https://github.com/substack/node-browserify) project. Simply:
 
-## Roadmap
-
-To add more pixel primitives - 4 directions [slopes](http://nosir.github.io/obelisk.js/images/slope.gif) will be the first
+```js
+var obelisk = require('obelisk.js');
+console.log(obelisk.Point)
+// > function Point() { }
+```
 
 ## Get in Touch
 
-- Build any cool stuff? Please feel free to add it here: [User Contributed Showcase](https://github.com/nosir/obelisk.js/wiki/User-Contributed-Showcase) I prefer you not to send PR to update README.md, someone will update it at some point:)
+- Build any cool stuff? Please feel free to add it here: [User Contributed Showcase](https://github.com/nosir/obelisk.js/wiki/User-Contributed-Showcase)
 - Bugs & Suggestions: [open an issue](https://github.com/nosir/obelisk.js/issues)
 - Twitter: [@rison](https://twitter.com/rison)
 
