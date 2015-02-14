@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 199
+#rev 200
 
 CACHE:
 TridentSandbox.htm
@@ -178,6 +178,7 @@ libraries/moment.min.js
 libraries/indexed.js
 libraries/json-editor/jsoneditor.js
 libraries/d3/d3.min.js
+libraries/babylon.js/babylon.1.14.js
 images_ide/cog.png
 images_ide/add.png
 images_ide/local.svg
@@ -253,6 +254,7 @@ samples/jQuery%20UI%20Demo.prg
 samples/JSON%20Databank.prg
 samples/JSONDatabank-WJS.prg
 samples/JsonEditor%20Forms%20Sample.prg
+samples/KeystoreBeacon.prg
 samples/Library%20Unit%20Management.prg
 samples/Loan%20Calculator.prg
 samples/Local%20Storage%20Usage.prg

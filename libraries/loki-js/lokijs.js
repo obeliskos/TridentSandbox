@@ -29,6 +29,74 @@
       }
     };
 
+    // Sort helper that support null and undefined
+    function ltHelper(prop1, prop2, equal) {
+      if (prop1 === prop2) {
+        if (equal) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      if (prop1 === undefined) {
+        return true;
+      }
+      if (prop2 === undefined) {
+        return false;
+      }
+      if (prop1 === null) {
+        return true;
+      }
+      if (prop2 === null) {
+        return false;
+      }
+      return prop1 < prop2;
+    }
+
+    function gtHelper(prop1, prop2, equal) {
+      if (prop1 === prop2) {
+        if (equal) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      if (prop1 === undefined) {
+        return false;
+      }
+      if (prop2 === undefined) {
+        return true;
+      }
+      if (prop1 === null) {
+        return false;
+      }
+      if (prop2 === null) {
+        return true;
+      }
+      return prop1 > prop2;
+    }
+
+    function sortHelper(prop1, prop2, desc) {
+      if (prop1 === prop2) {
+        return 0;
+      }
+      if (desc) {
+        if (ltHelper(prop1, prop2)) {
+          return 1;
+        } else {
+          return -1;
+        }
+      } else {
+        if (gtHelper(prop1, prop2)) {
+          return 1;
+        } else {
+          return -1;
+        }
+      }
+    }
+
     var LokiOps = {
       // comparison operators
       $eq: function (a, b) {
@@ -36,19 +104,19 @@
       },
 
       $gt: function (a, b) {
-        return a > b;
+        return gtHelper(a, b);
       },
 
       $gte: function (a, b) {
-        return a >= b;
+        return gtHelper(a, b, true);
       },
 
       $lt: function (a, b) {
-        return a < b;
+        return ltHelper(a, b);
       },
 
       $lte: function (a, b) {
-        return a <= b;
+        return ltHelper(a, b, true);
       },
 
       $ne: function (a, b) {
@@ -64,18 +132,39 @@
       },
 
       $contains: function (a, b) {
+        var checkFn = function () {
+          return true;
+        };
+
+        if (!Array.isArray(b)) {
+          b = [b];
+        }
+
         if (Array.isArray(a)) {
-          return a.indexOf(b) !== -1;
+          checkFn = function (curr) {
+            return a.indexOf(curr) !== -1;
+          };
         }
 
         if (typeof a === 'string') {
-          return a.indexOf(b) !== -1;
+          checkFn = function (curr) {
+            return a.indexOf(curr) !== -1;
+          };
         }
 
         if (a && typeof a === 'object') {
-          return a.hasOwnProperty(b);
+          checkFn = function (curr) {
+            return a.hasOwnProperty(curr);
+          };
         }
 
+        return b.reduce(function (prev, curr) {
+          if (!prev) {
+            return prev;
+          }
+
+          return checkFn(curr);
+        }, true);
       }
     };
     var fs = (typeof exports === 'object') ? require('fs') : false;
@@ -168,7 +257,7 @@
     /**
      * @prop remove() - removes the listener at position 'index' from the event 'eventName'
      */
-    LokiEventEmitter.prototype.remove = function (eventName, index) {
+    LokiEventEmitter.prototype.removeListener = function (eventName, index) {
       if (this.events[eventName]) {
         this.events[eventName].splice(index, 1);
       }
@@ -209,9 +298,7 @@
       // retain reference to optional (non-serializable) persistenceAdapter 'instance'
       this.persistenceAdapter = null;
 
-      if (typeof (options) !== 'undefined') {
-        this.configureOptions(options, true);
-      }
+
 
       this.events = {
         'init': [],
@@ -223,11 +310,15 @@
       var self = this;
 
       var getENV = function () {
-        if (fs) {
+        if (typeof window === 'undefined') {
           return 'NODEJS';
         }
 
-        if (!(document === undefined)) {
+        if (typeof global !== 'undefined' && global.window) {
+          return 'NODEJS'; //node-webkit
+        }
+
+        if (typeof document !== 'undefined') {
           if (document.URL.indexOf('http://') === -1 && document.URL.indexOf('https://') === -1) {
             return 'CORDOVA';
           }
@@ -236,12 +327,27 @@
         return 'CORDOVA';
       };
 
-      this.ENV = getENV();
-
-      if (this.ENV === 'NODEJS') {
-        this.fs = fs;
+      // refactored environment detection due to invalid detection for browser environments.
+      // if they do not specify an options.env we want to detect env rather than default to nodejs.
+      // currently keeping two properties for similar thing (options.env and options.persistenceMethod)
+      //   might want to review whether we can consolidate.
+      if (options && options.hasOwnProperty('env')) {
+        this.ENV = options.env;
+      } else {
+        this.ENV = getENV();
       }
 
+      // not sure if this is necessary now that i have refactored the line above
+      if (this.ENV === 'undefined') {
+        this.ENV = 'NODEJS';
+      }
+
+      if (this.ENV === 'NODEJS') {
+        this.fs = require("fs");
+      }
+      if (typeof (options) !== 'undefined') {
+        this.configureOptions(options, true);
+      }
 
       this.on('init', this.clearChanges);
 
@@ -281,7 +387,7 @@
 
       // if they want to load database on loki instantiation, now is a good time to load... after adapter set and before possible autosave initiation
       if (options.hasOwnProperty('autoload') && typeof (initialConfig) !== 'undefined' && initialConfig) {
-        this.loadDatabase(null, options.autoloadCallback);
+        this.loadDatabase({}, options.autoloadCallback);
       }
 
       if (this.options.hasOwnProperty('autosaveInterval')) {
@@ -321,6 +427,9 @@
     };
 
     Loki.prototype.loadCollection = function (collection) {
+      if (!collection.name) {
+        throw new Error('Collection must be have a name property to be loaded');
+      }
       this.collections.push(collection);
     };
 
@@ -371,9 +480,22 @@
       return this.name;
     };
 
+    /**
+     * serializeReplacer - used to prevent certain properties from being serialized
+     *
+     */
+    Loki.prototype.serializeReplacer = function (key, value) {
+      switch (key) {
+      case 'autosaveHandle':
+        return null;
+      default:
+        return value;
+      }
+    };
+
     // toJson
     Loki.prototype.serialize = function () {
-      return JSON.stringify(this);
+      return JSON.stringify(this, this.serializeReplacer);
     };
     // alias of serialize
     Loki.prototype.toJson = Loki.prototype.serialize;
@@ -421,9 +543,9 @@
           var loader = options[coll.name]['inflate'] ? options[coll.name]['inflate'] : Utils.copyProperties;
 
           for (j; j < clen; j++) {
-            var obj = new(options[coll.name]['proto'])();
-            loader(coll.data[j], obj);
-            copyColl.data[j] = obj;
+            var collObj = new(options[coll.name]['proto'])();
+            loader(coll.data[j], collObj);
+            copyColl.data[j] = collObj;
 
           }
         } else {
@@ -630,7 +752,9 @@
 
         if (this.persistenceMethod === 'localStorage') {
           if (localStorageAvailable()) {
-            self.loadJSON(localStorage.getItem(this.filename));
+            var data = localStorage.getItem(this.filename);
+
+            self.loadJSON(data, options || {});
             cFun(null, data);
           } else {
             cFun(new Error('localStorage is not available'));
@@ -665,12 +789,17 @@
           if (err) {
             return cFun(err, null);
           }
+          if (!data.length) {
+            data = self.serialize();
+          }
           self.loadJSON(data, options || {});
           cFun(null, data);
         });
       } else if (this.ENV === 'BROWSER') {
         if (localStorageAvailable()) {
-          self.loadJSON(localStorage.getItem(this.filename));
+          var data = localStorage.getItem(this.filename);
+
+          self.loadJSON(data, options || {});
           cFun(null, data);
         } else {
           cFun(new Error('localStorage is not available'));
@@ -959,7 +1088,9 @@
         this.filteredrows = Object.keys(this.collection.data);
       }
 
-      if (typeof (isdesc) === 'undefined') isdesc = false;
+      if (typeof (isdesc) === 'undefined') {
+        isdesc = false;
+      }
 
       var wrappedComparer =
         (function (prop, desc, rslt) {
@@ -967,24 +1098,8 @@
             var obj1 = rslt.collection.data[a];
             var obj2 = rslt.collection.data[b];
 
-            if (obj1[prop] === obj2[prop]) {
-              return 0;
-            }
-            if (desc) {
-              if (obj1[prop] < obj2[prop]) {
-                return 1;
-              }
-              if (obj1[prop] > obj2[prop]) {
-                return -1;
-              }
-            } else {
-              if (obj1[prop] > obj2[prop]) {
-                return 1;
-              }
-              if (obj1[prop] < obj2[prop]) {
-                return -1;
-              }
-            }
+            return sortHelper(obj1[prop], obj2[prop], desc);
+
           }
         })(propname, isdesc, this);
 
@@ -1026,11 +1141,7 @@
         }
       }
 
-      if (isdesc) {
-        return (obj1[firstProp] < obj2[firstProp]) ? 1 : -1;
-      } else {
-        return (obj1[firstProp] > obj2[firstProp]) ? 1 : -1;
-      }
+      return sortHelper(obj1[firstProp], obj2[firstProp], isdesc);
     };
 
     /**
@@ -1093,27 +1204,27 @@
       // if value falls outside of our range return [0, -1] to designate no results
       switch (op) {
       case '$eq':
-        if (val < minVal || val > maxVal) {
+        if (ltHelper(val, minVal) || gtHelper(val, maxVal)) {
           return [0, -1];
         }
         break;
       case '$gt':
-        if (val >= maxVal) {
+        if (gtHelper(val, maxVal, true)) {
           return [0, -1];
         }
         break;
       case '$gte':
-        if (val > maxVal) {
+        if (gtHelper(val, maxVal)) {
           return [0, -1];
         }
         break;
       case '$lt':
-        if (val <= minVal) {
+        if (ltHelper(val, minVal, true)) {
           return [0, -1];
         }
         break;
       case '$lte':
-        if (val < minVal) {
+        if (ltHelper(val, minVal)) {
           return [0, -1];
         }
         break;
@@ -1123,7 +1234,7 @@
       while (min < max) {
         mid = Math.floor((min + max) / 2);
 
-        if (rcd[index[mid]][prop] < val) {
+        if (ltHelper(rcd[index[mid]][prop], val)) {
           min = mid + 1;
         } else {
           max = mid;
@@ -1139,7 +1250,7 @@
       while (min < max) {
         mid = Math.floor((min + max) / 2);
 
-        if (val < rcd[index[mid]][prop]) {
+        if (ltHelper(val, rcd[index[mid]][prop])) {
           max = mid;
         } else {
           min = mid + 1;
@@ -1163,20 +1274,23 @@
         return [lbound, ubound];
 
       case '$gt':
-        if (uval <= val) {
+        if (ltHelper(uval, val, true)) {
           return [0, -1];
         }
 
         return [ubound, rcd.length - 1];
 
       case '$gte':
-        if (lval < val) {
+        if (ltHelper(lval, val)) {
           return [0, -1];
         }
 
         return [lbound, rcd.length - 1];
 
       case '$lt':
+        if (lbound === 0 && ltHelper(lval, val)) {
+          return [0, 0];
+        }
         return [0, lbound - 1];
 
       case '$lte':
@@ -1184,11 +1298,93 @@
           ubound--;
         }
 
+        if (ubound === 0 && ltHelper(uval, val)) {
+          return [0, 0];
+        }
         return [0, ubound];
 
       default:
         return [0, rcd.length - 1];
       }
+    };
+
+    /**
+     * findOr() - oversee the operation of OR'ed query expressions.
+     *    OR'ed expression evaluation runs each expression individually against the full collection,
+     *    and finally does a set OR on each expression's results.
+     *    Each evaluation can utilize a binary index to prevent multiple linear array scans.
+     *
+     * @param {array} expressionArray - array of expressions
+     * @returns {Resultset} this resultset for further chain ops.
+     */
+    Resultset.prototype.findOr = function (expressionArray) {
+      var fri = 0,
+        ei = 0,
+        fr = null,
+        docset = [],
+        expResultset = null;
+
+      // if filter is already initialized we need to query against only those items already in filter.
+      // This means no index utilization for fields, so hopefully its filtered to a smallish filteredrows.
+      if (this.filterInitialized) {
+        docset = [];
+
+        for (ei = 0; ei < expressionArray.length; ei++) {
+          // we need to branch existing query to run each filter separately and combine results
+          expResultset = this.branch();
+          expResultset.find(expressionArray[ei]);
+          expResultset.data();
+
+          // add any document 'hits'
+          fr = expResultset.filteredrows;
+          for (fri = 0; fri < fr.length; fri++) {
+            if (docset.indexOf(fr[fri]) === -1) {
+              docset.push(fr[fri]);
+            }
+          }
+        }
+
+        this.filteredrows = docset;
+      } else {
+        for (ei = 0; ei < expressionArray.length; ei++) {
+          // we will let each filter run independently against full collection and mashup document hits later
+          expResultset = this.collection.chain();
+          expResultset.find(expressionArray[ei]);
+          expResultset.data();
+
+          // add any document 'hits'
+          fr = expResultset.filteredrows;
+          for (fri = 0; fri < fr.length; fri++) {
+            if (this.filteredrows.indexOf(fr[fri]) === -1) {
+              this.filteredrows.push(fr[fri]);
+            }
+          }
+        }
+      }
+
+      this.filterInitialized = true;
+
+      // possibly sort indexes
+      return this;
+    };
+
+    /**
+     * findAnd() - oversee the operation of AND'ed query expressions.
+     *    AND'ed expression evaluation runs each expression progressively against the full collection,
+     *    internally utilizing existing chained resultset functionality.
+     *    Only the first filter can utilize a binary index.
+     *
+     * @param {array} expressionArray - array of expressions
+     * @returns {Resultset} this resultset for further chain ops.
+     */
+    Resultset.prototype.findAnd = function (expressionArray) {
+      // we have already implementing method chaining in this (our Resultset class)
+      // so lets just progressively apply user supplied and filters
+      for (var i = 0; i < expressionArray.length; i++) {
+        this.find(expressionArray[i]);
+      }
+
+      return this;
     };
 
     /**
@@ -1261,6 +1457,29 @@
       for (p in queryObject) {
         if (queryObject.hasOwnProperty(p)) {
           property = p;
+
+          // injecting $and and $or expression tree evaluation here.
+          if (p === '$and') {
+            if (this.searchIsChained) {
+              this.findAnd(queryObject[p]);
+
+              return this;
+            } else {
+              // our and operation internally chains filters
+              return this.collection.chain().findAnd(queryObject[p]).data();
+            }
+          }
+
+          if (p === '$or') {
+            if (this.searchIsChained) {
+              this.findOr(queryObject[p]);
+
+              return this;
+            } else {
+              return this.collection.chain().findOr(queryObject[p]).data();
+            }
+          }
+
           if (p.indexOf('.') != -1) {
             usingDotNotation = true;
           }
@@ -1361,7 +1580,7 @@
           // so return object itself
           if (firstOnly) {
             if (seg[1] !== -1) {
-              return this.data[seg[0]];
+              return t[seg[0]];
             }
 
             return [];
@@ -1802,7 +2021,10 @@
      * @returns {DynamicView} this DynamicView object, for further chain ops.
      */
     DynamicView.prototype.applySimpleSort = function (propname, isdesc) {
-      if (typeof (isdesc) === 'undefined') isdesc = false;
+
+      if (typeof (isdesc) === 'undefined') {
+        isdesc = false;
+      }
 
       this.sortCriteria = [
         [propname, isdesc]
@@ -1919,9 +2141,12 @@
       // Apply immediately to Resultset; if persistent we will wait until later to build internal data
       this.resultset.where(fun);
 
-      if (this.sortFunction || this.sortCriteria) this.sortDirty = true;
-      if (this.persistent) this.resultsdirty = true;
-
+      if (this.sortFunction || this.sortCriteria) {
+        this.sortDirty = true;
+      }
+      if (this.persistent) {
+        this.resultsdirty = true;
+      }
       return this;
     };
 
@@ -1946,7 +2171,7 @@
 
       // if nonpersistent return resultset data evaluation
       if (!this.persistent) {
-        // not sure if this emit will be useful, but if view is non-persistent 
+        // not sure if this emit will be useful, but if view is non-persistent
         // we will raise event only if resulset has yet to be initialized.
         // user can intercept via dynView.on('rebuild', myCallback);
         // emit is async wait 1 ms so our data() call should exec before event fired
@@ -2006,10 +2231,14 @@
       if (oldPos === -1 && newPos !== -1) {
         ofr.push(objIndex);
 
-        if (this.persistent) this.resultdata.push(this.collection.data[objIndex]);
+        if (this.persistent) {
+          this.resultdata.push(this.collection.data[objIndex]);
+        }
 
         // need to re-sort to sort new document
-        if (this.sortFunction || this.sortCriteria) this.sortDirty = true;
+        if (this.sortFunction || this.sortCriteria) {
+          this.sortDirty = true;
+        }
 
         return;
       }
@@ -2028,7 +2257,9 @@
         } else {
           ofr.length = oldlen - 1;
 
-          if (this.persistent) this.resultdata.length = oldlen - 1;
+          if (this.persistent) {
+            this.resultdata.length = oldlen - 1;
+          }
         }
 
         return;
@@ -2042,7 +2273,9 @@
         }
 
         // in case changes to data altered a sort column
-        if (this.sortFunction || this.sortCriteria) this.sortDirty = true;
+        if (this.sortFunction || this.sortCriteria) {
+          this.sortDirty = true;
+        }
 
         return;
       }
@@ -2055,6 +2288,7 @@
       var ofr = this.resultset.filteredrows;
       var oldPos = ofr.indexOf(objIndex);
       var oldlen = ofr.length;
+      var idx;
 
       if (oldPos !== -1) {
         // if not last row in resultdata, swap last to hole and truncate last row
@@ -2062,13 +2296,28 @@
           ofr[oldPos] = ofr[oldlen - 1];
           ofr.length = oldlen - 1;
 
-          this.resultdata[oldPos] = this.resultdata[oldlen - 1];
-          this.resultdata.length = oldlen - 1;
+          if (this.persistent) {
+            this.resultdata[oldPos] = this.resultdata[oldlen - 1];
+            this.resultdata.length = oldlen - 1;
+          }
         }
         // last row, so just truncate last row
         else {
           ofr.length = oldlen - 1;
-          this.resultdata.length = oldlen - 1;
+
+          if (this.persistent) {
+            this.resultdata.length = oldlen - 1;
+          }
+        }
+      }
+
+      // since we are using filteredrows to store data array positions
+      // if they remove a document (whether in our view or not), 
+      // we need to adjust array positions -1 for all document array references after that position
+      oldlen = ofr.length;
+      for (idx = 0; idx < oldlen; idx++) {
+        if (ofr[idx] > objIndex) {
+          ofr[idx] --;
         }
       }
     };
@@ -2097,7 +2346,7 @@
      * @param {object} configuration object
      */
     function Collection(name, options) {
-      // the name of the collection 
+      // the name of the collection
 
       this.name = name;
       // the data held by the collection
@@ -2109,7 +2358,8 @@
 
       // in autosave scenarios we will use collection level dirty flags to determine whether save is needed.
       // currently, if any collection is dirty we will autosave the whole database if autosave is configured.
-      this.dirty = false;
+      // defaulting to true since this is called from addCollection and adding a collection should trigger save
+      this.dirty = true;
 
       // private holders for cached data
       this.cachedIndex = null;
@@ -2127,7 +2377,7 @@
       this.cloneObjects = options.hasOwnProperty('clone') ? options.clone : false;
 
       // option to make event listeners async, default is sync
-      this.asyncListeners = options.hasOwnProperty('asyncListeners') ? options.asyncListeners : true;
+      this.asyncListeners = options.hasOwnProperty('asyncListeners') ? options.asyncListeners : false;
 
       // disable track changes
       this.disableChangesApi = options.hasOwnProperty('disableChangesApi') ? options.disableChangesApi : true;
@@ -2153,13 +2403,17 @@
 
       // initialize the id index
       this.ensureId();
-      var indices;
+      var indices = [];
       // initialize optional user-supplied indices array ['age', 'lname', 'zip']
       //if (typeof (indices) !== 'undefined') {
-      if (options) {
-        indices = options.indices || [];
-      } else {
-        indices = [];
+      if (options && options.indices) {
+        if (Object.prototype.toString.call(options.indices) === '[object Array]') {
+          indices = options.indices;
+        } else if (typeof options.indices === 'string') {
+          indices = [options.indices];
+        } else {
+          throw new TypeError('Indices needs to be a string or an array of strings');
+        }
       }
 
       for (var idx = 0; idx < indices.length; idx++) {
@@ -2277,7 +2531,9 @@
      */
     Collection.prototype.ensureIndex = function (property, force) {
       // optional parameter to force rebuild whether flagged as dirty or not
-      if (typeof (force) === 'undefined') force = false;
+      if (typeof (force) === 'undefined') {
+        force = false;
+      }
 
       if (property === null || property === undefined) {
         throw 'Attempting to set index without an associated property';
@@ -2310,8 +2566,8 @@
             var obj2 = coll.data[b];
 
             if (obj1[prop] === obj2[prop]) return 0;
-            if (obj1[prop] > obj2[prop]) return 1;
-            if (obj1[prop] < obj2[prop]) return -1;
+            if (gtHelper(obj1[prop], obj2[prop])) return 1;
+            if (ltHelper(obj1[prop], obj2[prop])) return -1;
           }
         })(property, this);
 
@@ -2417,10 +2673,8 @@
 
     /**
      * generate document method - ensure objects have id and objType properties
-     * Come to think of it, really unfortunate name because of what document normally refers to in js.
-     * that's why there's an alias below but until I have this implemented
      * @param {object} the document to be inserted (or an array of objects)
-     * @returns document or documents (if array)
+     * @returns document or documents (if passed an array of objects)
      */
     Collection.prototype.insert = function (doc) {
       var self = this;
@@ -2605,11 +2859,36 @@
       }
     };
 
+
+    Collection.prototype.removeWhere = function (query) {
+      var list;
+      if (typeof query === 'function') {
+        list = this.data.filter(query);
+      } else {
+        list = new Resultset(this, query);
+      }
+      var len = list.length;
+      while (len--) {
+        this.remove(list[len]);
+      }
+
+    };
+
+    Collection.prototype.removeDataOnly = function () {
+      this.removeWhere(function (obj) {
+        return true;
+      });
+    };
+
     /**
      * delete wrapped
      */
     Collection.prototype.remove = function (doc) {
       var self = this;
+      if (typeof doc === 'number') {
+        doc = this.get(doc);
+      }
+
       if ('object' !== typeof doc) {
         throw new Error('Parameter is not an object');
       }
@@ -2667,17 +2946,17 @@
      * Get by Id - faster than other methods because of the searching algorithm
      */
     Collection.prototype.get = function (id, returnPosition) {
+
       var retpos = returnPosition || false,
         data = this.idIndex,
         max = data.length - 1,
         min = 0,
         mid = Math.floor(min + (max - min) / 2);
 
+      id = typeof id === 'number' ? id : parseInt(id, 10);
+
       if (isNaN(id)) {
-        id = parseInt(id);
-        if (isNaN(id)) {
-          throw 'Passed id is not an integer';
-        }
+        throw 'Passed id is not an integer';
       }
 
       while (data[min] < data[max]) {
@@ -2834,7 +3113,70 @@
       return;
     };
 
+
+
+    function binarySearch(array, item, fun) {
+      var lo = 0,
+        hi = array.length,
+        compared,
+        mid;
+      while (lo < hi) {
+        mid = ((lo + hi) / 2) | 0;
+        compared = fun.apply(null, [item, array[mid]]);
+        if (compared == 0) {
+          return {
+            found: true,
+            index: mid
+          };
+        } else if (compared < 0) {
+          hi = mid;
+        } else {
+          lo = mid + 1;
+        }
+      }
+      return {
+        found: false,
+        index: hi
+      };
+    };
+
+    function BSonSort(fun) {
+      return function (array, item) {
+        return binarySearch(array, item, fun);
+      };
+    }
+
+    function KeyValueStore() {}
+
+    KeyValueStore.prototype = {
+      keys: [],
+      values: [],
+      sort: function (a, b) {
+        return (a < b) ? -1 : ((a > b) ? 1 : 0);
+      },
+      setSort: function (fun) {
+        this.bs = BSonSort(fun);
+      },
+      bs: function () {
+        return BSonSort(this.sort);
+      },
+      set: function (key, value) {
+        var pos = this.bs(this.keys, key);
+        if (pos.found) {
+          this.values[pos.index] = value;
+        } else {
+          this.keys.splice(pos.index, 0, key);
+          this.values.splice(pos.index, 0, value);
+        }
+      },
+      get: function (key) {
+        return this.values[binarySearch(this.keys, key, this.sort).index];
+      }
+    };
+
+
     Loki.Collection = Collection;
+    Loki.KeyValueStore = KeyValueStore;
     return Loki;
   }());
 
