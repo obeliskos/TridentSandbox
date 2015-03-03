@@ -46,6 +46,7 @@ available for use by the sandbox app, add them here.
 <script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
+<script src="libraries/knockout-3.3.0.js"></script>
 <script src="libraries/winjs/js/WinJS.min.js"></script>
 <script src="libraries/winjs/js/en-US/ui.strings.js"></script>
 <link rel="stylesheet" type="text/css" href="libraries/winjs/css/ui-dark.css"/>
@@ -302,6 +303,9 @@ div.UI_MainPlaceholder
 		pend_changes_warn : true
 	}
 
+  var stats = null;
+  var statsRequestId = null;
+
 	// possibly hash script and markup to determine if changes have been made 
 	var sb_markup_hash = null;
 	var sb_script_hash = null;
@@ -442,6 +446,18 @@ div.UI_MainPlaceholder
 		var localrun = null;
 		
 		if (localStorage) {
+      var memStats = localStorage["memstats"];
+      if (memStats != null && memStats != "") 
+      {
+        if (memStats.toLowerCase() == "true") {
+          sb_memstat();
+        }
+      }
+      else 
+      {
+        localStorage["memstats"] = "false";
+      }
+      
       var ideMode = localStorage["ide-mode"];
       if (ideMode === 'mobile') {
         sb_mode_mobile();
@@ -488,7 +504,7 @@ div.UI_MainPlaceholder
 		
 			var sar = localStorage["skip-autorun"];
 			if (sar != null && sar != "") {
-				if (sar == "true") {
+				if (sar.toLowerCase() == "true") {
 					VAR_UI_Settings.skip_autorun = sar;
 					localsar = true;
 				}
@@ -499,7 +515,7 @@ div.UI_MainPlaceholder
 			
 			var errorPopups = localStorage["error-popups"];
 			if (errorPopups != null && errorPopups != "") {
-				VAR_UI_Settings.error_popups = (errorPopups == "true");
+				VAR_UI_Settings.error_popups = (errorPopups.toLowerCase() == "true");
 			}
 			else {
 				localStorage["error-popups"] = "true";
@@ -507,7 +523,7 @@ div.UI_MainPlaceholder
 			
 			var pcWarn = localStorage["pend-changes-warn"];
 			if (pcWarn != null && pcWarn != "") {
-				VAR_UI_Settings.pend_changes_warn = (pcWarn == "true");
+				VAR_UI_Settings.pend_changes_warn = (pcWarn.toLowerCase() == "true");
 			}
 			else {
 				localStorage["pend-changes-warn"] = "true";
@@ -735,6 +751,11 @@ div.UI_MainPlaceholder
 		
 		// Register Event Handler to warn if leaving page
 		window.onbeforeunload = function(e) {
+      // API_ClearOuput will call EVT_CleanSandbox() is the user has one defined.
+      // will allow synchronous shutdown activities to complete, async activities may not complete (tridentdb)
+      // local storage should be ok.
+      API_ClearOutput();
+			
 			// Get Hash of current editor contents to compare with last 'load' or 'new
 			// If they are different (user made changes) then warm them when they are leaving the page.  
 			var htmlHash = CryptoJS.SHA1(editorMarkup.getValue()).toString();
@@ -747,6 +768,33 @@ div.UI_MainPlaceholder
 		
 	});
 	
+  function sb_memstat() 
+  {
+    stats = new MemoryStats();
+
+    stats.domElement.style.position = 'fixed';
+    stats.domElement.style.left        = '210px';
+    stats.domElement.style.top       = '5px';
+
+    document.body.appendChild( stats.domElement );
+
+    statsRequestId = requestAnimationFrame(function rAFloop(){
+        stats.update();
+        statsRequestId = requestAnimationFrame(rAFloop);
+    });
+  }
+	
+  function sb_memstat_off() 
+  {
+    if (stats == null) return;
+    
+    window.cancelAnimationFrame(statsRequestId);
+    
+    document.body.removeChild(stats.domElement);
+    stats = null;
+    statsRequestId = null;
+  }
+  
 	function applyUiSettings() {
 		editorMarkup.setOption("theme", VAR_UI_Settings.editor_theme);
 		editorScript.setOption("theme", VAR_UI_Settings.editor_theme);
@@ -767,7 +815,7 @@ div.UI_MainPlaceholder
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/286) + "%)");
+		$("#sb_spn_appcache_progress").text("(" + Math.floor(sb_appcache_progress*100/291) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
@@ -2837,7 +2885,7 @@ function API_Restore_TridentDB() {
 
 			$("#ui_ls_txtKeyName").val("");
 			$("#ui_ls_txtKeySize").val("");
-			$("#ui_ls_txtLocalStorageValue").text("");
+			$("#ui_ls_txtLocalStorageValue").val("");
 
 			// repopulate the listbox while simultaneously building the arrayLS data for plot
 			$("#ui_ldb_selLocalStorage").html("");
@@ -2899,7 +2947,7 @@ function API_Restore_TridentDB() {
 		
 		saveLSKey : function() {
 			var key = $("#ui_ls_txtKeyName").val();
-			var val = $("#ui_ls_txtLocalStorageValue").text();
+      var val = $("#ui_ls_txtLocalStorageValue").val();
 			
 			localStorage[key] = val;
 			sb_dashboard.calcLocalStorageUsage();
@@ -2910,7 +2958,7 @@ function API_Restore_TridentDB() {
 
 			$("#ui_ls_txtKeyName").val(key);
 			$("#ui_ls_txtKeySize").val(localStorage[key].length + " bytes");
-			$("#ui_ls_txtLocalStorageValue").text(localStorage[key]);
+			$("#ui_ls_txtLocalStorageValue").val(localStorage[key]);
 		},
 
 		deleteLSKey: function() {
@@ -2954,6 +3002,18 @@ function API_Restore_TridentDB() {
 							$("#sb_spn_indexeddb_status").html("Yes <span style='font-family:Symbol'>Å</span>");
 						}
 					}
+					
+          if (stats == null && localStorage["memstats"].toLowerCase() == "true") 
+          {
+            sb_memstat();
+          }
+          else 
+          {
+            if (stats != null && localStorage["memstats"].toLowerCase() != "true")
+            {
+              sb_memstat_off();
+            }
+          }
 					
 					sb_refresh_slots();
 				}, 

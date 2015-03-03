@@ -146,13 +146,13 @@
           };
         }
 
-        if (typeof a === 'string') {
+        else if (typeof a === 'string') {
           checkFn = function (curr) {
             return a.indexOf(curr) !== -1;
           };
         }
 
-        if (a && typeof a === 'object') {
+        else if (a && typeof a === 'object') {
           checkFn = function (curr) {
             return a.hasOwnProperty(curr);
           };
@@ -217,7 +217,8 @@
       if (!event) {
         event = this.events[eventName] = [];
       }
-      return event.push(listener) - 1;
+      event.push(listener);
+      return listener;
     };
 
     function applyListener(listener, args) {
@@ -257,9 +258,10 @@
     /**
      * @prop remove() - removes the listener at position 'index' from the event 'eventName'
      */
-    LokiEventEmitter.prototype.removeListener = function (eventName, index) {
+    LokiEventEmitter.prototype.removeListener = function (eventName, listener) {
       if (this.events[eventName]) {
-        this.events[eventName].splice(index, 1);
+        var listeners = this.events[eventName];
+        listeners.splice(listeners.indexOf(listener), 1);
       }
     };
 
@@ -387,7 +389,7 @@
 
       // if they want to load database on loki instantiation, now is a good time to load... after adapter set and before possible autosave initiation
       if (options.hasOwnProperty('autoload') && typeof (initialConfig) !== 'undefined' && initialConfig) {
-        this.loadDatabase({}, options.autoloadCallback);
+        this.loadDatabase(options, options.autoloadCallback);
       }
 
       if (this.options.hasOwnProperty('autosaveInterval')) {
@@ -473,7 +475,6 @@
           return;
         }
       }
-      throw 'No such collection';
     };
 
     Loki.prototype.getName = function () {
@@ -769,7 +770,7 @@
                 console.warn('lokijs loadDatabase : Database not found');
                 cFun('Database not found');
               } else {
-                self.loadJSON(dbString);
+                self.loadJSON(dbString, options || {});
                 cFun(null);
               }
             });
@@ -1580,7 +1581,7 @@
           // so return object itself
           if (firstOnly) {
             if (seg[1] !== -1) {
-              return t[seg[0]];
+              return t[index.values[seg[0]]];
             }
 
             return [];
@@ -2677,46 +2678,30 @@
      * @returns document or documents (if passed an array of objects)
      */
     Collection.prototype.insert = function (doc) {
+      
+      if (!doc) {
+        var error = new Error('Object cannot be null');
+        this.emit('error', error);
+        throw error;
+      }
+
       var self = this;
       // holder to the clone of the object inserted if collections is set to clone objects
       var obj;
-      if (Array.isArray(doc)) {
-        doc.forEach(function (d) {
-          if (self.clone) {
-            obj = JSON.parse(JSON.stringify(d));
-          } else {
-            obj = d;
-          }
-          //d.objType = self.objType;
-          if (typeof obj.meta === 'undefined') {
-            obj.meta = {
-              revision: 0,
-              created: 0
-            };
-          }
-          self.add(obj);
-          self.emit('insert', obj);
+      var docs = Array.isArray(doc) ? doc : [doc];
 
-        });
-        return obj;
-      } else {
-        if (typeof doc !== 'object') {
+      docs.forEach(function (d) {
+        if (typeof d !== 'object') {
           throw new TypeError('Document needs to be an object');
           return;
-        }
-        if (!doc) {
-          var error = new Error('Object cannot be null');
-          this.emit('error', error);
-          throw error;
-        }
+        }    
         if (self.clone) {
-          obj = JSON.parse(JSON.stringify(doc));
+          obj = JSON.parse(JSON.stringify(d));
         } else {
-          obj = doc;
+          obj = d;
         }
-        //doc.objType = self.objType;
-
-        if (typeof doc.meta === 'undefined') {
+        
+        if (typeof obj.meta === 'undefined') {
           obj.meta = {
             revision: 0,
             created: 0
@@ -2725,8 +2710,8 @@
         self.add(obj);
         self.emit('insert', obj);
 
-        return obj;
-      }
+      });
+      return obj;
     };
 
     Collection.prototype.clear = function () {
@@ -3173,7 +3158,6 @@
         return this.values[binarySearch(this.keys, key, this.sort).index];
       }
     };
-
 
     Loki.Collection = Collection;
     Loki.KeyValueStore = KeyValueStore;

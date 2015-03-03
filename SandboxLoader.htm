@@ -33,6 +33,7 @@ available for use by the sandbox app, add them here.
 <script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
 <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
 <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
+<script src="libraries/knockout-3.3.0.js"></script>
 <script src="scripts/tridentlist.js"></script>
 <script src="scripts/tridentdb.js"></script>
 <script src="scripts/workerpool.js"></script>
@@ -328,12 +329,34 @@ body {
 		
 	});
 	
+  function sb_memstat() 
+  {
+    stats = new MemoryStats();
+
+    stats.domElement.style.position = 'fixed';
+    stats.domElement.style.left        = '5px';
+    stats.domElement.style.top       = '5px';
+
+    document.body.appendChild( stats.domElement );
+
+    statsRequestId = requestAnimationFrame(function rAFloop(){
+        stats.update();
+        requestAnimationFrame(rAFloop);
+    });
+  }
+	
+  function sb_memstat_off() 
+  {
+    window.cancelAnimationFrame(statsRequestId);
+    document.body.removeChild(stats.domElement);
+  }
+  
 	function progressAC(e)
 	{
 		sb_appcache_progress++;
 		
 		// hardcoding total # files
-		$("#sb_spn_ac_progress").text("(" + Math.floor(sb_appcache_progress*100/349) + "%)");
+		$("#sb_spn_ac_progress").text("(" + Math.floor(sb_appcache_progress*100/291) + "%)");
 	}
 	
 	// Helper method for appcache diagnostic
