@@ -172,7 +172,7 @@ body {
 
 	//	API VARIABLES 
 	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = "2.00";
+	var VAR_TRIDENT_VERSION = "2.01";
 	var VAR_TRIDENT_HOSTED = false;
 	var VAR_TRIDENT_APPCACHED = false;
 	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
@@ -416,14 +416,16 @@ body {
 	}
 	
 	function sb_prompt_update() {
-		alertify.confirm("An update exists to your app environment.  Do you want to install it and reload this page?", function (e) {
-    		if (e) {
-        		// user clicked "ok"
-              	applicationCache.swapCache();
-				location.reload(); 
-    		} else {
-        		// user clicked "cancel"
-            }
+		alertify.confirm("An update exists to your AppCache install.  Do you want to install it and reload this page?", function (e) {
+   		if (e) {
+     		// user clicked "ok"
+        try {
+         	applicationCache.swapCache();
+        }
+        catch(err) {}
+
+        location.reload(); 
+      }
 		});
 	}
 
