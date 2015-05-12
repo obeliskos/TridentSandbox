@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<bundle xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://vswebessentials.com/schemas/v1/bundle.xsd">
+  <settings>
+    <!--Determines if the bundle file should be automatically optimized after creation/update.-->
+    <minify>true</minify>
+    <!--Determine whether to generate/re-generate this bundle on building the solution.-->
+    <runOnBuild>false</runOnBuild>
+    <!--Specifies a custom subfolder to save files to. By default, compiled output will be placed in the same folder and nested under the original file.-->
+    <outputDirectory />
+  </settings>
+  <!--The order of the <file> elements determines the order of the files in the bundle.-->
+  <files>
+    <file>/libraries/codemirror/lib/codemirror.js</file>
+    <file>/libraries/codemirror/mode/xml/xml.js</file>
+    <file>/libraries/codemirror/mode/htmlmixed/htmlmixed.js</file>
+    <file>/libraries/codemirror/mode/javascript/javascript.js</file>
+    <file>/libraries/codemirror/mode/css/css.js</file>
+    <file>/libraries/codemirror/mode/clike/clike.js</file>
+    <file>/libraries/codemirror/mode/markdown/markdown.js</file>
+    <file>/libraries/codemirror/mode/dtd/dtd.js</file>>
+    <file>/libraries/codemirror/mode/coffeescript/coffeescript.js</file>
+    <file>/libraries/codemirror/mode/python/python.js</file>
+    <file>/libraries/codemirror/mode/cypher/cypher.js</file>>
+    <file>/libraries/codemirror/addon/display/fullscreen.js</file>
+    <file>/libraries/codemirror/addon/fold/foldcode.js</file>
+    <file>/libraries/codemirror/addon/fold/foldgutter.js</file>
+    <file>/libraries/codemirror/addon/fold/brace-fold.js</file>
+    <file>/libraries/codemirror/addon/fold/xml-fold.js</file>
+    <file>/libraries/codemirror/addon/fold/markdown-fold.js</file>
+    <file>/libraries/codemirror/addon/fold/comment-fold.js</file>
+    <file>/libraries/codemirror/addon/edit/closetag.js</file>
+    <file>/libraries/codemirror/addon/dialog/dialog.js</file>
+    <file>/libraries/codemirror/addon/search/searchcursor.js</file>
+    <file>/libraries/codemirror/addon/search/search.js</file>
+  </files>
+</bundle>

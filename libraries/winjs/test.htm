@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js/WinJS.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/ui-dark.css" />
+</head>
+<body>
+    <style>
+        .content,
+        #app {
+            height: 100%;
+        }
+
+            /* SplitView pane content style*/
+            #app .header {
+                white-space: nowrap;
+            }
+
+            #app .title {
+                font-size: 25px;
+                left: 50px;
+                margin-top: 6px;
+                vertical-align: middle;
+                display: inline-block;
+            }
+
+            #app .nav-commands {
+                margin-top: 20px;
+            }
+
+        .win-navbarcommand-button {
+            background-color: transparent;
+        }
+
+        #app .win-splitview-pane-hidden .win-navbarcommand-button {
+            width: 46px;
+        }
+
+        #app .win-splitview-pane-hidden .win-navbarcommand-label {
+            /* Workaround: Make sure pane doesn't scroll if ContentDialog restores focus to
+           NavBarCommand's label
+        */
+            visibility: hidden;
+        }
+
+        /*SplitView content style*/
+        #app .win-splitview-content {
+            background-color: rgb(112,112,112);
+        }
+
+        #app .contenttext {
+            margin-left: 20px;
+            margin-top: 6px;
+        }
+
+        /*SplitView pane show button style*/
+        button.win-splitview-button {
+            float: left;
+            box-sizing: border-box;
+            height: 48px;
+            width: 48px;
+            min-height: 0;
+            min-width: 0;
+            padding: 0;
+            border: 1px dotted transparent;
+            margin: 0;
+            outline: none;
+            background-color: transparent;
+        }
+
+        html.win-hoverable button.win-splitview-button:hover {
+            background-color: rgba(255,255,255, 0.1);
+        }
+
+        button.win-splitview-button.win-splitview-button:active,
+        button.win-splitview-button.win-splitview-button:hover:active {
+            background-color: rgba(255,255,255, 0.2);
+        }
+
+        button.win-splitview-button.win-keyboard:focus {
+            border-color: rgb(255, 255, 255);
+        }
+
+        button.win-splitview-button:after {
+            font-size: 24px;
+            font-family: 'Segoe MDL2 Assets', 'Symbols';
+            content: "\E700";
+        }
+    </style>
+    <div id="app">
+        <div class="splitView" data-win-control="WinJS.UI.SplitView" data-win-options="{panePlacement:'right'}">
+            <!-- Pane area -->
+            <div>
+                <div class="header">
+                    <button type="button" class="win-splitview-button" onclick="Sample.togglePane();"></button>
+                    <div class="title">SplitView Pane area</div>
+                </div>
+
+                <div class="nav-commands">
+                    <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Home', icon: 'home'}"></div>
+                    <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Favorite', icon: 'favorite'}"></div>
+                    <div data-win-control="WinJS.UI.NavBarCommand" data-win-options="{ label: 'Settings', icon: 'settings'}"></div>
+                </div>
+            </div>
+
+            <!-- Content area -->
+            <div class="contenttext"><h2>SplitView Content area</h2> </div>
+        </div>
+    </div>
+
+<script>
+    setTimeout(function () {
+        WinJS.Namespace.define("Sample", {
+            splitView: null,
+            togglePane: WinJS.UI.eventHandler(function (ev) {
+                if (Sample.splitView) {
+                    Sample.splitView.paneHidden = !Sample.splitView.paneHidden;
+                }
+            })
+        });
+
+        WinJS.Binding.processAll(null, Sample).then(function () {
+            WinJS.UI.processAll().done(function () {
+                Sample.splitView = document.querySelector(".splitView").winControl;
+                new WinJS.UI._WinKeyboard(Sample.splitView.paneElement); // Temporary workaround: Draw keyboard focus visuals on NavBarCommands
+            });
+        })
+    }, 1000);
+
+</script>
+</body>
+</html>
