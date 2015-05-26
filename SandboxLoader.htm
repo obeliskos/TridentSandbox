@@ -1,27 +1,26 @@
 <!DOCTYPE html>
 <!--html-->
-<html manifest="appcache.mf"> 
+<html manifest="appcache.mf">
 <head>
-<title>Trident Sandbox</title>
-<!--
-<meta name="application-name" content="Trident Sandbox"/>
-<meta name="msapplication-TileColor" content="#1F96CF"/>
-<meta name="msapplication-square70x70logo" content="/images_ide/live_tile/Poseidon-Small70.png"/>
-<meta name="msapplication-square150x150logo" content="/images_ide/live_tile/Poseidon-Normal150.png"/>
-<meta name="msapplication-wide310x150logo" content="/images_ide/live_tile/Poseidon-Wide310.png"/>
-<meta name="msapplication-square310x310logo" content="/images_ide/live_tile/Poseidon-Square310.jpg"/>
--->
+    <title>Trident Sandbox</title>
 
-<!--	TRIDENT SANDBOX Loader : 
-		GitHub development at : https://github.com/obeliskos/TridentSandbox
+    <meta name="application-name" content="Trident Sandbox"/>
+    <meta name="msapplication-TileColor" content="#1F96CF"/>
+    <meta name="msapplication-square70x70logo" content="/images_ide/live_tile/Poseidon-Small70.png"/>
+    <meta name="msapplication-square150x150logo" content="/images_ide/live_tile/Poseidon-Normal150.png"/>
+    <meta name="msapplication-wide310x150logo" content="/images_ide/live_tile/Poseidon-Wide310.png"/>
+    <meta name="msapplication-square310x310logo" content="/images_ide/live_tile/Poseidon-Square310.jpg"/>
 
-		This page is used as a minimal run-time environment for running saved programs.
-		It has no IDE other than what your program provides, it is otherwise a blank page with 
-		the full TridentSandbox runtime environment available for your programs.
-		
-		You pass url parameters to this page, such as #RunSlot= or #RunApp= to indicate for the
-		loader to load a Trident Save Slot (indexeddb) or a sample app via ajax (to the appcache).
--->
+    <!--	TRIDENT SANDBOX Loader :
+            GitHub development at : https://github.com/obeliskos/TridentSandbox
+
+            This page is used as a minimal run-time environment for running saved programs.
+            It has no IDE other than what your program provides, it is otherwise a blank page with
+            the full TridentSandbox runtime environment available for your programs.
+
+            You pass url parameters to this page, such as #RunSlot= or #RunApp= to indicate for the
+            loader to load a Trident Save Slot (indexeddb) or a sample app via ajax (to the appcache).
+    -->
 
     <script src="libraries/jquery/jquery-2.1.0.min.js"></script>
     <script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
@@ -41,1035 +40,91 @@
     <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
     <link rel="stylesheet" type="text/css" href="css/style-bundle.min.css" />
 
-<style>
-@font-face{
-	font-family: "heorot";
-	src: url('fonts/heorot.ttf'),
-	url('fonts/heorot.ttf');
-}
-
-body {
-	margin: 0;
-}
-		
-</style>
-
-<script>
-	var sb_appcache_progress = 0;
-	
-
-	//	API VARIABLES 
-	var VAR_UserFileValue = "";
-	var VAR_TRIDENT_VERSION = "2.01";
-	var VAR_TRIDENT_HOSTED = false;
-	var VAR_TRIDENT_APPCACHED = false;
-	var VAR_TRIDENT_ONLINE = function() { return navigator.onLine; }
-	var VAR_TRIDENT_ENV_TYPE = 'SBL'; // IDE, STANDALONE, SBL
-	var VAR_TRIDENT_DB = null;
-	var VAR_TRIDENT_API = null;
-	
-	var tridentVars = {
-		isAutorun: false
-	}
-	
-	var VAR_UI_Settings = {
-		skip_autorun : false,
-		error_popups : true
-	}
-
-	$(document).ready(function() {
-		// I dont want to allow this to run in an iframe
-		if(location.href != top.location.href) {
-			document.body.innerHTML = "Trident Sandbox does not run in an IFRAME";
-			return;
-		}
-		
-		// If served up from a website then we should bother to monitor possible appcache events
-		// for diagnostics.  If not appcaching the events will just not fire.
-		if (document.URL.indexOf("file://") == -1) {
-			VAR_TRIDENT_HOSTED = true;
-
-			// Determine if we are connecting or running from an appcache site
-			var appCache = window.applicationCache;
-			if (window.applicationCache) {
-					appCache.addEventListener('error', logACEvent, false);
-					appCache.addEventListener('checking', logACEvent, false);
-					appCache.addEventListener('noupdate', logACEvent, false);
-					appCache.addEventListener('downloading', logACEvent, false);
-					appCache.addEventListener('progress', progressAC, false);
-					appCache.addEventListener('updateready', logACEvent, false);
-					appCache.addEventListener('cached', logACEvent, false);
-			}
-		}
-		
-		// Load up local storage settings
-		if (localStorage) {
-			var sar = localStorage["skip-autorun"];
-			if (sar != null && sar != "") {
-				if (sar == "true")	{ VAR_UI_Settings.skip_autorun = true; }
-				else 				{ VAR_UI_Settings.skip_autorun = false; }
-			}
-			else { localStorage["skip-autorun"] = "false"; }
-			
-			var errorPopups = localStorage["error-popups"];
-			if (errorPopups != null && errorPopups != "") 
-			{ 
-				VAR_UI_Settings.error_popups = (errorPopups == "true"); 
-			}
-			else { localStorage["error-popups"] = "true"; }
-		}
-			
-		// if loading from the web (not sa template), clear out the template placeholders
-		if (document.URL.indexOf("file://") == -1) $("#UI_MainPlaceholder").empty();
-		
-		// Help user quickly identify errors in their code by displaying alert with msg, line and col
-		window.onerror = function(msg, url, line, col, error) {
-			if (!VAR_UI_Settings.error_popups) return;
-			
-			alertify.error(msg + " (line " + line + " col " + col + ")");
-		};
-		
-		// Fix for IE 10 and possibly IE 11 (on 8.1 update 0)
-		// Needed for Crypto.JS to work properly with typearray lib
-		if (typeof Uint8ClampedArray == "undefined") {
-            Uint8ClampedArray = Uint8Array;
+    <style>
+        @font-face {
+            font-family: "heorot";
+            src: url('fonts/heorot.ttf'), url('fonts/heorot.ttf');
         }
-		
-		alertify.set({ buttonReverse: true });
-		
-		// Check for indexed db support and set up new TridentSandbox DB with simple app/key/value Object Store (Table) for internal and api use
-		// For good tutorial on indexedDB, see http://code.tutsplus.com/tutorials/working-with-indexeddb--net-34673
-		if (indexedDB) {
-			var openRequest = indexedDB.open("TridentSandboxDB", 1);
- 
-			// If database doesnt exist yet or its version is lower than our version specified above (2nd param in line above)
-			openRequest.onupgradeneeded = function(e) {
-				var thisDB = e.target.result;
-								if (thisDB.objectStoreNames.contains("TridentSandboxKVP")) {
-					thisDB.deleteObjectStore("TridentSandboxKVP");
-				}
-				
-				if(!thisDB.objectStoreNames.contains("TridentSandboxKVP")) {
-					var objectStore = thisDB.createObjectStore("TridentSandboxKVP", { keyPath: "id", autoIncrement:true });
-					objectStore.createIndex("app","app", {unique:false});
-					objectStore.createIndex("key","key", {unique:false});
-					// hack to simulate composite key since overhead is low (main size should be in val field)
-					// user (me) required to duplicate the app and key into comma delimited appkey field off object
-					// This will allow retrieving single record with that composite key as well as 
-					// still supporting opening cursors on app or key alone
-					objectStore.createIndex("appkey", "appkey", {unique:true});
-				}
-				
-				API_LogMessage("Upgrading...");
-			}
- 
-			openRequest.onsuccess = function(e) {
-				API_LogMessage("TridentSandboxDB (indexedDB) opened.");
-				VAR_TRIDENT_DB = e.target.result;
-				
-				// To be future-proof you can code against the new VAR_TRIDENT_API
-				// It lets you switch between old indexedDb TridentDatabase
-				// and a web service implementation to run on your own private 'cloud'
-				// You can switch between the two dynamically.
-				VAR_TRIDENT_API = new TridentDatabase(VAR_TRIDENT_DB, function() {
-					if (typeof(EVT_TridentChanged) == "function") EVT_TridentChanged();
-				});
-				
-				var skipautorun = API_GetURLParameter("SkipAutorun");
-				if (skipautorun == null && !VAR_UI_Settings.skip_autorun) {
-					sb_run_autorun();
-				}
-				
-				var runSlot = API_GetURLParameter("RunSlot");
-				if (runSlot != null) {
-					sb_run_slot(runSlot);
-				}
-				else {
-					var runSample = API_GetURLParameter("RunApp");
-					if (runSample != null) {
-						setTimeout(function() {
-							sb_run_app(runSample);
-						}, 200);
-					}
-					else {
-						API_LogMain("This page requires a 'RunSlot' param which equals the name of a Trident Save slot.");
-						API_LogMain("Example url : http://www.obeliskos.com/TridentSandbox/SandboxLoader.htm#RunSlot=CryptoNotepad");
-						API_LogMain("(where CryptoNotepad equals a program name contained in the trident save slots (drop down list above the editors)");
-						alertify.log("Missing RunSlot or RunApp hash param");
-					}
-				}
-			}
- 
-			openRequest.onerror = function(e) {
-				API_LogMessage("Error opening TridentSandboxDB (indexedDB).");
-				API_Inspect(e);
-			}
-			
-			// Detect Hash Param changes for loadslot/runslot; 
-			window.onhashchange = function() {
-				// Probably better (cleaner) to just clean slate and force page reload
-				location.reload();
-			}
-		}
-		
-		$(window).resize(function() {
-			// Allow User Programs to receive window resize events
-			// by implementing this callback
-			if (typeof(EVT_WindowResize) == typeof(Function)) EVT_WindowResize();
-		});
-		
-	});
-	
-  function sb_memstat() 
-  {
-    stats = new MemoryStats();
 
-    stats.domElement.style.position = 'fixed';
-    stats.domElement.style.left        = '5px';
-    stats.domElement.style.top       = '5px';
-
-    document.body.appendChild( stats.domElement );
-
-    statsRequestId = requestAnimationFrame(function rAFloop(){
-        stats.update();
-        requestAnimationFrame(rAFloop);
-    });
-  }
-	
-  function sb_memstat_off() 
-  {
-    window.cancelAnimationFrame(statsRequestId);
-    document.body.removeChild(stats.domElement);
-  }
-  
-	function progressAC(e)
-	{
-		sb_appcache_progress++;
-		
-		// hardcoding total # files
-		$("#sb_spn_ac_progress").text("(" + Math.floor(sb_appcache_progress*100/147) + "%)");
-	}
-	
-	// Helper method for appcache diagnostic
-	function logACEvent(e)
-	{
-		VAR_TRIDENT_APPCACHED = true;  // if any of the events fire we will assume it is successful and running in appcached mode
-		$("#divAppCache").show();
-		
-		// Update diagnostic panel
-		var statusString = getACStatus();
-		if (statusString == "Idle") {
-			setTimeout(function() {
-				$("#divAppCache").hide(500);
-			}, 1000);
-		}
-		
-		$("#sb_spn_ac_status").text(statusString);
-		
-		if (statusString == "Update ready") {
-			$("#sb_spn_ac_progress").text(""); 
-			setTimeout(function() {
-				sb_prompt_update();
-			}, 200);
-		}
-	}
-
-	// Helper method for appcache diagnostics, this event will be fired whenever appcache status changes
-	function getACStatus()
-	{
-		try{
-			var sCacheStatus = "Not supported";
-			if (window.applicationCache) 
-			{
-				var oAppCache = window.applicationCache;
-				switch ( oAppCache.status ) 
-				{
-					case oAppCache.UNCACHED : sCacheStatus = "Not cached"; break;
-					case oAppCache.IDLE : sCacheStatus = "Idle"; $("#sb_spn_ac_progress").text(""); break;
-					case oAppCache.CHECKING : sCacheStatus = "Checking"; break;
-					case oAppCache.DOWNLOADING : sCacheStatus = "Downloading Environment"; break; 
-					case oAppCache.UPDATEREADY : sCacheStatus = "Update ready"; break;
-					case oAppCache.OBSOLETE : sCacheStatus = "Obsolete"; break;
-					default : sCacheStatus = "Unexpected Status ( " + oAppCache.status.toString() + ")"; break;
-				}
-			}
-			return sCacheStatus;
-		}
-		catch (e)
-		{
-			alertify.log(e);
-			API_LogMessage(e);
-		}
-	}
-	
-	function sb_prompt_update() {
-		alertify.confirm("An update exists to your AppCache install.  Do you want to install it and reload this page?", function (e) {
-   		if (e) {
-     		// user clicked "ok"
-        try {
-         	applicationCache.swapCache();
+        body {
+            margin: 0;
         }
-        catch(err) {}
+    </style>
 
-        location.reload(); 
-      }
-		});
-	}
+    <script>
+        $(document).ready(function () {
+            if (location.href != top.location.href) {
+                // Only allow loader to run in IFRAME if served up from obeliskos
+                if (location.href.length < 25 || location.href.substring(0, 25) != "http://www.obeliskos.com/") {
+                    document.body.innerHTML = "Trident Sandbox does not run in an IFRAME from a foreign domain";
+                    return;
+                }
 
-	function errorHandler(evt) {
-		alertify.error('load error');
-	}
-	
-	function sb_user_hide_load() {
-		$("#sb_div_userfile").hide();
-	}
-	
-	// event handler
-	function sb_user_file_loaded(evt) {
-		var filename = $("#sb_user_file").val().replace(/^.*[\\\/]/, '');
+                // Only allow loader to run in IFRAME if that iframe is within a page also from obeliskos
+                if (top.location.href.length < 25 || top.location.href.substring(0, 25) != "http://www.obeliskos.com/") {
+                    document.body.innerHTML = "Trident Sandbox does not run in an IFRAME from a foreign domain";
+                    return;
+                }
+            }
 
-		var filestring = evt.target.result;
-	
-		// store in global API var in case they haven't set up async callback
-		VAR_UserFileValue = filestring;
-		
-		// IE's HTML 5 file control seems to place a lock on the last loaded file which
-		// was interfering with the saving and overwriting of that same file.
-		// So I will reset it by destroying and recreating, allowing the GC to release
-		// any old file locks.
-		var control = $("#sb_user_file");
-		control.replaceWith( control = control.clone( true ) );
-		
-		API_HideUserLoader();
-		
-		// If user has registered a callback function (for when load is completed), call it
-		if (typeof(EVT_UserLoadCallback) == typeof(Function)) {
-			// Give time for the file control replace (done above) to complete
-			// before giving the user a chance to interfere with that process
-			setTimeout(function() {
-				EVT_UserLoadCallback(filestring, filename);
-			}, 250);
-		}
-	}
-	
-	function sb_user_datafile_loaded(evt) {
-		var filename = $("#sb_user_datafile").val().replace(/^.*[\\\/]/, '');
+            // Initialize the sandbox environment
+            sandbox.initialize({
+                env: "SBL"
+            });
 
-		// IE's HTML 5 file control seems to place a lock on the last loaded file which
-		// was interfering with the saving and overwriting of that same file.
-		// So I will reset it by destroying and recreating, allowing the GC to release
-		// any old file locks.
-		
-		var control = $("#sb_user_datafile");
-		control.replaceWith( control = control.clone( true ) );
-		
-		API_HideUserDataLoader();
-		
-		// If user has registered a callback function (for when load is completed), call it
-		if (typeof(EVT_UserDataLoadCallback) == typeof(Function)) {
-			// Give time for the file control replace (done above) to complete
-			// before giving the user a chance to interfere with that process
-			setTimeout(function() {
-				EVT_UserDataLoadCallback(evt.target.result, filename);
-			}, 250);
-		}
-	}
-	
-	// event handler
-	function sb_user_load()	{
-		var file = document.getElementById('sb_user_file').files[0];
-		if(file) {
-			var reader = new FileReader();
-
-			reader.readAsText(file, "UTF-8");
-
-			// Handle progress, success, and errors
-			//reader.onprogress = updateProgress;
-			reader.onload = sb_user_file_loaded;
-			reader.onerror = errorHandler;
-		}
-	}
-	
-	function sb_user_dataload() {
-		var file = document.getElementById('sb_user_datafile').files[0];
-		if(file) {
-			var reader = new FileReader();
-
-			reader.readAsDataURL(file, "UTF-8");
-
-			// Handle progress, success, and errors
-			//reader.onprogress = updateProgress;
-			reader.onload = sb_user_datafile_loaded;
-			reader.onerror = errorHandler;
-		}
-	}
-	
-	function sb_run_autorun() {
-        VAR_TRIDENT_API.GetAppKey("SandboxScriptUnits", "autorun", function (result) {
-			if (result == null || result.id == 0) return;
-			
-			API_AppendUnitScript(result.val);
-		});
-	}
-	
-// runs a program from a trident save slot
-// allows launch command on main page to work and allows for bookmark-able launched apps
-function sb_run_slot(appName) { 
-	
-        VAR_TRIDENT_API.GetAppKey("SandboxSaveSlots", appName, function (result) {
-			if (result == null || result.id == 0) {
-				alertify.error("No save at that slot");
-				return;
-			}
-			
-			var sandboxObject = JSON.parse(result.val);
-		
-			document.title = sandboxObject.progName;
-
-			if (sandboxObject.scriptText.substring(0, 250).indexOf("FLAG_StartPrgFullscreen") != -1) document.getElementById("UI_Tab_Main").msRequestFullscreen();
-			
-			setTimeout(function() {
-				// HTML needs to go first so script will work if they have code outside functions
-				$("#UI_MainPlaceholder").append(sandboxObject.htmlText);
-
-				var s = document.createElement("script");
-				s.innerHTML = sandboxObject.scriptText;
-			
-				// give dom a chance to clean out by waiting a bit?
-				setTimeout(function() {
-					document.getElementById("UI_MainPlaceholder").appendChild(s);
-				}, 150);
-			}, (tridentVars.isAutorun)?600:250);		// if autorun script unit is involved, give it more time
-		});
-	}
-	
-	// runs a program from appcache
-	// allows url friendly linking to sample apps
-	function sb_run_app(progname) {
-		progname = progname.replace("%20", " ");	// handle encoded spaces
-		progname = progname.replace(/[^a-zA-Z 0-9\-]+/g, ""); // whitelist alphanumeric
-		progname = "samples\\" + progname + ".prg";	// force extension
-		
-		jQuery.ajax({
-			type: "GET",
-			url: progname,
-			cache: true,
-			dataType: "json",
-
-			success: function (response) {
-				var sandboxObject = response;
-	
-				$("#sb_txt_ProgramName").val(sandboxObject.progName);
-
-				$("#UI_MainPlaceholder").append(sandboxObject.htmlText);
-				
-				var s = document.createElement("script");
-				s.innerHTML = sandboxObject.scriptText;
-			
-				document.title = sandboxObject.progName;
-				
-				// give dom a chance to parse html into dom
-				setTimeout(function() {
-					document.getElementById("UI_MainPlaceholder").appendChild(s);
-				}, 350);
-				
-			},
-			error: function (xhr, ajaxOptions, thrownError) {
-				API_LogMessage("If you are hosting this on your own server, make sure to add mime type for .prg files as text/json");
-				API_LogMessage(xhr.status + " : " + xhr.statusText);
-				alertify.log(xhr.status + " : " + xhr.statusText);
-				alertify.log("See user log for more info");
-			}
-		});
-	}
-	
-	function toggleVisibility(id) {
-       var e = document.getElementById(id);
-       if(e.style.display == 'block')
-          e.style.display = 'none';
-       else
-          e.style.display = 'block';
-	}
-	
-	var hookScripts = function(url, src) {
-		var s = document.createElement("script");
-		s.type = "text/javascript";
-		//s.id = 'scriptDynamic';
-		s.src = url || null;
-		s.innerHTML = src || null;
-		document.getElementsByTagName("head")[0].appendChild(s);
-	};
-	
-	// function to inspect a variable/expression highlighted in a script or markup editor
-	function sb_inspect() {
-		var strSelection;
-		var scriptSelection = editorScript.getSelection();
-		var markupSelection = editorMarkup.getSelection();
-		
-		if (scriptSelection != "" && markupSelection != "") alertify.error("Ambiguous selection; Highlighted code exists in both editors; using Script selection", "", 0);
-		
-		if (scriptSelection == "" && markupSelection == "") {
-				alertify.alert("This feature requires you to select a variable or object in the script editor before clicking 'Inspect'.");
-				return;
-		}
-		
-		if (scriptSelection != "") strSelection = scriptSelection;
-		else strSelection = markupSelection;
-		
-		var objResult;
-		try {
-			objResult = eval(strSelection);
-		}
-		catch (exc) {
-			alertify.error("malformed inspection selection");
-			return;
-		}
-
-		var tbl = prettyPrint( objResult, { /* options such as maxDepth, etc. */ });
-		$(tbl).dialog({ title: 'Trident Object/Variable Inspector', width: 'auto', maxHeight: ($(window).height() - 50) });
-	}
-	
-//
-// TRIDENTSANDBOX APP/KEY/VALUE OBJECT STORE INTERFACE API - IMPLEMENTED USING INDEXEDDB
-// This is an attempt to provide as simple (as possible?) interface for using indexedDb to increase storage capabilities when running Hosted or AppCached
-// If you run out of the ~5MB of local storage, you can expand into this relatively easily.
-// I intend to use this for storing AppSave slots for your programs as well as for In-Memory databases using Loki.js and serialized as json for the value.
-// You may use it for whatever string 'value' you want to save (serialized objects/text/settings) but the app is for your convenience/organization, every app can in theory read 
-// any other app's key/values.
-//
-	
-// Get a Trident App/Key/Val object by app/key
-function API_GetIndexedAppKey(app, key, callback) {
-	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"],"readonly");
-	var store = transaction.objectStore("TridentSandboxKVP");
-	var index = store.index("appkey");
-  	var appkey = app + "," + key;
-  	var request = index.get(appkey);
-
-  	request.onsuccess = callback;
-}
-
-// Get a Trident App/Key/Val object by id (if for some reason you keep a collection of id's, you can get the object back with this)
-// Added extra optional data param you can pass and process within your aync callback
-function API_GetIndexedAppKeyById(id, callback, data) {
-	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"],"readonly");
-	var store = transaction.objectStore("TridentSandboxKVP");
-  	var request = store.get(id);
-
-	request.onsuccess = (function(data){
-		return function(e) { callback(e, data) };
-	})(data);   
-
-}
-
-// Will add or update (if that app/key combo already exists) a Trident App/Key/Value object
-function API_SetIndexedAppKey(app, key, val) {
-	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"],"readwrite");
-    var store = transaction.objectStore("TridentSandboxKVP");
-	var index = store.index("appkey");
-  	var appkey = app + "," + key;
-  	var request = index.get(appkey);
-
-	// first try to retrieve an existing object by that key
-	// need to do this because to update an object you need to have id in object, otherwise it will append id with new autocounter and clash the unique index appkey
-	request.onsuccess = function(e) {
-		var res = e.target.result;
-		
-		if (res == null) {
-			res = {
-				app:app,
-				key:key,
-				appkey: app + ',' + key,
-				val:val
-			}
-		}
-		else {
-			res.val = val;
-		}
-		
-		var requestPut = store.put(res);
- 
-		requestPut.onerror = function(e) {
-			alertify.error("set error: " + e.target.error.name);
-		}
- 
-		requestPut.onsuccess = function(e) {
-			alertify.success("saved");
-		}
-	};
-	
-	request.onerror = function(e) {
-		alertify.error("get error: " + e.target.error.name);
-	}
-}
-	
-// The object can only be deleted by the primary key 'id' which is autoincremented number on object
-function API_DelIndexedAppKey(id) {
-	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"],"readwrite");
-	var store = transaction.objectStore("TridentSandboxKVP");
-	
-	var request = store.delete(id);
-	request.onsuccess = function(evt) {
-		alertify.success("deleted");
-	};
-	request.onerror = function(evt) {
-		alertify.error("failed to delete id: " + id);
-	}
-}
-
-// Retrieve a cursor for all App/Key/Val objects by app
-// Your callback is called once per record and you must advance cursor (see examples)
-function API_GetIndexedAppCursor(app, callback) {
-	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
-	var store = transaction.objectStore("TridentSandboxKVP");
-	var index = store.index("app");
- 
-	// We want cursor to all values matching our (single) app param
-	var singleKeyRange = IDBKeyRange.only(app);
-
-	// Match anything past "Bill", including "Bill"
-	//var lowerBoundKeyRange = IDBKeyRange.lowerBound("Bill");
-
-	// Match anything past "Bill", but don't include "Bill"
-	//var lowerBoundOpenKeyRange = IDBKeyRange.lowerBound("Bill", true);
-
-	// Match anything up to, but not including, "Donna"
-	//var upperBoundOpenKeyRange = IDBKeyRange.upperBound("Donna", true);
-
-	// Match anything between "Bill" and "Donna", but not including "Donna"
-	//var boundKeyRange = IDBKeyRange.bound("Bill", "Donna", false, true);
-
-	// To use one of the key ranges, pass it in as the first argument of openCursor()/openKeyCursor()
-	var cursor = index.openCursor(singleKeyRange);
- 
-	cursor.onsuccess = callback;
-}
-
-// This can allow end user running in hosted or appcached environment to use the TridentDB save slots as 'modules'
-// They can switch between programs using this API Call to stop the existing program and switch to (and run) a different save slot program
-// Since hosted, you can pass params between the two programs using local storage or TridentDB/indexed db.
-function API_TransferSlot(slotId) {
-	location.href = "SandboxLoader.htm#RunApp=slotId";
-}
-
-function API_Backup_TridentDB(filename) {
-	var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
-	var store = transaction.objectStore("TridentSandboxKVP");
-
-	var cursor = store.openCursor();
- 
-	var keyArray = [];
- 
-	cursor.onsuccess = function(e) {
-	  	var cursor = e.target.result;
-      
-		if(cursor) {
-          	var currObject = cursor.value;
-          
-			keyArray.push(currObject);
-          
-            cursor.continue();
-		}
-		else {
-			if (keyArray.length == 0) {
-				alertify.log("Nothing to backup, TridentDB is empty");
-				return;
-			}
-			
-			if (filename == null) filename = "TridentDB.backup";
-			
-			API_SaveTextFile(filename, JSON.stringify(keyArray));
-		}
-	};
-
-}
-
-function API_Restore_TridentDB() {
-	$("#sb_div_restorefile").show();
-}
-
-// END TRIDENT DB
-
-// LIBRARY UNIT I/O
-// This collection of functions support the ability for you to modularize your code into 
-// Markup and/or Script fragments called 'Units'.  With this functionality you can move fragments of html or
-// javascript into a unit to be called up from other programs.  So you might fine tune your units
-// in the editors and run them to test them, and then use console commands to save them with a name to be 
-// recalled programmatically within a real prg.
-// Initial Implementation will be invoking these functions via the Text Console calling these commands : 
-	function API_LogMarkupUnits() {
-	}
-	
-	function API_SaveMarkupUnit(unitName) {
-	}
-	
-	function API_LoadMarkupUnit(unitName) {
-	}
-	
-	function API_GetMarkupUnit(unitName, callback) {
-        VAR_TRIDENT_API.GetAppKey("SandboxMarkupUnits", unitName, function (result) {
-			if (result == null || result.id == 0) {
-				alertify.error("No markup unit by that name");
-				return false;
-			}
-			
-			callback(result.val);
-		});
-	}
-	
-	// Import
-	function API_ImportMarkupUnit(unitName, clearFirst) {
-	}
-	
-	function API_LogScriptUnits() {
-	}
-	
-	function API_SaveScriptUnit(unitName) {
-		var scriptTextString = editorScript.getValue();
-		
-		VAR_TRIDENT_API.SetAppKey("SandboxScriptUnits", unitName, scriptTextString, function(result) {
-			if (result.success) return true;
-			
-			alertify.error("Error calling SetAppKey()");
-			return false;
         });
-	}
-	
-	function API_LoadScriptUnit(unitName) {
-	}
-	
-	function API_ImportScriptUnit(unitName, callback) {
-        VAR_TRIDENT_API.GetAppKey("SandboxScriptUnits", unitName, function (result) {
-			if (result == null || result.id == 0) {
-				alertify.error("No script unit by that name");
-				return false;
-			}
-			
-			API_AppendUnitScript(result.val, callback);
-		});
-	}
-	
-	function API_AppendUnitScript(scriptText, callback) {
-		var s = document.createElement("script");
-		s.innerHTML = scriptText;
-		
-		document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
-		
-		if (typeof(callback) == "function") {
-			setTimeout(function() {
-				callback();
-			}, 100);
-		}
-	}
-	
-	function API_ClearUnitScripts() {
-		$("#UI_LibUnitPlaceholder").empty();
-	}
-	
-	// API/HELPER ROUTINES 
-	// Helper method to support hosted or appcache url params
-	function API_GetURLParameter(sParam) {
-		var sPageURL = window.location.hash.substring(1);
 
-		var sURLVariables = sPageURL.split('&');
-		for (var i = 0; i < sURLVariables.length; i++)
-		{
-			var sParameterName = sURLVariables[i].split('=');
-			if (sParameterName[0] == sParam)
-			{
-				return decodeURIComponent(sParameterName[1]);
-			}
-		}
-	}
-	
-	function API_ClearOutput() {
-	}
-	
-	function API_LogMain(msg) {
-		$("#UI_MainPlaceholder").append(msg + "<br/>");
-	}
-	
-	function API_ClearMain() {
-		$("#UI_MainPlaceholder").empty();
-	}
-	
-	function API_LogHtml(msg) {
-	}
-	
-	function API_ClearHtmlLog() {
-	}
-	
-	function API_LogMessage(msg) {
-		console.log(msg);
-	}
-	
-	function API_LogObject(objToLog, objName) {
-		if (objName != null && (typeof(objName) == "string"))
-			console.log(objName + " = ");
-		
-		console.dir(objToLog);
-	}
-	
-	function API_ClearLog()	{
-	}
-	
-	function API_SetActiveTab(tabId) {
-	}
-	
-	// Make Developer area fullscreen (Editors, output, and run bar)
-	function API_MetalFullscreen() {
-	}
-	
-	function API_UserFullscreen(elem) {
-		if (elem == null) elem = document.getElementById("UI_MainPlaceholder");
-		
-		if (elem.requestFullscreen) {
-			elem.requestFullscreen();
-		} else if (elem.msRequestFullscreen) {
-			elem.msRequestFullscreen();
-		} else if (elem.mozRequestFullScreen) {
-			elem.mozRequestFullScreen();
-		} else if (elem.webkitRequestFullscreen) {
-			elem.webkitRequestFullscreen();
-		}    
-	}
-	
-	function API_UserFullscreenExit() {
-		if (document.exitFullscreen) { document.exitFullscreen(); } 
-		else if (document.msExitFullscreen) { document.msExitFullscreen(); } 
-		else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); } 
-		else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
-	}
-	
-	function API_UserFullToggle() {
-		var inFullScreenMode = document.fullscreenElement || 
-		document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
-
-		if (inFullScreenMode) {
-			if (document.exitFullscreen) { document.exitFullscreen(); } 
-			else if (document.msExitFullscreen) { document.msExitFullscreen(); } 
-			else if (document.mozCancelFullScreen) { document.mozCancelFullScreen(); } 
-			else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
-		} 
-		else {
-			var docElm = document.documentElement;
-			if (docElm.requestFullscreen) {
-				docElm.requestFullscreen();
-			} else if (docElm.msRequestFullscreen) {
-				docElm.msRequestFullscreen();
-			} else if (docElm.mozRequestFullScreen) {
-				docElm.mozRequestFullScreen();
-			} else if (docElm.webkitRequestFullscreen) {
-				docElm.webkitRequestFullscreen();
-			}    
-		}    
-	}
-	
-	function API_PlaySound(soundFilename) {
-		var aud = new Audio();
-		aud.src = 'sounds/' + soundFilename;
-		aud.load();
-		aud.play();
-	}
-	
-	function API_PlaySoundURI(soundURI) {
-		var aud = new Audio();
-		aud.src = soundURI;
-		aud.load();
-		aud.play();
-	}
-	
-	// Display the User Area file loader
-	function API_ShowLoad() {
-		$("#sb_div_userfile").show();
-	}
-	
-	function API_ShowDataLoad() {
-		$("#sb_div_userdatafile").show();
-	}
-	
-	function API_HideUserLoader() {
-		$('#sb_div_userfile').hide();   // hide user file picker if visible
-	}
-	
-	function API_HideUserDataLoader() {
-		$("#sb_div_userdatafile").hide();
-	}
-	
-	// Handling Blobs is somewhat browser specific 
-	// As such this seems to work on IE 11 and firefox
-	function API_DataUrlToBlob(dataURL) {
-		// convert base64 to raw binary data held in a string
-		var byteString = atob(dataURL.split(',')[1]);
- 
-		// separate out the mime component
-		var mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
- 
-		// write the bytes of the string to an ArrayBuffer
-		var arrayBuffer = new ArrayBuffer(byteString.length);
-		//var _ia = new Uint8Array(arrayBuffer);
-		var _ia = new Int8Array(arrayBuffer);
-		for (var i = 0; i < byteString.length; i++) {
-			_ia[i] = byteString.charCodeAt(i) & 0xff;
-		}
-
-		//var dataView = new DataView(arrayBuffer);
-		//var blobResult = new Blob([dataView], { type: mimeString });
-		var blobResult = new Blob([_ia], { type: mimeString });
-		return blobResult;
-	}
-
-	// Pass in a filename and some text to save and this will 'serve' up that text as a download
-	function API_SaveTextFile(fileName, saveString)	{
-		// The File Loaders seem to place a lock on the file so, in the event they are saving to the same filename,
-		// lets clear out the old file control so that (if they save to the same filename as they last loaded) it will work.
-		var control = $("#sb_user_file");
-		control.replaceWith( control = control.clone( true ) );
-		
-		if (typeof Blob == "undefined") {
-			alert('no blobs available (incompatible browser?)');
-		}
-		else {
-			// if not using internet explorer then fallback to filesaver.js polyfill method
-			if (window.navigator.msSaveBlob === undefined) {
-				var blob = new Blob([saveString], {type: "application/octet-stream"});
-				saveAs(blob, fileName);
-			}
-			else {
-				var blob1 = new Blob([saveString]);
-				window.navigator.msSaveBlob(blob1, fileName);
-			}
-		}
-	}
-	
-	// API_SaveDataURL will take a dataURL string (representing a binary object), 
-	// and save it as a binary file
-	function API_SaveDataURL(fileName, dataURL) {
-		var fileBlob = API_DataUrlToBlob(dataURL);
-		
-		// if not using internet explorer then fallback to filesaver.js polyfill method
-		if (window.navigator.msSaveBlob === undefined) {
-			saveAs(fileBlob, fileName);
-		}
-		else {
-			window.navigator.msSaveOrOpenBlob(fileBlob, fileName);
-		}
-	}
-	
-	// Pass in a filename and some text to save and this will 'serve' up that text as a download
-	function API_SaveOrOpenTextFile(fileName, saveString) {
-		// The File Loaders seem to place a lock on the file so, in the event they are saving to the same filename,
-		// lets clear out the old file control so that (if they save to the same filename as they last loaded) it will work.
-		var control = $("#sb_user_file");
-		control.replaceWith( control = control.clone( true ) );
-		
-		if (typeof Blob == "undefined") {
-			alert('no blobs available (incompatible browser?)');
-		}
-		else {
-			var blob1 = new Blob([saveString]);
-			window.navigator.msSaveOrOpenBlob(blob1, fileName);
-		}
-	}
-	
-	function API_SetToolbarMode(showCaption, showLoader, showDevToolbar) {
-	}
-	
-	// Determines whether the Code or the Output areas get full width or if they split 50/50
-	function API_SetWindowMode(mode) {
-	}
-	
-	function API_RestoreLayout() {
-	}
-	
-	function API_SetDarkTheme() {
-		API_SetBackgroundColor("#444");
-		$("#UI_MainPlaceholder").css("color", "#fff");
-	}
-	
-	function API_SetLightTheme() {
-		API_SetBackgroundColor("#fff");
-		$("#UI_MainPlaceholder").css("color", "#000");
-	}
-	
-	function API_SetBackgroundColor(colorCode) {
-		$("body").css("background-color", colorCode);
-		$("#UI_MainPlaceholder").css("background-color", colorCode);
-	}
-	
-	function API_Inspect(objVar) {
-		var tbl = prettyPrint( objVar, { /* options such as maxDepth, etc. */ });
-		$(tbl).dialog({ title: 'Trident Object/Variable Inspector', width: 'auto', maxHeight: ($(window).height() - 50) });
-	}
-
-	function API_GetCursor(callback) {
-		var transaction = VAR_TRIDENT_DB.transaction(["TridentSandboxKVP"], "readonly");
-		var store = transaction.objectStore("TridentSandboxKVP");
-
-		var cursor = store.openCursor();
-	 
-		cursor.onsuccess = callback;
-	}
-
-	function API_ShowPasswordDialog(callback) {
-		$("#UI_PasswordDialog").show();
-		$("#sb_password_text").focus();
-		$("#sb_password_ok").unbind("click");
-		$("#sb_password_ok").bind("click", function() { callback($("#sb_password_text").val()); });
-	}
-	
-</script>
+    </script>
 </head>
 <body>
 
-	<div id="divAppCache" style="display:none; position:fixed; top: 1em; right: 1em; padding: 12px;">
-		<span id="sb_spn_ac_status"></span>&nbsp;
-		<span id="sb_spn_ac_progress"></span>
-	</div>
-	<div id="UI_TabsOutput" style="font-family:Tahoma">
-		<div id="UI_Tab_Main">
-			<div id='sb_div_userfile' style="display:none">
-				<input style='height:30px;width:400px;' id='sb_user_file' type="file" name="userfileloader" onchange="sb_user_load()" />
-				<button id="sb_btn_user_file_cancel" onclick="$('#sb_div_userfile').hide()">Cancel</button>&nbsp;&nbsp;[Text]
-			</div>
-			<div id='sb_div_userdatafile' style="display:none; background-color:#cdc">
-				<input style='height:30px;width:400px;' id='sb_user_datafile' type="file" name="userdatafileloader" onchange="sb_user_dataload()" />
-				<button id="sb_btn_user_datafile_cancel" onclick="$('#sb_div_userdatafile').hide()">Cancel</button>&nbsp;&nbsp;[Binary]
-			</div>
-			<div id='UI_LibUnitPlaceholder' style="display:none"></div>
-			<div id='UI_MainPlaceholder' style='background-color:white'>
-			<!--TRIDENT_HTML-->
-			<SCRIPT>
-				/*TRIDENT_SCRIPT*/
-			</SCRIPT>
-			</div>
-		</div>
-	</div>
+    <div id="divAppCache" style="display:none; position:fixed; top: 1em; right: 1em; padding: 12px;">
+        <span id="sb_spn_ac_status"></span>&nbsp;
+        <span id="sb_spn_ac_progress"></span>
+    </div>
+    <div id="UI_TabsOutput" style="font-family:Tahoma">
+        <div id="UI_Tab_Main">
+            <div id='sb_div_userfile' style="display:none">
+                <input style='height:30px;width:400px;' id='sb_user_file' type="file" name="userfileloader" onchange="sandbox.files.userfilePicked()" />
+                <button id="sb_btn_user_file_cancel" onclick="$('#sb_div_userfile').hide()">Cancel</button>&nbsp;&nbsp;[Text]
+            </div>
+            <div id='sb_div_userdatafile' style="display:none; background-color:#cdc">
+                <input style='height:30px;width:400px;' id='sb_user_datafile' type="file" name="userdatafileloader" onchange="sandbox.files.userdataPicked()" />
+                <button id="sb_btn_user_datafile_cancel" onclick="$('#sb_div_userdatafile').hide()">Cancel</button>&nbsp;&nbsp;[Binary]
+            </div>
+            <div id='UI_LibUnitPlaceholder' style="display:none"></div>
+            <div id='UI_MainPlaceholder' style='background-color:white'>
+                <!--TRIDENT_HTML-->
+                <script>
+                    /*TRIDENT_SCRIPT*/
+                </script>
+            </div>
+        </div>
+    </div>
 
-	<div id="UI_PasswordDialog" style="display:none">
+    <div id="UI_PasswordDialog" style="display:none">
 
-		<h3><span class="fa"><i class="fa fa-lock"></i></span> Authorization</h3>
+        <h3><span class="fa"><i class="fa fa-lock"></i></span> Authorization</h3>
 
-		<form action="javascript:void(0);" method="POST">
+        <form action="javascript:void(0);" method="POST">
 
-			<fieldset>
+            <fieldset>
 
-				<p><label for="password">Enter Password</label>
-				<input id="sb_password_text" type="password" id="password" value="" placeholder="password" >
+                <p>
+                    <label for="password">Enter Password</label>
+                    <input id="sb_password_text" type="password" id="password" value="" placeholder="password">
                 </p>
-				<p>
-                	<button id="sb_password_ok" onclick="$('#UI_PasswordDialog').hide();">Ok</button>
-					<button onclick="$('#UI_PasswordDialog').hide();">Cancel</button>
-        		</p>
+                <p>
+                    <button id="sb_password_ok" onclick="$('#UI_PasswordDialog').hide();">Ok</button>
+                    <button onclick="$('#UI_PasswordDialog').hide();">Cancel</button>
+                </p>
 
-			</fieldset>
+            </fieldset>
 
-		</form>
+        </form>
 
-	</div> <!-- end login -->
+    </div> <!-- end login -->
 
 
 </body>
 </html>
-
-

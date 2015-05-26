@@ -37,8 +37,9 @@
     <file>d3/d3.min.js</file>
     <file>memory-stats.js</file>
 
+	<file>/scripts/sandbox-api.js</file>    
+	<file>/scripts/tridentdb.js</file>    
     <file>../scripts/tridentlist.js</file>
-    <file>../scripts/tridentdb.js</file>
     <file>../scripts/workerpool.js</file>
   </files>
 </bundle>
