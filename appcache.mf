@@ -138,7 +138,6 @@ samples/SpeechSynthesisAPI%20Safari.prg
 samples/Springy%20Demo.prg
 samples/TinyMCE%20Demo.prg
 samples/Trident%20API%20Demo.prg
-samples/Trident%20Backup%20Restore.prg
 samples/Trident%20Binary%20Encryptor.prg
 samples/Trident%20DB%20Usage.prg
 samples/Trident%20Sandbox%20Radio.prg

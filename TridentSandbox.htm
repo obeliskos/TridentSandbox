@@ -97,7 +97,7 @@
                 </td>
                 <td>
                     <div class="divWideButtons" style="display:inline">
-                        <h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An HTML / Javascript development sandbox' onclick="sb_toggle_header_font()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0 0 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript dev sandbox</h1>
+                        <h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An HTML / Javascript development sandbox' onclick="sandbox.ide.toggleHeaderFont()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0 0 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript dev sandbox</h1>
                     </div>
                     <div class="divTinyButtons" style="display:inline">
                         <h3 id='sb_header_caption2' title='Trident Sandbox : An HTML / Javascript sandbox' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0 0 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript sandbox</h3>
@@ -123,7 +123,7 @@
                     <input style='height:30px; width:90px; color:transparent;' id='sb_file' type="file" name="fileloader" onchange="sandbox.files.programPicked()" />
                 </td>
                 <td style="align:'right'">
-                    <select onchange="selectTheme()" id='selTheme' style='font-size:16px;'>
+                    <select onchange="sandbox.ide.selectTheme()" id='selTheme' style='font-size:16px;'>
                         <option selected>default</option>
                         <option>3024-day</option>
                         <option>3024-night</option>
@@ -173,22 +173,22 @@
                 </td>
                 <td>
                     <div class="divWideButtons" style="display:inline">
-                        <button style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
-                        <button style='height:40px; float:right' title="New Program" onclick="sb_new_program()"><i class="fa fa-plus-circle fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_browse_samples" class="ui_browse_samples" onclick="sb_browse_samples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
-                        <button style='height:40px; float:right; display:none;' id="ui_show_dashboard" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
+                        <button style='height:40px; float:right' title='Toggle Maximize' onclick="sandbox.ide.toggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
+                        <button style='height:40px; float:right' title="New Program" onclick="sandbox.ide.newProgram()"><i class="fa fa-plus-circle fa-2x"></i></button>
+                        <button style='height:40px; float:right' id="ui_browse_samples" class="ui_browse_samples" onclick="sandbox.ide.browseSamples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
+                        <button style='height:40px; float:right; display:none;' id="ui_show_dashboard" class="ui_show_dashboard" onclick='sandbox.dashboard.show()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
                         <button style='height:40px; float:right' id="ui_gen_sa" class="ui_gen_sa" onclick='sandbox.files.templatePrompt()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_mode_desktop" class="ui_mode_desktop" title='Desktop Mode' onclick="sb_mode_desktop()"><i class="fa fa-desktop fa-2x"></i></button>
-                        <button style='height:40px; width:40px; float:right' id="ui_mode_mobile" class="ui_mode_mobile" title='Mobile Mode' onclick="sb_mode_mobile(true)"><i class="fa fa-mobile fa-2x"></i></button>
+                        <button style='height:40px; float:right' id="ui_mode_desktop" class="ui_mode_desktop" title='Desktop Mode' onclick="sandbox.ide.applyDesktopMode()"><i class="fa fa-desktop fa-2x"></i></button>
+                        <button style='height:40px; width:40px; float:right' id="ui_mode_mobile" class="ui_mode_mobile" title='Mobile Mode' onclick="sandbox.ide.applyMobileMode(true)"><i class="fa fa-mobile fa-2x"></i></button>
                     </div>
                     <div class="divTinyButtons" style="display:inline">
-                        <button style='height:40px; float:right' title='Toggle Maximize' onclick="ToggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
-                        <button style='height:40px; float:right' title="New Program" onclick="sb_clean_sandbox()"><i class="fa fa-plus-circle fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_browse_samples2" class="ui_browse_samples" onclick="sb_browse_samples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
-                        <button style='height:40px; float:right; display:none;' id="ui_show_dashboard2" class="ui_show_dashboard" onclick='sb_show_dashboard()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
+                        <button style='height:40px; float:right' title='Toggle Maximize' onclick="sandbox.ide.toggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
+                        <button style='height:40px; float:right' title="New Program" onclick="sandbox.ide.clean()"><i class="fa fa-plus-circle fa-2x"></i></button>
+                        <button style='height:40px; float:right' id="ui_browse_samples2" class="ui_browse_samples" onclick="sandbox.ide.browseSamples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
+                        <button style='height:40px; float:right; display:none;' id="ui_show_dashboard2" class="ui_show_dashboard" onclick='sandbox.dashboard.show()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
                         <button style='height:40px; float:right' id="ui_gen_sa2" class="ui_gen_sa" onclick='sandbox.files.templatePrompt()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_mode_desktop" class="ui_mode_desktop" title='Desktop Mode' onclick="sb_mode_desktop()"><i class="fa fa-desktop fa-2x"></i></button>
-                        <button style='height:40px; width:40px; float:right' id="ui_mode_mobile" class="ui_mode_mobile" title='Mobile Mode' onclick="sb_mode_mobile(true)"><i class="fa fa-mobile fa-2x"></i></button>
+                        <button style='height:40px; float:right' id="ui_mode_desktop" class="ui_mode_desktop" title='Desktop Mode' onclick="sandbox.ide.applyDesktopMode()"><i class="fa fa-desktop fa-2x"></i></button>
+                        <button style='height:40px; width:40px; float:right' id="ui_mode_mobile" class="ui_mode_mobile" title='Mobile Mode' onclick="sandbox.ide.applyMobileMode(true)"><i class="fa fa-mobile fa-2x"></i></button>
                     </div>
                 </td>
             </tr>
@@ -200,38 +200,38 @@
             <td colspan="2">
                 <div id="ui_editor_toolbar" style="font-size:4px; display:inline-block">
                     <div id="divDesktopEditorMode" style="display:inline">
-                        <button id="sb_btn_markup" style="height:32px" onclick="sb_toggle_markup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i></button>
-                        <button id="sb_btn_togglesplit" style="height:32px" onclick="sb_toggle_split()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i></button>
-                        <button id="sb_btn_script" style="height:32px" onclick="sb_toggle_script()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i></button>
+                        <button id="sb_btn_markup" style="height:32px" onclick="sandbox.ide.toggleMarkup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i></button>
+                        <button id="sb_btn_togglesplit" style="height:32px" onclick="sandbox.ide.toggleSplit()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i></button>
+                        <button id="sb_btn_script" style="height:32px" onclick="sandbox.ide.toggleScript()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i></button>
                         &nbsp;&nbsp;
                     </div>
                     <div id="divMobileWindowMode" style="display:none">
-                        <button id="sb_btn_markup_only" style="height:32px" onclick="API_SetMobileMode(1)" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> 1</button>
-                        <button id="sb_btn_script_only" style="height:32px" onclick="API_SetMobileMode(2)" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> 2</button>
-                        <button id="sb_btn_output_only" style="height:32px" onclick="API_SetMobileMode(3)" title='Show Output only (Alt+O)'><i class="fa fa-film"></i> 3</button>
+                        <button id="sb_btn_markup_only" style="height:32px" onclick="sandbox.ide.setMobileMode(1)" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> 1</button>
+                        <button id="sb_btn_script_only" style="height:32px" onclick="sandbox.ide.setMobileMode(2)" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> 2</button>
+                        <button id="sb_btn_output_only" style="height:32px" onclick="sandbox.ide.setMobileMode(3)" title='Show Output only (Alt+O)'><i class="fa fa-film"></i> 3</button>
                         &nbsp;&nbsp;
                     </div>
-                    <button id="sb_btn_inpect" style="height:32px" onclick="sb_inspect()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i></button>
+                    <button id="sb_btn_inpect" style="height:32px" onclick="sandbox.ide.inspectSelection()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i></button>
                     <div id='sb_div_ls_slots' style='display:none'>
-                        <button style="height:32px" title='Load from selected TridentDB save slot' onclick='sb_load_slot()'><i class="fa fa-arrow-up"></i> <i class="fa fa-database"></i></button>
-                        <button style="height:32px" title='Save to selected TridentDB save slot' onclick='sb_save_slot()'><i class="fa fa-arrow-down"></i> <i class="fa fa-database"></i></button>
-                        <select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot' onchange="sb_load_slot()"></select>
-                        <button style="height:32px" title='Delete the selected TridentDB save' onclick='sb_del_slot()'><i class="fa fa-remove"></i> <i class="fa fa-database"></i></button>
+                        <button style="height:32px" title='Load from selected TridentDB save slot' onclick='sandbox.ide.loadSlot()'><i class="fa fa-arrow-up"></i> <i class="fa fa-database"></i></button>
+                        <button style="height:32px" title='Save to selected TridentDB save slot' onclick='sandbox.ide.saveSlot()'><i class="fa fa-arrow-down"></i> <i class="fa fa-database"></i></button>
+                        <select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot' onchange="sandbox.ide.loadSlot()"></select>
+                        <button style="height:32px" title='Delete the selected TridentDB save' onclick='sandbox.ide.deleteSlot()'><i class="fa fa-remove"></i> <i class="fa fa-database"></i></button>
                         &nbsp;&nbsp;
                     </div>
                     <div style="display:inline-block">
-                        <button class="ui_btn_launch" style='height:32px; display:none' onclick="sb_launch()" title="Save and Launch in new Window"><i class="fa fa-database"></i> <i class="fa fa-external-link"></i></button>
+                        <button class="ui_btn_launch" style='height:32px; display:none' onclick="sandbox.ide.launch()" title="Save and Launch in new Window"><i class="fa fa-database"></i> <i class="fa fa-external-link"></i></button>
                         <button style='height:32px;' onclick="sandbox.files.programSave()" title="Save your program (Alt+S)"><i class="fa fa-save"></i></button>
-                        <button id="sb_btn_fscode" style="height:32px" onclick="sb_fs_code()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i></button>
-                        <button style='height:32px;' title='Clear Output Tabs' onclick="API_ClearOutput()"><i class="fa fa-eraser"></i></button>
+                        <button id="sb_btn_fscode" style="height:32px" onclick="sandbox.ide.fullscreenDevArea()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i></button>
+                        <button style='height:32px;' title='Clear Output Tabs' onclick="sandbox.ide.clearOutput()"><i class="fa fa-eraser"></i></button>
                         &nbsp;&nbsp;
-                        <button id="ui_btn_run" style='height:32px; width:80px;' onclick="sb_run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
+                        <button id="ui_btn_run" style='height:32px; width:80px;' onclick="sandbox.ide.run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
                         &nbsp;&nbsp;
                     </div>
                     <div id='divDesktopWindowMode' style="display:inline">
-                        <button style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='API_SetWindowMode(1)'>1</button>
-                        <button style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='API_SetWindowMode(2)'>2</button>
-                        <button style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='API_SetWindowMode(3)'>3</button>
+                        <button style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='sandbox.ide.setWindowMode(1)'>1</button>
+                        <button style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='sandbox.ide.setWindowMode(2)'>2</button>
+                        <button style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='sandbox.ide.setWindowMode(3)'>3</button>
                     </div>
                 </div>
             </td>
@@ -272,13 +272,9 @@
                         <div id='UI_MainPlaceholder' style='background-color:white'><br /><br /></div>
                     </div>
                     <div id="UI_Tab_Text" style="background-color:#555">
-                        <div id='sb_div_restorefile' style="display:none;color:#ccc">
-                            <input style='height:30px;width:400px;' id='sb_restore_file' type="file" name="restorefileloader" onchange="sb_restore_load()" />
-                            <button id="sb_btn_restore_file_cancel" onclick="$('#sb_div_restorefile').hide()">Cancel</button>&nbsp;&nbsp;[Pick Restore File]
-                        </div>
                         <div id='sb_div_LogPlaceholder' style='background-color:#555;'>
                             <textarea id="UI_TxtLogText" spellcheck='false' rows='30' style="font-family: Lucida Console; height:100; width:100%; background-color:#333; color:#ccc">You need to allow blocked content for Trident Sandbox to initialize.</textarea><br />
-                            <input type='text' id='UI_TxtLogConsole' style="width:100%;height:30px; background-color:#333; color:#ccc" onkeydown="{ if (event.keyCode==38) $('#UI_TxtLogConsole').val(sandbox.volatile.lastConsoleCommand) }" onkeypress="{ if (event.keyCode==13) sb_console_eval() }" />
+                            <input type='text' id='UI_TxtLogConsole' style="width:100%;height:30px; background-color:#333; color:#ccc" onkeydown="{ if (event.keyCode==38) $('#UI_TxtLogConsole').val(sandbox.volatile.lastConsoleCommand) }" onkeypress="{ if (event.keyCode==13) sandbox.ide.consoleEval() }" />
                         </div>
                     </div>
                 </div>
@@ -316,7 +312,8 @@
                 <li><a href="#UI_Tab_Summary">Storage Summary</a></li>
                 <li><a href="#UI_Tab_LocalStorageUsage">LocalStorage Usage</a></li>
                 <li><a href="#UI_Tab_TridentDbUsage">TridentDB Usage</a></li>
-                <li><a href="#UI_Tab_TridentAPI">Trident API</a></li>
+                <li><a href="#UI_Tab_DatabaseBackup">Database Backup</a></li>
+                <li><a href="#UI_Tab_DatabaseRestore">Database Restore</a></li>
             </ul>
             <div id="UI_Tab_Summary" style="overflow: auto;">
                 <table>
@@ -353,8 +350,8 @@
                                 <div id="ui_ldb_chartLocalUsage" style="height:300px; width:300px;"></div>
                             </td>
                             <td valign='top' style='padding-top:10px'>
-                                <select id="ui_ldb_selLocalStorage" size=10 onchange="sb_dashboard.selectLSKey()"></select><br />
-                                <button class="minimal" style="height:40px; width:100px" onclick="sb_dashboard.deleteLSKey()">Delete</button>
+                                <select id="ui_ldb_selLocalStorage" size=10 onchange="sandbox.dashboard.selectLSKey()"></select><br />
+                                <button class="minimal" style="height:40px; width:100px" onclick="sandbox.dashboard.deleteLSKey()">Delete</button>
                             </td>
                             <td valign='top' style='padding-top:10px'>
                                 <div style="background-color:#f0f0f0; padding: 15px">
@@ -378,7 +375,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><button class="minimal" onclick="sb_dashboard.saveLSKey()">Save</button></td>
+                                            <td><button class="minimal" onclick="sandbox.dashboard.saveLSKey()">Save</button></td>
                                         </tr>
                                     </table>
                                 </div>
@@ -396,9 +393,9 @@
                                 <div id="ui_tdb_chartTridentUsage" style="height:300px; width:300px;"></div>
                             </td>
                             <td valign='top' style='padding-top:10px'>
-                                <select id="ui_tdb_selTridentDB" size=11 onchange="sb_dashboard.selTdbChanged()"></select><br />
-                                <button class="minimal" style="height:40px;" onclick="sb_dashboard.deleteTridentKey()">Delete</button>
-                                <button class="minimal" id="ui_tdb_download" style="height:40px; display:none;" onclick="sb_dashboard.downloadTridentFile()">Download</button>
+                                <select id="ui_tdb_selTridentDB" size=11 onchange="sandbox.dashboard.selTdbChanged()"></select><br />
+                                <button class="minimal" style="height:40px;" onclick="sandbox.dashboard.deleteTridentKey()">Delete</button>
+                                <button class="minimal" id="ui_tdb_download" style="height:40px; display:none;" onclick="sandbox.dashboard.downloadTridentFile()">Download</button>
                             </td>
                             <td valign='top' style='padding-top:10px'>
                                 <div style='background-color:#f0f0f0; padding: 15px'>
@@ -423,7 +420,7 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <button class="minimal" style="height:40px;" onclick="sb_dashboard.renameTridentKey()">Rename</button>
+                                                <button class="minimal" style="height:40px;" onclick="sandbox.dashboard.renameTridentKey()">Rename</button>
                                             </td>
                                         </tr>
                                     </table>
@@ -433,23 +430,41 @@
                     </table>
                 </div>
             </div>
-            <div id="UI_Tab_TridentAPI">
-                <h3>Trident API Settings</h3>
-                <i>Note: I recommend you do not touch this, Use Trident DB for now.  It does work however if you want to review the service implementation in scripts/tridentdb.js</i><br /><br />
-                <div style='background-color:#f0f0f0; padding: 15px'>
-                    <table>
-                        <tr>
-                            <td>Trident Mode :</td>
-                            <td><label id="ui_api_lblMode"></label>
-                        </tr>
-                        <tr>
-                            <td>Service Location :</td>
-                            <td><input type="text" id="ui_api_txtService" style='height:30px; width:420px' />&nbsp;<button class="minimal" style="height:40px; width:80px" onclick="sb_dashboard.apiSaveService()">Update</button>
-                        </tr>
-                    </table>
-                </div><br />
-                <button class="minimal" style="height:40px; width:160px" onclick="sb_dashboard.apiUseTrident()">Use Trident DB</button>
-                <button class="minimal" style="height:40px; width:200px" onclick="sb_dashboard.apiUseService()">Use Trident Service</button>
+            <div id="UI_Tab_DatabaseBackup" style="overflow:auto;">
+                <h3>Trident Database Backup</h3>
+                <table>
+                    <tr>
+                        <td>
+                            <div class="container" id="sb_backup_keys" style="background-color:#ccc; border: 2px solid; width:650px; height: 300px; overflow-y:scroll;"></div>
+                        </td>
+                        <td valign="top">
+                            <button class="minimal" onclick="$('.tfilechk').prop('checked', true);">Select All</button>
+                            <button class="minimal" onclick="$('.tfilechk').prop('checked', false);">Unselect All</button>
+                            <br /><br /><br />
+                            Filename :
+                            <br />
+                            <input id="sb_database_backup_filename" type="text" value="tridentdb.backup" style="width:250px" />
+                            <br /><br />
+                            <button class="minimal" onclick="sandbox.dashboard.doBackup()">Backup</button>
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div id="UI_Tab_DatabaseRestore" style="overflow:auto;">
+                <h3>Trident Database Restore</h3>
+                <table>
+                    <tr>
+                        <td>
+                            <input style='height:30px;width:400px;' id='sb_restore_file' type="file" name="restorefileloader" onchange="sandbox.dashboard.restoreFilePicked()" />
+                            <div class="container" id="sb_restore_keys" style="background-color:#ccc; border: 2px solid; width:750px; height: 270px; overflow-y:scroll;"></div>
+                            <br />
+                            <button class="minimal" onclick="$('.trfilechk').prop('checked', true);">Select All</button>
+                            <button class="minimal" onclick="$('.trfilechk').prop('checked', false);">Unselect All</button>
+                            <button class="minimal" onclick="sandbox.dashboard.doRestore()">Restore</button>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
 

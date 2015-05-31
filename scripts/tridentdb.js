@@ -12,71 +12,123 @@
 function nullFunction () {
 }
 
-/*
- * Fascade Adapter for registering and interfacing with 'trident database adapters'.  Some adapters may require async initialization,
- *     so it is cleaner for me to create your adapter, and let you know when it is done
- * 
- * @param adapterClass - class (constructor function) for creating your adapter instance
- * @param options - any options specific to your adapter.
- * @param rootOptions - options such as onInit and onError callback functions so adapter can noti
- */
-/*
-    var TridentDatabase = function (adapterClass, adapterOptions, rootOptions) {
-    this.adapter = adapter;
+//#region In-Memory Adapter
 
-    this.initCallback = nullFunction;
-    this.changeCallback = nullFunction;
+function TridentMemoryAdapter(options) {
+    this.name = "memory adapter";
 
-    if (rootOptions.hasOwnProperty('onInit') && typeof (rootOptions.onInit) == "function") {
-        this.initCallback = rootOptions.onInit;
+    this.successCallback = nullFunction;
+    this.errorCallback = nullFunction;
+
+    if (options.hasOwnProperty("successCallback")) this.successCallback = options.successCallback;
+    if (options.hasOwnProperty("errorCallback")) this.errorCallback = options.errorCallback;
+
+    this.db = new loki("trident memory");
+    this.kvpColl = this.db.addCollection("kvp");
+
+    this.successCallback();
+}
+
+TridentMemoryAdapter.prototype.GetAllKeys = function (callback) {
+    var result = this.kvpColl.find();
+    if (!result) result = [];
+    result = result.map(function (obj) {
+        return {
+            id: obj.$loki,
+            app: obj.app,
+            key: obj.key,
+            size: obj.app.length + obj.key.length + obj.val.length
+        };
+    });
+
+    if (typeof (callback) === "function") callback(result);
+};
+
+TridentMemoryAdapter.prototype.GetAppKeys = function (app, callback) {
+    var result = this.kvpColl.find({ 'app': app });
+    if (!result) result = [];
+    result = result.map(function (obj) {
+        return {
+            id: obj.$loki,
+            app: obj.app,
+            key: obj.key,
+            size: obj.app.length + obj.key.length + obj.val.length
+        };
+    });
+
+    if (typeof (callback) === "function") callback(result);
+};
+
+TridentMemoryAdapter.prototype.GetAppKey = function (app, key, callback) {
+    var result = this.kvpColl.findOne({ '$and': [{ 'app': app }, { 'key': key }] });
+
+    if (typeof (callback) === "function") {
+        if (!result) {
+            callback(result);
+            return;
+        }
+
+        callback({
+            id: result.$loki,
+            app: result.app,
+            key: result.key,
+            val: result.val
+        });
+    };
+};
+
+TridentMemoryAdapter.prototype.GetAppKeyById = function (id, callback) {
+    var result = this.kvpColl.get(id);
+
+    if (typeof (callback) === "function") {
+        if (!result) {
+            callback(null);
+            return;
+        }
+
+        callback({
+            id: result.$loki,
+            app: result.app,
+            key: result.key,
+            val: result.val
+        });
+    }
+};
+
+TridentMemoryAdapter.prototype.SetAppKey = function (app, key, val, callback) {
+    var result = this.kvpColl.findOne({ '$and': [{ 'app': app }, { 'key': key }] });
+
+    if (result) {
+        result.val = val;
+        this.kvpColl.update(result);
+    }
+    else {
+        this.kvpColl.insert({
+            app: app,
+            key: key,
+            val: val
+        });
     }
 
-    if (rootOptions.hasOwnProperty('onError') && typeof (rootOptions.onError) == "function") {
-        this.initCallback = rootOptions.onError;
+    if (typeof (callback) === "function") callback({ success: true });
+};
+
+TridentMemoryAdapter.prototype.DeleteAppKey = function (id, callback) {
+    var result = this.kvpColl.get(id);
+
+    if (!result) {
+        if (typeof (callback) === "function") callback({ success: false });
+        return;
     }
-}
 
-TridentDatabase.prototype.setAdapter = function(adapter) {
-    this.adapter = adapter;
+    this.kvpColl.remove(id);
 
-    if (typeof (this.changeCallback) == "function") {
-        this.changeCallback(this);
-    }
-}
+    if (typeof (callback) === "function") callback({ success: true });
+};
 
-TridentDatabase.prototype.GetAllKeys = function (callback) {
-	return this.GetAllKeys(callback);
-}
+//#endregion
 
-// GET APP KEY BY APP,KEY
-TridentDatabase.prototype.GetAppKeys = function (app, callback) {
-	return adapter.GetAppKeys(app, callback);
-}
-
-TridentDatabase.prototype.GetAppKey = function (app, key, callback) {
-	return this.GetAppKey(app, key, callback);
-}
-
-TridentDatabase.prototype.GetAppKeyById = function (id, callback, data) {
-	return adapter.GetAppKeyById(id, callback, data);
-}
-
-TridentDatabase.prototype.SetAppKey = function(app, key, val, callback) {
-	return adapter.SetAppKey(app, key, val, callback);
-}
-
-TridentDatabase.prototype.DeleteAppKey = function (id, callback) {
-	return adapter.DeleteAppKey(id, callback);
-}
-*/
-
-function TridentNullAdapter(options) {
-    this.name = "nullAdapter";
-}
-
-TridentNullAdapter.prototype.GetAllKeys = function (callback) {
-    callback(null);
-}
+//#region IndexedDB Adapter
 
 /*
  * A persistence adapter for trident app/key/value database, implemented as indexedDB store
@@ -266,7 +318,7 @@ TridentIndexedAdapter.prototype.SetAppKey = function (app, key, val, callback) {
     request.onsuccess = function (e) {
         var res = e.target.result;
 
-        if (res === null) {
+        if (!res) {
             res = {
                 app: app,
                 key: key,
@@ -319,6 +371,10 @@ TridentIndexedAdapter.prototype.DeleteAppKey = function (id, callback) {
         };
     })(callback);
 };
+
+//#endregion
+
+//#region Ajax WebService Adapter
 
 function TridentServiceAdapter(options) {
     this.name = "service";
@@ -458,3 +514,4 @@ TridentServiceAdapter.prototype.DeleteAppKey = function (id, callback) {
     });
 };
 
+//#endregion
