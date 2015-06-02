@@ -16,6 +16,7 @@
     <file>/libraries/codemirror/addon/display/fullscreen.css</file>
     <file>/libraries/codemirror/addon/dialog/dialog.css</file>
     <file>/libraries/codemirror/addon/fold/foldgutter.css</file>
+    <file>/libraries/codemirror/addon/hint/show-hint.css</file>
     <file>/libraries/codemirror/theme/night.css</file>
     <file>/libraries/codemirror/theme/3024-day.css</file>
     <file>/libraries/codemirror/theme/3024-night.css</file>

@@ -1404,7 +1404,9 @@ var sandboxIDE = {
         sandbox.events.databaseChanged = null;
         sandbox.events.userLoadCallback = null;
         sandbox.events.userdataLoadCallback = null;
-        sandbox.volatile.vars = null;
+
+        sandbox.volatile.markupCursor = null;
+        sandbox.volatile.scriptCursor = null;
 
         sandbox.logger.clearLog();
         sandbox.files.userfileHide();
@@ -1416,7 +1418,7 @@ var sandboxIDE = {
                     sandbox.events.clean();
                 }
                 catch (ex) {
-                    notify.error(ex, "sandbox.events.clean");
+                    sandbox.logger.notifyError(ex, "sandbox.events.clean");
                     sandbox.logger.log(ex);
                 }
 
@@ -1426,6 +1428,7 @@ var sandboxIDE = {
                 alertify.error("sandbox.events.clean: " + err);
             }
         }
+
 
         document.title = "Trident Sandbox " + sandbox.volatile.env + "v" + sandbox.volatile.version;
 
@@ -1449,6 +1452,9 @@ var sandboxIDE = {
         // main includes div with script so hopefully sandbox.events.clean has completed
         setTimeout(function () {
             sandbox.ui.clearMain();
+
+            // now that user cleanup has run, clear out sandbox.volatile.vars if they used it
+            sandbox.volatile.vars = null;
         }, 100);
 
         sandbox.ide.setActiveTab(0);
@@ -1532,7 +1538,7 @@ var sandboxIDE = {
                 var sandboxObject = response;
 
                 if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
-                    $("#sb_txt_ProgramName").val(sandboxObject.progName + " Copy");
+                    $("#sb_txt_ProgramName").val(sandboxObject.progName);
 
                     sandbox.volatile.editorMarkup.setValue(sandboxObject.htmlText);
                     sandbox.volatile.editorScript.setValue(sandboxObject.scriptText);
@@ -1920,14 +1926,32 @@ var sandboxIDE = {
         sandbox.ide.clean();
     },
     toggleMarkup: function () {
+        sandbox.volatile.scriptCursor = sandbox.volatile.editorScript.getCursor();
+
         sandbox.volatile.editorMode = sandbox.editorModeEnum.Markup;
 
         sandbox.ide.fitEditors();
+
+        if (sandbox.volatile.markupCursor) {
+            sandbox.volatile.editorMarkup.setCursor(sandbox.volatile.markupCursor);
+            sandbox.volatile.editorMarkup.refresh();
+        }
+
+        sandbox.volatile.editorMarkup.focus();
     },
     toggleScript: function () {
+        sandbox.volatile.markupCursor = sandbox.volatile.editorMarkup.getCursor();
+
         sandbox.volatile.editorMode = sandbox.editorModeEnum.Script;
 
         sandbox.ide.fitEditors();
+
+        if (sandbox.volatile.scriptCursor) {
+            sandbox.volatile.editorScript.setCursor(sandbox.volatile.scriptCursor);
+            sandbox.volatile.editorScript.refresh();
+        }
+
+        sandbox.volatile.editorScript.focus();
     },
     toggleSplit: function () {
         if (sandbox.volatile.editorMode == sandbox.editorModeEnum.Split) {
@@ -2360,6 +2384,8 @@ var sandbox = {
         onlineSamples: true,
         memStats: null,
         memStatsRequestId: null,
+        markupCursor: null,
+        scriptCursor: null,
         splitMode: 0, // determines if split mode for editors is side-by-side (0) or top-bottom (1)
         envTest: function (envs) {
             return (envs.indexOf(this.env) !== -1);
@@ -2610,11 +2636,11 @@ var sandbox = {
 
             if (sandbox.volatile.env === "IDE") {
                 document.title = "Trident Sandbox v" + sandbox.volatile.version;
-                $("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
+                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
             }
             else {
                 document.title = "Trident Sandbox WJS v" + sandbox.volatile.version;
-                $("#sb_txt_Markup").val("<!-- \r\nWelcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
+                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
             }
 
             $('#UI_TabsDashboard').on('tabsactivate', function (event, ui) {
@@ -2654,12 +2680,15 @@ var sandbox = {
                 lineNumbers: true,
                 theme: sandbox.settings.editorTheme,
                 mode: "htmlmixed",
+                matchTags: true,
                 foldGutter: true,
+                showCursorWhenSelecting: true,
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
                 extraKeys: {
                     "Ctrl-Q": function (cm) {
                         cm.foldCode(cm.getCursor());
                     },
+                    "Ctrl-Space": "autocomplete",
                     "F11": function (cm) {
                         cm.setOption("fullScreen", !cm.getOption("fullScreen"));
                     },
@@ -2673,13 +2702,16 @@ var sandbox = {
                 smartIndent: false,
                 lineNumbers: true,
                 theme: sandbox.settings.editorTheme,
-                mode: "javascript",
+                mode: { name:"javascript", globalVars: true},
+                matchBrackets: true,
                 foldGutter: true,
+                showCursorWhenSelecting: true,
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
                 extraKeys: {
                     "Ctrl-Q": function (cm) {
                         cm.foldCode(cm.getCursor());
                     },
+                    "Ctrl-Space": "autocomplete",
                     "F11": function (cm) {
                         cm.setOption("fullScreen", !cm.getOption("fullScreen"));
                     },

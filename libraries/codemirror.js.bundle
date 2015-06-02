@@ -4,7 +4,7 @@
     <!--Determines if the bundle file should be automatically optimized after creation/update.-->
     <minify>true</minify>
     <!--Determine whether to generate/re-generate this bundle on building the solution.-->
-    <runOnBuild>false</runOnBuild>
+    <runOnBuild>true</runOnBuild>
     <!--Specifies a custom subfolder to save files to. By default, compiled output will be placed in the same folder and nested under the original file.-->
     <outputDirectory />
   </settings>
@@ -32,5 +32,12 @@
     <file>/libraries/codemirror/addon/dialog/dialog.js</file>
     <file>/libraries/codemirror/addon/search/searchcursor.js</file>
     <file>/libraries/codemirror/addon/search/search.js</file>
+    <file>/libraries/codemirror/addon/edit/matchbrackets.js</file>
+    <file>/libraries/codemirror/addon/edit/matchtags.js</file>
+    <file>/libraries/codemirror/addon/hint/show-hint.js</file>
+    <file>/libraries/codemirror/addon/hint/javascript-hint.js</file>
+    <file>/libraries/codemirror/addon/hint/html-hint.js</file>
+    <file>/libraries/codemirror/addon/hint/css-hint.js</file>
+    <file>/libraries/codemirror/addon/hint/xml-hint.js</file>
   </files>
 </bundle>
