@@ -29,7 +29,7 @@ function TridentMemoryAdapter(options) {
     this.successCallback();
 }
 
-TridentMemoryAdapter.prototype.GetAllKeys = function (callback) {
+TridentMemoryAdapter.prototype.getAllKeys = function (callback) {
     var result = this.kvpColl.find();
     if (!result) result = [];
     result = result.map(function (obj) {
@@ -44,7 +44,7 @@ TridentMemoryAdapter.prototype.GetAllKeys = function (callback) {
     if (typeof (callback) === "function") callback(result);
 };
 
-TridentMemoryAdapter.prototype.GetAppKeys = function (app, callback) {
+TridentMemoryAdapter.prototype.getAppKeys = function (app, callback) {
     var result = this.kvpColl.find({ 'app': app });
     if (!result) result = [];
     result = result.map(function (obj) {
@@ -59,7 +59,7 @@ TridentMemoryAdapter.prototype.GetAppKeys = function (app, callback) {
     if (typeof (callback) === "function") callback(result);
 };
 
-TridentMemoryAdapter.prototype.GetAppKey = function (app, key, callback) {
+TridentMemoryAdapter.prototype.getAppKey = function (app, key, callback) {
     var result = this.kvpColl.findOne({ '$and': [{ 'app': app }, { 'key': key }] });
 
     if (typeof (callback) === "function") {
@@ -77,7 +77,7 @@ TridentMemoryAdapter.prototype.GetAppKey = function (app, key, callback) {
     };
 };
 
-TridentMemoryAdapter.prototype.GetAppKeyById = function (id, callback) {
+TridentMemoryAdapter.prototype.getAppKeyById = function (id, callback) {
     var result = this.kvpColl.get(id);
 
     if (typeof (callback) === "function") {
@@ -95,7 +95,7 @@ TridentMemoryAdapter.prototype.GetAppKeyById = function (id, callback) {
     }
 };
 
-TridentMemoryAdapter.prototype.SetAppKey = function (app, key, val, callback) {
+TridentMemoryAdapter.prototype.setAppKey = function (app, key, val, callback) {
     var result = this.kvpColl.findOne({ '$and': [{ 'app': app }, { 'key': key }] });
 
     if (result) {
@@ -113,7 +113,7 @@ TridentMemoryAdapter.prototype.SetAppKey = function (app, key, val, callback) {
     if (typeof (callback) === "function") callback({ success: true });
 };
 
-TridentMemoryAdapter.prototype.DeleteAppKey = function (id, callback) {
+TridentMemoryAdapter.prototype.deleteAppKey = function (id, callback) {
     var result = this.kvpColl.get(id);
 
     if (!result) {
@@ -144,10 +144,10 @@ function TridentIndexedAdapter(options) {
     if (options.hasOwnProperty("successCallback")) this.successCallback = options.successCallback;
     if (options.hasOwnProperty("errorCallback")) this.errorCallback = options.errorCallback;
 
-    this.InitializeDatabase();
+    this.initializeDatabase();
 }
 
-TridentIndexedAdapter.prototype.InitializeDatabase = function () {
+TridentIndexedAdapter.prototype.initializeDatabase = function () {
     var openRequest = indexedDB.open("TridentSandboxDB", 1);
 
     var self = this;
@@ -184,7 +184,7 @@ TridentIndexedAdapter.prototype.InitializeDatabase = function () {
     };
 };
 
-TridentIndexedAdapter.prototype.GetAllKeys = function (callback) {
+TridentIndexedAdapter.prototype.getAllKeys = function (callback) {
     var transaction = this.db.transaction(["TridentSandboxKVP"], "readonly");
     var store = transaction.objectStore("TridentSandboxKVP");
     var cursor = store.openCursor();
@@ -225,7 +225,7 @@ TridentIndexedAdapter.prototype.GetAllKeys = function (callback) {
 
 // GET APP KEYS BY ID, RETURN ARRAY
 // Hide 'cursoring' and return array of { id: id, key: key }
-TridentIndexedAdapter.prototype.GetAppKeys = function (app, callback) {
+TridentIndexedAdapter.prototype.getAppKeys = function (app, callback) {
     var transaction = this.db.transaction(["TridentSandboxKVP"], "readonly");
     var store = transaction.objectStore("TridentSandboxKVP");
     var index = store.index("app");
@@ -268,7 +268,7 @@ TridentIndexedAdapter.prototype.GetAppKeys = function (app, callback) {
 
 };
 
-TridentIndexedAdapter.prototype.GetAppKey = function (app, key, callback) {
+TridentIndexedAdapter.prototype.getAppKey = function (app, key, callback) {
     var transaction = this.db.transaction(["TridentSandboxKVP"], "readonly");
     var store = transaction.objectStore("TridentSandboxKVP");
     var index = store.index("appkey");
@@ -293,7 +293,7 @@ TridentIndexedAdapter.prototype.GetAppKey = function (app, key, callback) {
     })(callback);
 };
 
-TridentIndexedAdapter.prototype.GetAppKeyById = function (id, callback) {
+TridentIndexedAdapter.prototype.getAppKeyById = function (id, callback) {
     var transaction = this.db.transaction(["TridentSandboxKVP"], "readonly");
     var store = transaction.objectStore("TridentSandboxKVP");
     var request = store.get(id);
@@ -306,7 +306,7 @@ TridentIndexedAdapter.prototype.GetAppKeyById = function (id, callback) {
 };
 
 // SET APP KEY
-TridentIndexedAdapter.prototype.SetAppKey = function (app, key, val, callback) {
+TridentIndexedAdapter.prototype.setAppKey = function (app, key, val, callback) {
     var transaction = this.db.transaction(["TridentSandboxKVP"], "readwrite");
     var store = transaction.objectStore("TridentSandboxKVP");
     var index = store.index("appkey");
@@ -353,7 +353,7 @@ TridentIndexedAdapter.prototype.SetAppKey = function (app, key, val, callback) {
 };
 
 // DELETE APP KEY BY ID
-TridentIndexedAdapter.prototype.DeleteAppKey = function (id, callback) {
+TridentIndexedAdapter.prototype.deleteAppKey = function (id, callback) {
     var transaction = this.db.transaction(["TridentSandboxKVP"], "readwrite");
     var store = transaction.objectStore("TridentSandboxKVP");
 
@@ -401,7 +401,7 @@ function TridentServiceAdapter(options) {
     //this.successCallback();
 }
 
-TridentServiceAdapter.prototype.GetAllKeys = function (callback) {
+TridentServiceAdapter.prototype.getAllKeys = function (callback) {
     $.ajax({
         url: this.serviceLocation + 'GetAllKeys',
         type: "POST",
@@ -417,7 +417,7 @@ TridentServiceAdapter.prototype.GetAllKeys = function (callback) {
     });
 };
 
-TridentServiceAdapter.prototype.GetAppKeys = function (app, callback) {
+TridentServiceAdapter.prototype.getAppKeys = function (app, callback) {
     var params = { "App": app };
 
     $.ajax({
@@ -436,7 +436,7 @@ TridentServiceAdapter.prototype.GetAppKeys = function (app, callback) {
     });
 };
 
-TridentServiceAdapter.prototype.GetAppKey = function (app, key, callback) {
+TridentServiceAdapter.prototype.getAppKey = function (app, key, callback) {
     var params = { "App": app, "Key": key };
 
     $.ajax({
@@ -457,7 +457,7 @@ TridentServiceAdapter.prototype.GetAppKey = function (app, key, callback) {
 };
 
 // GET APP KEY BY ID
-TridentServiceAdapter.prototype.GetAppKeyById = function (id, callback) {
+TridentServiceAdapter.prototype.getAppKeyById = function (id, callback) {
     var params = { "id": id };
 
     $.ajax({
@@ -476,7 +476,7 @@ TridentServiceAdapter.prototype.GetAppKeyById = function (id, callback) {
     });
 };
 
-TridentServiceAdapter.prototype.SetAppKey = function (app, key, val, callback) {
+TridentServiceAdapter.prototype.setAppKey = function (app, key, val, callback) {
     var params = { "app": app, "key": key, "val": val };
 
     $.ajax({
@@ -495,7 +495,7 @@ TridentServiceAdapter.prototype.SetAppKey = function (app, key, val, callback) {
     });
 };
 
-TridentServiceAdapter.prototype.DeleteAppKey = function (id, callback) {
+TridentServiceAdapter.prototype.deleteAppKey = function (id, callback) {
     var params = { "id": id };
 
     $.ajax({

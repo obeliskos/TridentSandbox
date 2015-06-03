@@ -372,7 +372,7 @@ var sandboxFiles = {
         var keyArray = [];
         var idx, cnt = 0, obj;
 
-        sandbox.db.GetAllKeys(function (result) {
+        sandbox.db.getAllKeys(function (result) {
             if (result.length == 0) {
                 alertify.log("Nothing to backup, TridentDB is empty");
             }
@@ -380,7 +380,7 @@ var sandboxFiles = {
             for (idx = 0; idx < result.length; idx++) {
                 obj = result[idx];
 
-                sandbox.db.GetAppKey(obj.app, obj.key, function (akv) {
+                sandbox.db.getAppKey(obj.app, obj.key, function (akv) {
                     keyArray.push(akv);
                     if (++cnt == result.length) {
                         sandbox.files.saveTextFile(filename, JSON.stringify(keyArray));
@@ -467,6 +467,36 @@ var sandboxDashboard = {
     gaugeLS: null,
     gaugeTDB: null,
 
+    adapterSet: function (name) {
+        var baseUri, adapterClass;
+
+        switch(name) {
+            case "memory":
+                sandbox.settings.set("databaseAdapter", "memory");
+                sandbox.dbInit();
+                alertify.log("adapter changed");
+                break;
+            case "trident":
+                sandbox.settings.set("databaseAdapter", "trident");
+                sandbox.dbInit();
+                alertify.log("adapter changed");
+                break;
+            case "service":
+                baseUri = $("#sb_txt_adapter_service_loc").val();
+                sandbox.settings.set("databaseAdapter", "service");
+                sandbox.settings.set("databaseServiceLocation", baseUri);
+                sandbox.dbInit();
+                alertify.log("adapter changed");
+                break;
+            case "user":
+                adapterClass = $("#sb_txt_adapter_user").val();
+                sandbox.settings.set("databaseAdapter", adapterClass);
+                sandbox.dbInit();
+                alertify.log("adapter changed");
+                break;
+        }
+    },
+
     show: function () {
         // no reason to call this under sandbox loaders
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
@@ -502,15 +532,6 @@ var sandboxDashboard = {
                         }
                     }
 
-                    if (sandbox.volatile.memStats == null && localStorage["memstats"].toLowerCase() == "true") {
-                        sandbox.memstats.on();
-                    }
-                    else {
-                        if (sandbox.volatile.memStats != null && localStorage["memstats"].toLowerCase() != "true") {
-                            sandbox.memstats.off();
-                        }
-                    }
-
                     sandbox.ide.refreshSlots();
                 },
                 Cancel: function () {
@@ -535,9 +556,11 @@ var sandboxDashboard = {
 
         var totalSizeLS = 0;
 
-        for (var i = 0; i < localStorage.length; i++) {
-            var keySize = localStorage[localStorage.key(i)].length;
-            totalSizeLS += keySize;
+        if (localStorage) {
+            for (var i = 0; i < localStorage.length; i++) {
+                var keySize = localStorage[localStorage.key(i)].length;
+                totalSizeLS += keySize;
+            }
         }
 
         $("#spn_LocalStorageUsage").text(totalSizeLS + " bytes (" + Math.round((totalSizeLS / 1024) / 1024 * 100) / 100 + "MB)");
@@ -562,7 +585,7 @@ var sandboxDashboard = {
 
         $("#ui_gaugeTDBspin").hide();
 
-        sandbox.db.GetAllKeys(function (results) {
+        sandbox.db.getAllKeys(function (results) {
             var idx;
             for (idx = 0; idx < results.length; idx++) {
                 totalSizeTDB += results[idx].size;
@@ -605,7 +628,7 @@ var sandboxDashboard = {
             // pass extra data to process in the async callback
             // We are passing boolean isLast to determine whether we are done
             // and can go ahead and save
-            sandbox.db.GetAppKeyById(objId, function (result) {
+            sandbox.db.getAppKeyById(objId, function (result) {
                 if (result == null || result.id == 0) {
                     alertify.log("GetAppKeyById failed");
                     return;
@@ -648,7 +671,7 @@ var sandboxDashboard = {
 
         var totalSize = 0;
 
-        sandbox.db.GetAllKeys(function (result) {
+        sandbox.db.getAllKeys(function (result) {
             tdbu_counter = result.length;
             if (result.length == 0) {
                 $("#ui_chartTDBspin").hide();
@@ -707,8 +730,12 @@ var sandboxDashboard = {
         });
     },
 
+    activateAdapterTab: function() {
+        $("#sb_lbl_adapter_name").text(sandbox.db.name);
+    },
+
     populateBackupTab: function () {
-        sandbox.db.GetAllKeys(function (result) {
+        sandbox.db.getAllKeys(function (result) {
             var clElement = document.getElementById("sb_backup_keys");
             $("#sb_backup_keys").empty();
 
@@ -758,7 +785,7 @@ var sandboxDashboard = {
             //reader.onprogress = updateProgress;
             reader.onload = function (evt) {
                 var clElement = document.getElementById("sb_restore_keys");
-                $("#sb_backup_keys").empty();
+                $("#sb_restore_keys").empty();
 
                 var loadString = evt.target.result;
 
@@ -776,6 +803,7 @@ var sandboxDashboard = {
                     checkbox.name = "file" + currObject.id;
                     checkbox.id = "file" + currObject.id;
                     checkbox.style.color = "#000";
+                    checkbox.checked = true;
 
                     var label = document.createElement('label');
                     label.htmlFor = "file" + currObject.id;
@@ -823,18 +851,21 @@ var sandboxDashboard = {
             currentObject = sandbox.dashboard.restoreData[i];
 
             if (idArray.indexOf(currentObject.id) !== -1) {
-                sandbox.db.SetAppKey(currentObject.app, currentObject.key, currentObject.val);
+                sandbox.db.setAppKey(currentObject.app, currentObject.key, currentObject.val);
             }
         }
 
         // ideally we would async this on last call to SetAppKey
-        setTimeout(sandbox.ide.refreshSlots, 300);
+        setTimeout(function () {
+            sandbox.ide.refreshSlots();
+            sandbox.logger.notifySuccess("Restore Completed.", "Trident Database");
+        }, 300);
     },
 
     deleteTridentKey: function () {
         var objId = $("#ui_tdb_selTridentDB option:selected").val();
 
-        sandbox.db.DeleteAppKey(parseInt(objId), function (result) {
+        sandbox.db.deleteAppKey(parseInt(objId), function (result) {
             sandbox.dashboard.calcTridentDbUsage();
         });
     },
@@ -842,7 +873,7 @@ var sandboxDashboard = {
     selTdbChanged: function () {
         var keyId = $("#ui_tdb_selTridentDB option:selected").val();
 
-        sandbox.db.GetAppKeyById(parseInt(keyId), function (result) {
+        sandbox.db.getAppKeyById(parseInt(keyId), function (result) {
             if (result.app == "TridentFiles") $("#ui_tdb_download").show();
             else $("#ui_tdb_download").hide();
 
@@ -855,7 +886,7 @@ var sandboxDashboard = {
     downloadTridentFile: function () {
         var objId = $("#ui_tdb_selTridentDB option:selected").val();
 
-        sandbox.db.GetAppKeyById(parseInt(objId), function (result) {
+        sandbox.db.getAppKeyById(parseInt(objId), function (result) {
             var fileName = result.key.replace("TridentFiles;", "");
             var dataURL = result.val;
             sandbox.files.saveDataURL(fileName, dataURL);
@@ -865,10 +896,10 @@ var sandboxDashboard = {
     renameTridentKey: function () {
         var objId = $("#ui_tdb_selTridentDB option:selected").val();
 
-        sandbox.db.GetAppKeyById(parseInt(objId), function (result) {
-            sandbox.db.SetAppKey(result.app, $("#ui_tdb_txtKeyName").val(), result.val, function (setres) {
+        sandbox.db.getAppKeyById(parseInt(objId), function (result) {
+            sandbox.db.setAppKey(result.app, $("#ui_tdb_txtKeyName").val(), result.val, function (setres) {
                 if (setres.success) {
-                    sandbox.db.DeleteAppKey(parseInt(objId), function (delres) {
+                    sandbox.db.deleteAppKey(parseInt(objId), function (delres) {
                         sandbox.dashboard.calcTridentDbUsage();
                     });
                 }
@@ -877,6 +908,8 @@ var sandboxDashboard = {
     },
 
     calcLocalStorageUsage: function () {
+        if (!localStorage) return;
+
         if (sandbox.dashboard.lsplot) { sandbox.dashboard.lsplot.destroy(); }
 
         var arrayLS = [];
@@ -986,7 +1019,7 @@ var sandboxDashboard = {
 
 var sandboxUnits = {
     logMarkupUnits: function () {
-        sandbox.db.GetAppKeys("SandboxMarkupUnits", function (result) {
+        sandbox.db.getAppKeys("SandboxMarkupUnits", function (result) {
             for (var idx = 0; idx < result.length; idx++) {
                 sandbox.logger.log(result[idx].key);
             }
@@ -999,7 +1032,7 @@ var sandboxUnits = {
 
         var htmlTextString = sandbox.volatile.editorMarkup.getValue();
 
-        sandbox.db.SetAppKey("SandboxMarkupUnits", unitName, htmlTextString, function (result) {
+        sandbox.db.setAppKey("SandboxMarkupUnits", unitName, htmlTextString, function (result) {
             if (result.success) return true;
 
             alertify.error("Error calling SetAppKey()");
@@ -1012,7 +1045,7 @@ var sandboxUnits = {
         }
 
 
-        sandbox.db.GetAppKey("SandboxMarkupUnits", unitName, function (result) {
+        sandbox.db.getAppKey("SandboxMarkupUnits", unitName, function (result) {
             if (result == null || result.id == 0) {
                 alertify.error("No markup unit by that name");
                 return false;
@@ -1023,7 +1056,7 @@ var sandboxUnits = {
         });
     },
     getMarkupUnit: function (unitName, callback) {
-        sandbox.db.GetAppKey("SandboxMarkupUnits", unitName, function (result) {
+        sandbox.db.getAppKey("SandboxMarkupUnits", unitName, function (result) {
             if (result == null || result.id == 0) {
                 alertify.error("No markup unit by that name");
                 return false;
@@ -1033,7 +1066,7 @@ var sandboxUnits = {
         });
     },
     logScriptUnits: function () {
-        sandbox.db.GetAppKeys("SandboxScriptUnits", function (result) {
+        sandbox.db.getAppKeys("SandboxScriptUnits", function (result) {
             for (var idx = 0; idx < result.length; idx++) {
                 sandbox.logger.log(result[idx].key);
             }
@@ -1047,7 +1080,7 @@ var sandboxUnits = {
 
         var scriptTextString = sandbox.volatile.editorScript.getValue();
 
-        sandbox.db.SetAppKey("SandboxScriptUnits", unitName, scriptTextString, function (result) {
+        sandbox.db.setAppKey("SandboxScriptUnits", unitName, scriptTextString, function (result) {
             if (result.success) return true;
 
             alertify.error("Error calling SetAppKey()");
@@ -1060,7 +1093,7 @@ var sandboxUnits = {
         }
 
 
-        sandbox.db.GetAppKey("SandboxScriptUnits", unitName, function (result) {
+        sandbox.db.getAppKey("SandboxScriptUnits", unitName, function (result) {
             if (result == null || result.id == 0) {
                 alertify.error("No script unit by that name");
                 return false;
@@ -1071,7 +1104,7 @@ var sandboxUnits = {
         });
     },
     importScriptUnit: function (unitName, callback) {
-        sandbox.db.GetAppKey("SandboxScriptUnits", unitName, function (result) {
+        sandbox.db.getAppKey("SandboxScriptUnits", unitName, function (result) {
             if (result == null || result.id == 0) {
                 alertify.error("No script unit by that name");
                 return false;
@@ -1495,7 +1528,7 @@ var sandboxIDE = {
         // clear out slots select
         $("#sb_sel_trident_slot").html("<option></option>");
 
-        sandbox.db.GetAppKeys("SandboxSaveSlots", function (result) {
+        sandbox.db.getAppKeys("SandboxSaveSlots", function (result) {
             if (result != null) {
                 for (var idx = 0; idx < result.length; idx++) {
                     $("#sb_sel_trident_slot").append($("<option></option>").attr("value", result[idx].id).text(result[idx].key));
@@ -1585,7 +1618,7 @@ var sandboxIDE = {
     runSlot: function (appName) {
         sandbox.ui.setDarkTheme();
 
-        sandbox.db.GetAppKey("SandboxSaveSlots", appName, function (result) {
+        sandbox.db.getAppKey("SandboxSaveSlots", appName, function (result) {
             if (result == null || result.id == 0) {
                 alertify.error("No save at that slot");
                 return;
@@ -1742,7 +1775,7 @@ var sandboxIDE = {
     runAutorun: function () {
         sandbox.volatile.autorunActive = false;
 
-        sandbox.db.GetAppKey("SandboxScriptUnits", "autorun", function (result) {
+        sandbox.db.getAppKey("SandboxScriptUnits", "autorun", function (result) {
             if (result == null || result.id == 0) return;
 
             sandbox.volatile.autorunActive = true;
@@ -1784,7 +1817,7 @@ var sandboxIDE = {
 
         if (selText == "") return;
 
-        sandbox.db.GetAppKey("SandboxSaveSlots", selText, function (result) {
+        sandbox.db.getAppKey("SandboxSaveSlots", selText, function (result) {
             var sandboxObject = JSON.parse(result.val);
 
             sandbox.volatile.markupHash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
@@ -1823,7 +1856,7 @@ var sandboxIDE = {
                 if (e) {
                     try {
                         //API_SetIndexedAppKey("SandboxSaveSlots", progNameString, json_text);
-                        sandbox.db.SetAppKey("SandboxSaveSlots", progNameString, json_text, function (result) {
+                        sandbox.db.setAppKey("SandboxSaveSlots", progNameString, json_text, function (result) {
                             if (result.success) {
                                 sandbox.ide.refreshSlots(function () {
                                     // todo: make SetAppKey (both trident and service) return id so i could select by that
@@ -1846,7 +1879,7 @@ var sandboxIDE = {
             });
         }
         else {
-            sandbox.db.SetAppKey("SandboxSaveSlots", progNameString, json_text, function (result) {
+            sandbox.db.setAppKey("SandboxSaveSlots", progNameString, json_text, function (result) {
                 if (result.success) {
                     alertify.success("saved");
                     if (typeof (callback) == "function") callback();
@@ -1865,9 +1898,9 @@ var sandboxIDE = {
         alertify.confirm("Are you sure you want to delete Trident Program Slot : " + selText, function (e) {
             if (e) {
 
-                sandbox.db.GetAppKey("SandboxSaveSlots", selText, function (result) {
+                sandbox.db.getAppKey("SandboxSaveSlots", selText, function (result) {
 
-                    sandbox.db.DeleteAppKey(result.id, function (result) {
+                    sandbox.db.deleteAppKey(result.id, function (result) {
                         if (result) {
                             sandbox.ide.refreshSlots();
                         }
@@ -2426,7 +2459,10 @@ var sandbox = {
         },
         set: function (setting, value) {
             this[setting] = value;
-            localStorage[setting] = value;
+
+            if (localStorage) {
+                localStorage[setting] = value;
+            }
         }
     },
     hashparams: {
@@ -2479,85 +2515,80 @@ var sandbox = {
             $("#sb_div_ls_slots").css("display", "inline-block");
         }
 
-        // Check for indexed db support and set up new TridentSandbox DB with simple app/key/value Object Store (Table) for internal and api use
-        // For good tutorial on indexedDB, see http://code.tutsplus.com/tutorials/working-with-indexeddb--net-34673
-        if (indexedDB || sandbox.settings.databaseServiceLocation != "") {
-            switch (sandbox.settings.databaseAdapter) {
-                case "trident":
-                    sandbox.db = new TridentIndexedAdapter({
-                        upgradeCallback: function () { sandbox.logger.log("Upgrading"); },
-                        successCallback: function () {
-                            sandbox.logger.log("Trident indexedDB adapter initialized successfully.");
+        // if running off local filesystem -and- indexeddb is not available -and- they arent using service or other adapter, use memory adapter
+        if (!indexedDB && !sandbox.volatile.isHosted && sandbox.settings.databaseAdapter === "trident") {
+            sandbox.settings.databaseAdapter = "memory";
+        }
 
-                            if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
-                                $("#sb_spn_indexeddb_status").text("Yes");
+        switch (sandbox.settings.databaseAdapter) {
+            case "trident":
+                sandbox.db = new TridentIndexedAdapter({
+                    upgradeCallback: function () { sandbox.logger.log("Upgrading"); },
+                    successCallback: function () {
+                        sandbox.logger.log("Trident indexedDB adapter initialized successfully.");
 
-                                // load slots now that db is initialized and then do post init
-                                sandbox.ide.refreshSlots(function () {
-                                    callback();
-                                });
-                            }
-                            else {
-                                callback();
-                            }
-                        },
-                        errorCallback: function () { sandbox.logger.log("Error opening TridentSandboxDB (indexedDB)."); }
-
-                    });
-                    // allow legacy variable support for a version or two
-                    VAR_TRIDENT_API = sandbox.db;
-
-                    break;
-
-                case "service":
-                    sandbox.db = new TridentServiceAdapter({
-                        serviceLocation: sandbox.settings.databaseServiceLocation,
-                        successCallback: function () {
-                            sandbox.logger.log("Trident service adapter initialized successfully.");
-
-                            if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
-                                $("#sb_spn_indexeddb_status").html("Yes <span style='font-family:Symbol'>Å</span>");
-
-                                // load slots now and do post init
-                                sandbox.ide.refreshSlots(function () {
-                                    callback();
-                                });
-                            }
-                            else {
-                                callback();
-                            }
-                        }
-                    });
-                    VAR_TRIDENT_API = sandbox.db;
-
-                    break;
-                case "":
-                case "memory":
-                    sandbox.db = new TridentMemoryAdapter({
-                        successCallback: function () {
-                            sandbox.logger.log("In-memory database adapter initialized.");
-                            sandbox.logger.log("You may use database backup and restore to save keys to a file, if needed.");
-                        }
-                    });
-                    break;
-                default:
-                    sandbox.db = new window[sandbox.settings.databaseAdapter]({
-                        successCallback: function () {
+                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
                             $("#sb_spn_indexeddb_status").text("Yes");
 
-                            if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
-                                // load slots now that db is initialized and then do post init
-                                sandbox.ide.refreshSlots(function () {
-                                    callback();
-                                });
-                            }
-                        },
-                        errorCallback: function () { sandbox.logger.log("Error opening adapter " + sandbox.settings.databaseAdapter); }
-                    });
-                    VAR_TRIDENT_API = sandbox.db;
+                            // load slots now that db is initialized and then do post init
+                            sandbox.ide.refreshSlots(callback);
+                        }
+                        else {
+                            callback();
+                        }
+                    },
+                    errorCallback: function () { sandbox.logger.log("Error opening TridentSandboxDB (indexedDB)."); }
 
-                    break;
-            }
+                });
+                // allow legacy variable support for a version or two
+                VAR_TRIDENT_API = sandbox.db;
+
+                break;
+
+            case "service":
+                sandbox.db = new TridentServiceAdapter({
+                    serviceLocation: sandbox.settings.databaseServiceLocation,
+                    successCallback: function () {
+                        sandbox.logger.log("Trident service adapter initialized successfully.");
+
+                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
+                            $("#sb_spn_indexeddb_status").html("Yes <span style='font-family:Symbol'>Å</span>");
+
+                            // load slots now and do post init
+                            sandbox.ide.refreshSlots(callback);
+                        }
+                        else {
+                            callback();
+                        }
+                    }
+                });
+                VAR_TRIDENT_API = sandbox.db;
+
+                break;
+            case "":
+            case "memory":
+                sandbox.db = new TridentMemoryAdapter({
+                    successCallback: function () {
+                        sandbox.logger.log("In-memory database adapter initialized.");
+                        sandbox.logger.log("You may use database backup and restore to save keys to a file, if needed.");
+                    }
+                });
+                break;
+            default:
+                sandbox.db = new window[sandbox.settings.databaseAdapter]({
+                    successCallback: function () {
+                        $("#sb_spn_indexeddb_status").text("Yes");
+
+                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
+                            // load slots now that db is initialized and then do post init
+                            sandbox.ide.refreshSlots(callback);
+                        }
+                    },
+                    errorCallback: function () { sandbox.logger.log("Error opening adapter " + sandbox.settings.databaseAdapter); }
+                });
+                VAR_TRIDENT_API = sandbox.db;
+
+                break;
         }
     },
     dbAdapterChanged: function () {
@@ -2650,6 +2681,7 @@ var sandbox = {
                     case 1: sandbox.dashboard.calcLocalStorageUsage(); break;
                     case 2: sandbox.dashboard.calcTridentDbUsage(); break;
                     case 3: sandbox.dashboard.populateBackupTab(); break;
+                    case 5: sandbox.dashboard.activateAdapterTab(); break;
                 }
             });
 
@@ -2658,7 +2690,7 @@ var sandbox = {
             // if served up from filesystem and localStorage is available... show
             // Mozilla supports ajax calls under filesystem
             if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB) {
-                $(".ui_show_dashboard").show();
+                //$(".ui_show_dashboard").show();
                 $(".ui_btn_launch").show();
                 $(".ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
                 shortcut.add("Alt+L", function () { sandbox.ide.launch(); });
