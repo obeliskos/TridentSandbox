@@ -1414,7 +1414,7 @@ var sandboxIDE = {
         if (sandbox.volatile.env == "IDE WJS") {
             markupText = "<h3>My Sandbox WinJS Program</h3>\r\n";
         }
-        var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n}\r\n\r\nsandbox.events.clean = function()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n}\r\n";
+        var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n};\r\n\r\nsandbox.events.clean = function()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n};\r\n";
 
         sandbox.volatile.editorMarkup.setValue(markupText);
         sandbox.volatile.editorScript.setValue(scriptText);
@@ -2674,6 +2674,8 @@ var sandbox = {
                 $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
             }
 
+            $("#sb_txt_Script").val("// script editor tips : \r\n// autoindenting is turned on\r\n// the horizontal slashes indicate forced tabs (instead of smart indenting)\r\n// use shift-tab to use auto-indention for a line instead (cleans up tab slashes)\r\n// use ctrl-a or select multiple lines and then press shift-tab to smart indent them\r\n// the javascript linter may notify you of issues with your code, such as : \r\n\r\nfunction badCode() {\r\n\tvar test=[]\r\n\r\n\tvar test = 'a';\r\n}");
+
             $('#UI_TabsDashboard').on('tabsactivate', function (event, ui) {
                 var newIndex = ui.newTab.index();
                 switch (newIndex) {
@@ -2702,7 +2704,7 @@ var sandbox = {
             // We are keeping track of whether the user has pending changes via a Crypto.JS hash on the markup and script
             // This will now calculate the initial value based on our Welcome text above
             sandbox.volatile.markupHash = CryptoJS.SHA1($("#sb_txt_Markup").val()).toString();
-            sandbox.volatile.scriptHash = CryptoJS.SHA1("").toString();
+            sandbox.volatile.scriptHash = CryptoJS.SHA1($("#sb_txt_Script").val()).toString();
 
             // We are using xml mode for markup so that if we add style tag it wont mess up rendering
             // hopefully in the future we can implement mixed rendering or add separate css
@@ -2731,14 +2733,17 @@ var sandbox = {
             });
 
             sandbox.volatile.editorScript = CodeMirror.fromTextArea(document.getElementById("sb_txt_Script"), {
-                smartIndent: false,
+                smartIndent: true,
                 lineNumbers: true,
                 theme: sandbox.settings.editorTheme,
                 mode: { name:"javascript", globalVars: true},
                 matchBrackets: true,
                 foldGutter: true,
                 showCursorWhenSelecting: true,
-                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers", "CodeMirror-foldgutter"],
+                lint: true,
+                indentUnit: 4,
+                tabSize: 4,
                 extraKeys: {
                     "Ctrl-Q": function (cm) {
                         cm.foldCode(cm.getCursor());

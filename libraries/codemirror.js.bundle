@@ -10,6 +10,7 @@
   </settings>
   <!--The order of the <file> elements determines the order of the files in the bundle.-->
   <files>
+    <file>/libraries/jshint.js</file>
     <file>/libraries/codemirror/lib/codemirror.js</file>
     <file>/libraries/codemirror/mode/xml/xml.js</file>
     <file>/libraries/codemirror/mode/htmlmixed/htmlmixed.js</file>
@@ -39,5 +40,11 @@
     <file>/libraries/codemirror/addon/hint/html-hint.js</file>
     <file>/libraries/codemirror/addon/hint/css-hint.js</file>
     <file>/libraries/codemirror/addon/hint/xml-hint.js</file>
+
+	<file>/libraries/codemirror/addon/lint/lint.js</file>
+    <file>/libraries/codemirror/addon/lint/javascript-lint.js</file>
+    <file>/libraries/codemirror/addon/lint/json-lint.js</file>
+    <file>/libraries/codemirror/addon/lint/css-lint.js</file>
+
   </files>
 </bundle>

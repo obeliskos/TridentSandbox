@@ -132,10 +132,12 @@
                         <option>base16-light</option>
                         <option>blackboard</option>
                         <option>cobalt</option>
+                        <option>colorforth</option>
                         <option>eclipse</option>
                         <option>elegant</option>
                         <option>erlang-dark</option>
                         <option>lesser-dark</option>
+                        <option>liquibyte</option>
                         <option>mbo</option>
                         <option>mdn-like</option>
                         <option>midnight</option>
@@ -150,11 +152,14 @@
                         <option>solarized dark</option>
                         <option>solarized light</option>
                         <option>the-matrix</option>
+                        <option>tomorrow-night-bright</option>
                         <option>tomorrow-night-eighties</option>
+                        <option>ttcn</option>
                         <option>twilight</option>
                         <option selected='selected'>vibrant-ink</option>
                         <option>xq-dark</option>
                         <option>xq-light</option>
+                        <option>zenburn</option>
                     </select>
 
 
@@ -314,6 +319,7 @@
                 <li><a href="#UI_Tab_TridentDbUsage">TridentDB Usage</a></li>
                 <li><a href="#UI_Tab_DatabaseBackup">Database Backup</a></li>
                 <li><a href="#UI_Tab_DatabaseRestore">Database Restore</a></li>
+                <li><a href="#UI_Tab_AdapterConfig">Adapter</a></li>
             </ul>
             <div id="UI_Tab_Summary" style="overflow: auto;">
                 <table>
@@ -465,6 +471,48 @@
                         </td>
                     </tr>
                 </table>
+            </div>
+            <div id="UI_Tab_AdapterConfig" style="overflow:auto;">
+                <h4>Current trident database adapter : </h4>
+                <label id="sb_lbl_adapter_name"></label>
+                <br /><br />
+                <h4>Change database adapter : </h4>
+                <br />
+                <button class="minimal" onclick="$('.sb-adapter-config').hide(); sandbox.dashboard.adapterSet('memory');">Memory</button>
+                <button class="minimal" onclick="$('.sb-adapter-config').hide(); sandbox.dashboard.adapterSet('trident');">IndexedDB</button>
+                <button class="minimal" onclick="$('.sb-adapter-config').hide(); $('#sb_div_adapter_service').show()">WebService</button>
+                <button class="minimal" onclick="$('.sb-adapter-config').hide(); $('#sb_div_adapter_user').show()">User Defined</button>
+                <div class="sb-adapter-config" style="display:none" id="sb_div_adapter_service">
+                    <br />
+                    <fieldset>
+                        <legend>Service Adapter Configuration</legend>
+                        <p>
+                            <i>
+                                Service adapter requires you have implemented the service endpoints specified the service adapter
+                                implementation.
+                            </i>
+                        </p>
+                        <label>Enter base service location : </label>
+                        <input type="text" id="sb_txt_adapter_service_loc" style="width:360px" value="http://192.168.1.100/Pyramidion/Keystore/" /><br />
+                        <button class="minimal" onclick="sandbox.dashboard.adapterSet('service');">Set</button>
+                    </fieldset>
+                </div>
+                <div class="sb-adapter-config" style="display:none" id="sb_div_adapter_user">
+                    <br />
+                    <fieldset>
+                        <legend>Custom Adapter Configuration</legend>
+                        <p>
+                            <i>
+                                Custom user adapters allow you to add your own adapters.  This tab can be used to test the adapter, but
+                                for the adapter to be seamless you will need to use an autorun script to create and switch this at
+                                environment load time.
+                            </i>
+                        </p>
+                        <label>Enter the adapter class name :</label>
+                        <input type="text" id="sb_txt_adapter_user" /><br />
+                        <button class="minimal" onclick="sandbox.dashboard.adapterSet('user');">Set</button>
+                    </fieldset>
+                </div>
             </div>
         </div>
 

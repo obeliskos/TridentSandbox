@@ -17,7 +17,7 @@
     <file>/libraries/codemirror/addon/dialog/dialog.css</file>
     <file>/libraries/codemirror/addon/fold/foldgutter.css</file>
     <file>/libraries/codemirror/addon/hint/show-hint.css</file>
-    <file>/libraries/codemirror/theme/night.css</file>
+    <file>/libraries/codemirror/addon/lint/lint.css</file>
     <file>/libraries/codemirror/theme/3024-day.css</file>
     <file>/libraries/codemirror/theme/3024-night.css</file>
     <file>/libraries/codemirror/theme/ambiance.css</file>
@@ -26,11 +26,14 @@
     <file>/libraries/codemirror/theme/base16-light.css</file>
     <file>/libraries/codemirror/theme/blackboard.css</file>
     <file>/libraries/codemirror/theme/cobalt.css</file>
+    <file>/libraries/codemirror/theme/colorforth.css</file>
     <file>/libraries/codemirror/theme/eclipse.css</file>
     <file>/libraries/codemirror/theme/elegant.css</file>
     <file>/libraries/codemirror/theme/erlang-dark.css</file>
     <file>/libraries/codemirror/theme/lesser-dark.css</file>
+    <file>/libraries/codemirror/theme/liquibyte.css</file>
     <file>/libraries/codemirror/theme/mbo.css</file>
+    <file>/libraries/codemirror/theme/mdn-like.css</file>
     <file>/libraries/codemirror/theme/midnight.css</file>
     <file>/libraries/codemirror/theme/monokai.css</file>
     <file>/libraries/codemirror/theme/neat.css</file>
@@ -42,11 +45,14 @@
     <file>/libraries/codemirror/theme/rubyblue.css</file>
     <file>/libraries/codemirror/theme/solarized.css</file>
     <file>/libraries/codemirror/theme/the-matrix.css</file>
+    <file>/libraries/codemirror/theme/tomorrow-night-bright.css</file>
     <file>/libraries/codemirror/theme/tomorrow-night-eighties.css</file>
+    <file>/libraries/codemirror/theme/ttcn.css</file>
     <file>/libraries/codemirror/theme/twilight.css</file>
     <file>/libraries/codemirror/theme/vibrant-ink.css</file>
     <file>/libraries/codemirror/theme/xq-dark.css</file>
     <file>/libraries/codemirror/theme/xq-light.css</file>
+    <file>/libraries/codemirror/theme/zenburn.css</file>
 
     <file>/libraries/tinymce/skins/lightgray/skin.min.css</file>
     <file>/libraries/textillate/animate.css</file>

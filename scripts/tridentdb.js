@@ -160,7 +160,7 @@ TridentIndexedAdapter.prototype.initializeDatabase = function () {
         }
 
         if (!self.db.objectStoreNames.contains("TridentSandboxKVP")) {
-            var objectStore = this.db.createObjectStore("TridentSandboxKVP", { keyPath: "id", autoIncrement: true });
+            var objectStore = self.db.createObjectStore("TridentSandboxKVP", { keyPath: "id", autoIncrement: true });
             objectStore.createIndex("app", "app", { unique: false });
             objectStore.createIndex("key", "key", { unique: false });
             // hack to simulate composite key since overhead is low (main size should be in val field)
