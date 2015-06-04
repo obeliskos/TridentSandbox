@@ -1470,10 +1470,9 @@ var sandboxIDE = {
         $("#sb_password_ok").unbind("click");
         $("#sb_div_restorefile").hide();
 
-        sandbox.ui.setBackgroundColor("#444");
-
-        if (sandbox.volatile.env == "IDE WJS" || sandbox.volatile.env == "SBL WJS") {
-            $("#UI_MainPlaceholder").css("color", "white");
+        switch (sandbox.volatile.env) {
+            case "IDE": sandbox.ui.setLightTheme(); break;
+            case "IDE WJS": sandbox.ui.setDarkTheme(); break;
         }
 
         // No longer clearing unit scripts, they are likely already attached to window
@@ -1564,7 +1563,7 @@ var sandboxIDE = {
         jQuery.ajax({
             type: "GET",
             url: progname,
-            cache: (sandbox.settings.cacheSamples == "true"),
+            cache: (sandbox.settings.cacheSamples === "true" || !navigator.onLine),
             dataType: "json",
 
             success: function (response) {
@@ -1616,7 +1615,9 @@ var sandboxIDE = {
         });
     },
     runSlot: function (appName) {
-        sandbox.ui.setDarkTheme();
+        if (sandbox.volatile.env === "SBL WJS") {
+            sandbox.ui.setDarkTheme();
+        }
 
         sandbox.db.getAppKey("SandboxSaveSlots", appName, function (result) {
             if (result == null || result.id == 0) {
@@ -1657,7 +1658,7 @@ var sandboxIDE = {
         jQuery.ajax({
             type: "GET",
             url: appname,
-            cache: (sandbox.settings.cacheSamples == "true"),
+            cache: (sandbox.settings.cacheSamples === "true" || !navigator.onLine),
             dataType: "json",
 
             success: function (response) {
@@ -1726,6 +1727,7 @@ var sandboxIDE = {
             baseUrl = "http://www.obeliskos.com/TridentSandbox/";
             alertify.log("Accessing Online Samples Browser");
         }
+
         setTimeout(function () {
             var sburl = baseUrl;
             switch (sandbox.volatile.env) {
@@ -1733,10 +1735,13 @@ var sandboxIDE = {
                 case "IDE WJS": sburl += "samples/Samples Browser WJS.prg"; break;
             }
 
+            // ajax caching is weird thing, if i cache always the samples are sometime old.
+            // to ensure freshness of sample only visit server if online and they dont have setting set
+
             jQuery.ajax({
                 type: "GET",
                 url: sburl,
-                cache: (sandbox.settings.cacheSamples == "true"),
+                cache: (sandbox.settings.cacheSamples === "true" || !navigator.onLine),
                 dataType: "json",
 
                 success: function (response) {
@@ -2709,7 +2714,7 @@ var sandbox = {
             // We are using xml mode for markup so that if we add style tag it wont mess up rendering
             // hopefully in the future we can implement mixed rendering or add separate css
             sandbox.volatile.editorMarkup = CodeMirror.fromTextArea(document.getElementById("sb_txt_Markup"), {
-                smartIndent: false,
+                smartIndent: true,
                 autoCloseTags: true,
                 lineNumbers: true,
                 theme: sandbox.settings.editorTheme,
@@ -2718,6 +2723,8 @@ var sandbox = {
                 foldGutter: true,
                 showCursorWhenSelecting: true,
                 gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                indentUnit: 4,
+                tabSize: 4,
                 extraKeys: {
                     "Ctrl-Q": function (cm) {
                         cm.foldCode(cm.getCursor());

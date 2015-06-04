@@ -46,7 +46,9 @@
   if (presto_version && presto_version >= 15) { presto = false; webkit = true; }
   // Some browsers use the wrong event properties to signal cmd/ctrl on OS X
   var flipCtrlCmd = mac && (qtwebkit || presto && (presto_version == null || presto_version < 12.11));
-  var captureRightClick = gecko || (ie && ie_version >= 9);
+
+  // trident sandbox hack; disable right click capture for ie 11 (seems to fix glitchy right click menu)
+  var captureRightClick = gecko || (ie && ie_version >= 9 && ie_version < 11);
 
   // Optimize some code when these features are not used.
   var sawReadOnlySpans = false, sawCollapsedSpans = false;
@@ -1459,7 +1461,7 @@
       var oldCSS = te.style.cssText;
       input.wrapper.style.position = "absolute";
       te.style.cssText = "position: fixed; width: 30px; height: 30px; top: " + (e.clientY - 5) +
-        "px; left: " + (e.clientX - 5) + "px; z-index: 1000; background: " +
+        "px; left: " + (e.clientX - 5) + "px; z-index: 99000; background: " +
         (ie ? "rgba(255, 255, 255, .05)" : "transparent") +
         "; outline: none; border-width: 0; outline: none; overflow: hidden; opacity: .05; filter: alpha(opacity=5);";
       if (webkit) var oldScrollY = window.scrollY; // Work around Chrome issue (#2712)
