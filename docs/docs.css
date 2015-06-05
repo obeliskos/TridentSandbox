@@ -1,20 +1,37 @@
 BODY
    {
 	font-family:"Segoe UI", sans;
-	background-color:#fcfcf0;
+	background-color:#224;
+    color:#ccc;
    }
 
 H2
 {
-	color:#116;
+	color:#fff;
 }
 
 H3
 {
-	color:#151;
+	color:#8c8;
 }
 
 th 
 {
 	text-align:left;
+}
+
+a:link
+{
+    color: #dd8;
+}
+
+a:hover
+{
+    text-decoration: underline;
+    color: #FFFF99;
+}
+
+a:visited
+{
+    color: #dd8;
 }

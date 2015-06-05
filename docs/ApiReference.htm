@@ -2,7 +2,11 @@
 <html>
 <head>
 <title>API Reference</title>
-<link rel="stylesheet" type="text/css" href="docs.css" />
+    <link rel="stylesheet" type="text/css" href="docs.css" />
+    <link rel="stylesheet" type="text/css" href="../css/style-bundle.min.css" />
+    <script src="../libraries/jquery/jquery-2.1.0.min.js"></script>
+    <script src="../libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script src="../libraries/dynatree/jquery.dynatree.min.js"></script>
 </head>
 <body>
 Topics : [ <a href="Welcome.htm">Welcome</a> ] [ API Reference ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ][ <a href="MarkupAndScriptUnits.htm">Markup and Script Units</a> ] 
@@ -14,347 +18,9 @@ which are ready and available for you to code against, Trident Sandbox provides 
 includes logging, controlling screen layout to collapse code or caption areas, summoning a user area file loader to load or quickly save a file, setting main output tab color, bring up an 
 object inspector programmatically to display the contents of your own variable, and several variables to determine Trident Sandbox version, hosting type, etc.</p>
 
-<h3>API Flags</h3>
-<table>
-	<tbody>
-		<tr>
-			<th width="400px">Flag Name</th>
-			<th>Description</th>
-		</tr>
-		<tr>
-			<td>FLAG_StartPrgFullscreen</td>
-			<td>If this text exists (put it in a comment) within the first 250 chars of your program script, the Trident Sandbox will automatically fullscreen your app when it runs it.  Provide your own exit fs functionality or use the ESC key to go back to normal view.</td>
-		</tr>
-	</tbody>
-</table>
-
-<h3>API Variables</h3>
-
-<table style="width:100%">
-	<tbody>
-		<tr>
-			<th width="400px">Variable Name</th>
-			<th>Description</th>
-		</tr>
-		<tr>
-			<td>VAR_TRIDENT_VERSION</td>
-			<td>A value such as 1.6 indicating the version of Trident Sandbox you are running under.  Can be used for ensuring program features are available.  This variable was introduced in version 1.6 so it will be undefined/null on prior versions.</td>
-		</tr>
-		<tr>
-			<td>VAR_TRIDENT_HOSTED</td>
-			<td>A boolean value indicating whether you are running in a hosted environment.  Local Filesystem yields false, hosted and AppCache return true. Introduced in version 1.6.</td>
-		</tr>
-		<tr>
-			<td>VAR_TRIDENT_APPCACHED</td>
-			<td>Boolean value indicating whether you are running under Trident Sandbox in an appcached environment.</td>
-		</tr>
-		<tr>
-			<td>VAR_TRIDENT_ENV_TYPE</td>
-			<td>String value containing 'IDE' when running under Trident Sandbox IDE, or 'STANDALONE' when running a generated Standalone App. (Value set within template) Introduced in version 1.6.</td>
-		</tr>
-		<tr>
-			<td>VAR_TRIDENT_ONLINE</td>
-			<td>Simple alias for html5 standard 'navigator.onLine'.  Boolean value indicating whether internet connectivity exists.</td>
-		</tr>
-		<tr>
-			<td>VAR_TRIDENT_DB</td>
-			<td>A reference to the Trident Database (uses indexedDB).  You should probably only use this to see if it is available by testing it for null... such as if (!VAR_TRIDENT_DB) alertify.log("Trident Database not available");</td>
-		</tr>
-		<tr>
-			<td>VAR_UserFileValue</td>
-			<td>The non-preferred method of 'receiving' text from a file loaded using API_ShowLoad() below.  It is up to you to check the contents of this variable if you do not implement a EVT_UserLoadCallback as described in Events/Callback section.</td>
-		</tr>
-	</tbody>
-</table>
-
-<h3>API Functions</h3>
-<table style="width:100%">
-	<tbody>
-		<tr>
-			<th width="400px">General Functions</th>
-			<th>Description</th>
-		</tr>
-		<tr>
-			<td>API_SetBackgroundColor(colorCode)</td>
-			<td>Sets the background color for Main Output tab. Color Code is string such as &quot;#cca&quot;</td>
-		</tr>
-		<tr>
-			<td>API_SetActiveTab(tabId)</td>
-			<td>allows you to switch active tab programmatically. tabId is zero-based... 0 is Main, 1 is Log (HTML), or 2 is Log (Text)</td>
-		</tr>
-		<tr>
-			<td>API_SetWindowMode(mode)</td>
-			<td>pass in 1 for Code only view, 2 for 50/50 split, or 3 for Output Only view</td>
-		</tr>
-		<tr>
-			<td>API_SetToolbarMode(showCaption, showLoader)</td>
-			<td>programmatically show/hide the top two areas at the top of the screen.</td>
-		</tr>
-		<tr>
-			<td>API_ClearOutput()</td>
-			<td>This clears out the contents of all output tabs, hides the user filepicker, and sets the active tab to Main Output.</td>
-		</tr>
-		<tr>
-			<td>API_ClearMain()</td>
-			<td>this clears out the contents of just the Main Output tab</td>
-		</tr>
-		<tr>
-			<td>API_ClearHtmlLog()</td>
-			<td>clears the contents of the Log (HTML) tab</td>
-		</tr>
-		<tr>
-			<td>API_ClearLog()</td>
-			<td>clear contents of the Log (Text) tab</td>
-		</tr>
-		<tr>
-			<td>API_LogMain(msg)</td>
-			<td>Easy way to log html text to the Main Output</td>
-		</tr>
-		<tr>
-			<td>API_LogHtml(msg)</td>
-			<td>easy way to log html text to the HTML Log</td>
-		</tr>
-		<tr>
-			<td>API_LogMessage(msg)</td>
-			<td>log text to the Log (Text) tab</td>
-		</tr>
-		<tr>
-			<td>API_MetalFullscreen()</td>
-			<td>equivalent to pressing the &#39;Fullscreen Dev&#39; button</td>
-		</tr>
-		<tr>
-			<td>API_UserFullscreen(elem)</td>
-			<td>If no param is passed, this command zooms the users Main Output tab fullscreen.&nbsp; You can also pass the actual dom element you want 'fullscreened'</td>
-		</tr>
-		<tr>
-			<td>API_UserFullscreenExit()</td>
-			<td>this command un-zooms an active fullscreen.</td>
-		</tr>
-		<tr>
-			<td>API_Inspect(object)</td>
-			<td>Call this method within your own program or as a Text Log Console command, passing it a javascript object to inspect, and it will bring up a dialog containing a Trident Sandbox object inspector.  This utilizes the prettyprint.js library to display</td>
-		</tr>
-		<tr>
-			<td>API_ShowPasswordDialog(callback)</td>
-			<td>Display a Password Entry dialog where the user can enter a password.  The callback you pass in will be called if they click on the dialog's Ok button.</td>
-		</tr>
-		<tr>
-			<td>API_PlaySound(soundFilename)</td>
-			<td>This method plays the sound indicated by soundFilename. It assumes the file is in the 'sounds' subfolder.</td>
-		</tr>
-		<tr>
-			<td>API_PlaySoundURI(soundURI)</td>
-			<td>This method plays the sound indicated by soundFilename.  This can be any valid URI such as an http:// web address of file:/// address.</td>
-		</tr>
-		<tr>
-			<td>API_GetURLParameter(sParam)</td>
-			<td>When used in a hosted or appcached environment you can utilize this API function to retrieve a url hash param.  (Such as http://obeliskos.com/TridentSandbox.htm#RunSlot=1&MyParam=MyVal) You could then call API_GetURLParameter("MyParam") to get "MyVal"</td>
-		</tr>
-	</tbody>
-</table>
-<br/>
-<table style="width:100%">
-	<tbody>
-		<tr>
-			<th width="400px">File API I/O Functions</th>
-			<th>Description</th>
-		</tr>
-		<tr>
-			<td>API_ShowLoad()</td>
-			<td>Displays a file loader control within the user area. See more info below.  You should implement the callback EVT_UserLoadCallback (see events section) to 'receive' a file loaded with this.</td>
-		</tr>
-		<tr>
-			<td>API_ShowDataLoad()</td>
-			<td>Displays a binary file loader control within the user area. Contents will be read into a base64 encoded dataURL string.  You should implement the callback EVT_UserDataLoadCallback (see events section) to 'receive' a file loaded with this.</td>
-		</tr>
-		<tr>
-			<td>API_HideUserLoader()</td>
-			<td>Hides a user loader if it is visible.</td>
-		</tr>
-		<tr>
-			<td>API_HideUserDataLoader()</td>
-			<td>Hides a binary (dataURL) user loader if it is visible.</td>
-		</tr>
-		<tr>
-			<td>API_DataUrlToBlob(dataURL)</td>
-			<td>Allows you to pass a dataURL string (representing a base64 encoded binary object) and recreate the binary object it represents.  Object will be returned as a blob.  This method is used by the API_SaveDataURL() function but can be used within your own programs as well.</td>
-		</tr>
-		<tr>
-			<td>API_SaveTextFile(fileName, saveString)</td>
-			<td>allows the user to easily save some text to a file. This will trigger a download.</td>
-		</tr>
-		<tr>
-			<td>API_SaveDataURL(fileName, dataURL)</td>
-			<td>Allows you to take a base64 encoded dataURL and save it as a binary file.</td>
-		</tr>
-	</tbody>
-</table>
-<br/>
-<table style="width:100%">
-	<tbody>
-		<tr>
-			<th width="400px">Trident DB Functions</th>
-			<th>Description (These are only available when used in a hosted or appcached environment)</th>
-		</tr>
-		<tr>
-			<td>API_TransferSlot(slotId)</td>
-			<td>This will Unload your current program and Load and run the program in the TridentDB save slot indicated by slotId.  Use carefully as you will lose unsaved changes if there are any.  You can pass parameters between programs using localStorage and/or TridentDB/IndexedDB.</td>
-		</tr>
-		<tr>
-			<td>API_GetIndexedAppKey(app, key, callback)</td>
-			<td>You can utilize this API function to retrieve an app/key value from the TridentSandbox global IndexedDb store.</td>
-		</tr>
-		<tr>
-			<td>API_GetIndexedAppKeyById(id, callback)</td>
-			<td>This gets a Trident App/Key/Val object by id. If for some reason you keep a collection of id's, you can use this to lookup object.</td>
-		</tr>
-		<tr>
-			<td>API_SetIndexedAppKey(app, key, val)</td>
-			<td>This will add or update (if the app/key combo already exists) a Trident App/Key/Value object</td>
-		</tr>
-		<tr>
-			<td>API_DelIndexedAppKey(id)</td>
-			<td>You can delete an object from the Trident Sandbox global IndexedDb store.  The object can only be deleted by the primary key 'id' which is autoincremented number on object</td>
-		</tr>
-		<tr>
-			<td>API_GetIndexedAppCursor(app, callback)</td>
-			<td>This will retrieve a cursor for all App/Key/Val objects by app. Your callback is called once per record and you must advance cursor (see examples).</td>
-		</tr>
-		<tr>
-			<td>API_Backup_TridentDB(filename)</td>
-			<td>You might call this API function as a Text Log Console command to backup the entire contents of the Trident Database to be restored later.  'filename' param is optional.</td>
-		</tr>
-		<tr>
-			<td>API_Restore_TridentDB()</td>
-			<td>You might call this API function as a Text Log Console command to bring up a file loader for loading a Trident Database backup file.  Upon selecting a file it will restore the database.</td>
-		</tr>
-	</tbody>
-</table>
-<br/>
-<p><i>Note: The above TridentDB Functions will eventually be obsoleted in favor of the new VAR_TRIDENT_API object interface.&nbsp; This new interface 
-decouples the TridentDb from just being an indexeddb keystore and allows also configuring keystore based on web services.&nbsp; The motivation is for me to use 
-TridentSandbox with a 'private keystore cloud' running on my home network, which i now do.&nbsp; Eventually I may provide code for a service implementation but you 
-can make your own for now or continue to use the (existing) indexeddb tridentdb key store.&nbsp; Script Units now utilize this new API internally, as do the Save Slots.</i></p>
-<table style="width:100%">
-	<tbody>
-		<tr>
-			<th width="400px">VAR_TRIDENT_API (Object/Class) Methods :</th>
-			<th>Description (Will eventually replace the above TridentDb interface; Available in hosted/appcached)</th>
-		</tr>
-		<tr>
-			<td>SwitchMode(mode)</td>
-			<td>Passing "trident" puts this into TridentDB mode, "service" put this into service mode.</td>
-		</tr>
-		<tr>
-			<td>GetAppKey(app, key, callback)</td>
-			<td>Used to retrieve an app/key, callback receives json object on success, null or id = 0 if not found.</td>
-		</tr>
-		<tr>
-			<td>GetAppKeyById(id, callback, data)</td>
-			<td>Retrieve a key by id, callback receives key object, null or an id of 0 if not found.</td>
-		</tr>
-		<tr>
-			<td>SetAppKey(app, key, val, callback)</td>
-			<td>Set an app key; callback is optional and receives obj with 'success' property value of true/false.</td>
-		</tr>
-		<tr>
-			<td>DeleteAppKey(id, callback)</td>
-			<td>Deletes an app key by id; callback is optional and receives obj with 'success' property value of true/false.</td>
-		</tr>
-		<tr>
-			<td>GetAppKeys(app, callback)</td>
-			<td>Retrieves list of all keys for a given app; returns array of objects with only 'id', 'app' and 'key' properties (no key val)</td>
-		</tr>
-		<tr>
-			<td>GetAllKeys(callback)</td>
-			<td>Retrieves unfiltered list of all keys; returns array of objects with only 'id', 'app' and 'key' properties (no key val)</td>
-		</tr>
-	</tbody>
-</table>
-<br/>
-<table style="width:100%">
-	<tbody>
-		<tr>
-			<th width="400px">Unit Library Functions</th>
-			<th>Description (These are only available when used in a hosted or appcached environment)</th>
-		</tr>
-		<tr>
-			<td>API_LogMarkupUnits()</td>
-			<td>You might call this API function as a Text Log Console command to show a list of all of the markup units in the database.</td>
-		</tr>
-		<tr>
-			<td>API_SaveMarkupUnit(unitName)</td>
-			<td>You might call this API function as a Text Log Console command to save the contents of the Markup codemirror editor as a unit.</td>
-		</tr>
-		<tr>
-			<td>API_LoadMarkupUnit(unitName)</td>
-			<td>You might call this API function as a Text Log Console command to load the unit back into the Markup editor, perhaps to further edit.</td>
-		</tr>
-		<tr>
-			<td>API_GetMarkupUnit(unitName, callback)</td>
-			<td>You might call this API function within a real program to dynamically retrieve the unit as a string which you can then insert into a div such as the HTML output log (UI_HtmlLogPlaceholder)</td>
-		</tr>
-		<tr>
-			<td>API_ImportMarkupUnit(unitName, clearFirst) (Obsolete)</td>
-			<td>You might call this API function to automatically load the markup unit into the HTML log tab.  Since the SandboxLoader page does not have an HTML log tab, this will not work with the 'Launch' Command.  
-			If you pass 'true' for the clearFirst param you will clear out any old html, otherwise you will append to the HTML output.  To work across 'Run' and 'Launch' environments, you should use API_GetMarkupUnit instead.</td>
-		</tr>
-		<tr>
-			<td>API_LogScriptUnits()</td>
-			<td>You might call this API function as a Text Log Console command to show a list of all of the script units in the database.</td>
-		</tr>
-		<tr>
-			<td>API_SaveScriptUnit(unitName)</td>
-			<td>You might call this API function as a Text Log Console command to save the contents of the Script codemirror editor as a unit.</td>
-		</tr>
-		<tr>
-			<td>API_LoadScriptUnit(unitName)</td>
-			<td>You might call this API function as a Text Log Console command to load the unit back into the Script editor, perhaps to further edit.</td>
-		</tr>
-		<tr>
-			<td>API_ImportScriptUnit(unitName, callback)</td>
-			<td>You might call this API function within a real program to import the script into a 'known' area specifically intended for placing these scripts.  Passing optional callback, it will be called when script is 'ready'.&nbsp; Ready means i wait 200ms after i insert script to give browser a chance to parse... that should hopefully be enough time for most scripts.  If importing multiple scripts (not dependent on each other), you might just pass the callback on the last one.</td>
-		</tr>
-		<tr>
-			<td>API_ClearUnitScripts() <b><i>Obsolete</i></b></td>
-			<td>This method will clear the div where all your imported scripts are loaded.&nbsp; Best practice now is to create an autoload script unit which imports any other scripts you may want... and those scripts stay for the life of the page load.&nbsp; If you really need to import a script within a prg file or save slot, you can use continue to use this function to clean global script placeholder in your sandbox cleanup event.</td>
-		</tr>
-	</tbody>
-</table>
-<br/>
-<label style="color:blue">
-<i>(Note: if you name a script unit <b>autorun</b>, Trident Sandbox will load it automatically when the main page is loaded unless a <b>SkipAutorun</b> hash param exists in the url bar)</i>
-</label>
-
-<h3>API Events / Callbacks</h3>
-<table style="width:100%">
-	<tbody>
-		<tr>
-			<th width="400px">Event Name</th>
-			<th>Description</th>
-		</tr>
-		<tr>
-			<td>EVT_CleanSandbox()</td>
-			<td>If you create global variables which use up alot of memory, reference user interface elements, or utilize timers, etc. then you should probably clean up after you are done to ensure the cleanliness / stability of the sandbox environment.  Implement this method in your app to allow your program to clean up after itself.  Trident Sandbox will call this on subsequent runs or change of programs.  (See DesignGuide for more details).</td>
-		</tr>
-		<tr>
-			<td>EVT_WindowResize()</td>
-			<td>Implement this callback to be notified whenever the browser window is resized.</td>
-		</tr>
-		<tr>
-			<td>EVT_TridentChanged()</td>
-			<td>Part of the new Trident DB API; When the configuration settings change in the VAR_TRIDENT_API, you can implement this callback in your program to be notified.</td>
-		</tr>
-		<tr>
-			<td>EVT_UserLoadCallback(filestring, filename)</td>
-			<td>When calling the API_ShowLoad() method above, you should implement this callback in your program to 'receive' a potentially loaded file.</td>
-		</tr>
-		<tr>
-			<td>EVT_UserDataLoadCallback(dataURL, filename)</td>
-			<td>When calling the API_ShowDataLoad() method above to load a binary file, you should implement this callback in your program to 'receive' a potentially loaded dataURL string.</td>
-		</tr>
-	</tbody>
-</table>
+<h3>sandbox object structure</h3>
+<div id="sandboxTree"></div>
+<div style="background-color:#444; color:#fff; border:1px solid; padding: 5px"><span id="nodeInfo" style="font-size:16pt; color:#fff; "></span></div>
 
 <h3>User Interface (UI) Elements</h3>
 <table style="width:100%">
@@ -368,18 +34,183 @@ can make your own for now or continue to use the (existing) indexeddb tridentdb 
 			<td>This is a DIV element representing the div your Main Output content goes into.</td>
 		</tr>
 		<tr>
-			<td>UI_HtmlLogPlaceholder</td>
-			<td>This is a DIV element representing the div your Html Log Output content goes into.</td>
-		</tr>
-		<tr>
 			<td>UI_TxtLogConsole</td>
 			<td>This is a DIV element representing the div your Text Log Output content goes into.</td>
 		</tr>
 	</tbody>
 </table>
 
+<script>
+    var treeData = [
+        {
+            title: "sandbox",
+            isFolder: true,
+            key: "id3",
+            hideCheckbox: true,
+            tooltip: "sandbox namespace root.  Wraps all the sandbox specific functionality and convenience methods into this namespace-like hierarchy.  It is a singleton and most methods are heavily ui-bound but it provides a common engine used by all page variations and adds cleanliness to sandbox and user program code.",
+            expand: true,
+            children: [
+                {
+                    title: "db",
+                    isFolder: true,
+                    key: "db",
+                    hideCheckbox: true,
+                    tooltip: "This object reference may point to any number of database adapters such as TridentMemoryAdapter, TridentIndexedAdapter, TridentServiceAdapter.  The sandbox environment uses this as the primary location for saving programs.",
+                    children: [
+                        { title: "getAllKeys(callback)", key: "getAllKeys", hideCheckbox: true, tooltip: "(adapter interface function) This will pass into your callback an array of objects representing all database keys (minus the val property and adding a size property)." },
+                        { title: "getAppKeys(app, callback)", key: "getAppKeys", hideCheckbox: true, tooltip: "(adapter interface function) This will pass into your callback an array of objects representing all keys for the specified application (minus the val property and adding a size property)." },
+                        { title: "getAppKey(app, key, callback)", key: "getAppKey", hideCheckbox: true, tooltip: "(adapter interface function) This will retrieve a single key with that app/key combination, returning an object representing it to your callback.  The object returned will contain app, key, val, and id properties." },
+                        { title: "getAppKeyById(id, callback)", key: "getAppKeyById", hideCheckbox: true, tooltip: "(adapter interface function) This will retrieve a single key with the id provided and return to your callback an object representing it." },
+                        { title: "setAppKey(app, key, val, callback)", key: "setAppKey", hideCheckbox: true, tooltip: "(adapter interface function) This will add or update a single key within the database.  You supply app, key, and val, and can optionally implement a callback to be notified when it completes." },
+                        { title: "deleteAppKey(id, callback)", key: "deleteAppKey", hideCheckbox: true, tooltip: "(adapter interface function) This will allow you to delete a database key by providing its 'id'.  You may implement a callback to be notified when it completes." }
+                    ]
+                },
+                {
+                    title: "events",
+                    isFolder: true,
+                    key: "events",
+                    hideCheckbox: true,
+                    tooltip: "This object placeholder allows you to attach, intercept, and respond to sandbox generated events.  Your program may override these to be notified.  These are cleared out when sandbox is cleared.",
+                    children: [
+                        { title: "clean()", key: "clean", hideCheckbox: true, tooltip: "You may optionally attach a function to this location (sandbox.events.clean) to be notified when the sandbox is clearing out your program." },
+                        { title: "windowResize", key: "windowResize", hideCheckbox: true, tooltip: "You may optionally attach a function to this location to be notified when the browser is resized." },
+                        { title: "databaseChanged", key: "databaseChanged", hideCheckbox: true, tooltip: "Attach an event to this if you want to be notified of when the database adapter has changed.  Hopefully that won't happen while your program is running." },
+                        { title: "userLoadCallback(filestring, filename)", key: "userLoadCallback", hideCheckbox: true, tooltip: "If you use the user file loader (in files namespace), this event will be fired upon the user picking a file to load.  Your callback will be passed two variables, the first containing the string contents of the text file, and the second containing the file name of the picked file." },
+                        { title: "userdataLoadCallback(dataUrl, filename)", key: "userdataLoadCallback", hideCheckbox: true, tooltip: "If you use the user binary file loader (in files namespace), this event will be fired upon the user picking and loading the file. Your callback will be passed two variables, the first containing a binaryUri representation of the binary data, and the second containing the file name of the picked file." }
+                    ]
+                },
+                {
+                    title: "files",
+                    isFolder: true,
+                    hideCheckbox: true,
+                    tooltip: "This is the sandbox interface to ease the use of the File API for importing and exporting files.",
+                    children: [
+                        { title: "userfileShow()", key: "userfileShow", hideCheckbox: true, tooltip: "Displays a file picker for the user to easily load text files from.  Requires you to implement and attach a callback to sandbox.events.userLoadCallback to receive the loaded text." },
+                        { title: "userfileHide()", key: "userfileHide", hideCheckbox: true, tooltip: "Hides the user file picker." },
+                        { title: "userdataShow()", key: "userdataShow", hideCheckbox: true, tooltip: "Displays a file picker for the user to easily load binary files from.  Requires you to implement and attach a callback to sandbox.events.userdataLoadCallback to receive the dataUri formatted binary file as a string." },
+                        { title: "userdataHide()", key: "userdataHide", hideCheckbox: true, tooltip: "Hides the user data (binary) file picker" },
+                        { title: "exportDatabaseKeys()", key: "exportDatabaseKeys", hideCheckbox: true, tooltip: "Invokes a download containing all of the keys in the database for archival.  More functionality is available from the dashboard but this was left available." },
+                        { title: "dataUrlToBlob(dataURL)", key: "dataUrlToBlob", hideCheckbox: true, tooltip: "Passing this function a dataUri/dataUrl string will convert it into a binary blob format." },
+                        { title: "saveTextFile(fileName, saveString)", key: "saveTextFile", hideCheckbox: true, tooltip: "Pass in a filename and a string containing text to put in a file and this method will invoke a download of that file." },
+                        { title: "saveDataURL(fileName, dataURL)", key: "saveDataURL", hideCheckbox: true, tooltip: "Pass in a filename and a dataUrl/dataUri string and this will invoke a download to save that as a binary file." },
+                        { title: "saveOrOpenTextFile(fileName, saveString)", key: "saveOrOpenTextFile", hideCheckbox: true, tooltip: "Similar to saveTextFile, except it offers the option to open along with save and cancel options." }
+                    ]
+                },
+                {
+                    title: "ide",
+                    isFolder: true,
+                    key: "ide",
+                    hideCheckbox: true,
+                    tooltip: "This contains methods for controlling the sandbox ide environment itself.",
+                    children: [
+                        { title: "run()", key: "run", hideCheckbox: true, tooltip: "Identical to pressing the 'run' toolbar button.  Clears sandbox and starts program cleanly." },
+                        { title: "launch()", key: "launch", hideCheckbox: true, tooltip: "Identical to pressing the 'launch' toolbar button.  Runs the program in a new window without an ide." },
+                        { title: "clean()", key: "clean", hideCheckbox: true, tooltip: "Identical to pressing 'new' toolbar button.  Clears editors and output and defaults to new program template." },
+                        { title: "clearOutput()", key: "clearOutput", hideCheckbox: true, tooltip: "Identical to pressing 'clear output' toolbar button.  Clears output and runs clean event but leaves editor text intact for subsequent runs." },
+                        { title: "runApp(progname)", key: "runApp", hideCheckbox: true, tooltip: "Will issue an ajax call to load a sample program.  Used by samples browsers." },
+                        { title: "runSlot(appName)", key: "runSlot", hideCheckbox: true, tooltip: "Will load a program from a save slot in the trident database.  Used by the program save dropdown list." },
+                        { title: "runAutorun()", key: "runAutorun", hideCheckbox: true, tooltip: "Will manually re-run the autorun save slot.  Might be useful if autorun is available but disabled, this would manually run it." },
+                        { title: "setActiveTab(tabId)", key: "setActiveTab", hideCheckbox: true, tooltip: "Switch the active tab to main output (0) or text log (1) " },
+                        { title: "setWindowMode(mode)", key: "setWindowMode", hideCheckbox: true, tooltip: "Switch between window modes : code only (1) code and output (2) or output only (3)" }
+                    ]
+                },
+                {
+                    title: "logger",
+                    isFolder: true,
+                    key: "logger",
+                    hideCheckbox: true,
+                    tooltip: "This contains methods for controlling logging, tracing, and visual inspection of data for diagnostic purposes.",
+                    children: [
+                        { title: "log(msg)", key: "log", hideCheckbox: true, tooltip: "The default method for sending text to the text log tab (in IDE).  In sandbox loaders the text will be sent to the console." },
+                        { title: "logObject(objToLog, objName)", key: "logObject", hideCheckbox: true, tooltip: "Dumps an object to the text log tab with formatted indentation." },
+                        { title: "clearLog()", key: "clearLog", hideCheckbox: true, tooltip: "Clears the text log output tab." },
+                        { title: "trace()", key: "trace", hideCheckbox: true, tooltip: "Invokes a browser trace which dumps stack.  Currently goes to browser console." },
+                        { title: "inspect(objVar, caption)", key: "inspect", hideCheckbox: true, tooltip: "Use this method to send an object to the trident variable inspector.  This utilizes the prettyprint.js library to create a dialog which you can drill down into simple or deeply hierarchical objects." },
+                        { title: "notify(msg, caption)", key: "notify", hideCheckbox: true, tooltip: "Alternative to alertify.log() in case i switch to another notification library in the future.  Provided for future proofing, caption is not currently being used." },
+                        { title: "notifySuccess(msg, caption)", key: "notifySuccess", hideCheckbox: true, tooltip: "Alternative to alertify.success() in case i switch to another notification library in the future.  Provided for future proofing, caption is not currently being used." },
+                        { title: "notifyError(msg, caption)", key: "notifyError", hideCheckbox: true, tooltip: "Alternative to alertify.error() in case i switch to another notification library in the future.  Provided for future proofing, caption is not currently being used." }
+                    ]
+                },
+                {
+                    title: "media",
+                    isFolder: true,
+                    hideCheckbox: true,
+                    tooltip: "Contains methods relevant to playing media.",
+                    children: [
+                        { title: "playAudio(uri)", key: "playAudio", hideCheckbox: true, tooltip: "Plays an audio file invisibly, given an internet url or dataUri." },
+                        { title: "speak(msgText)", key: "speak", hideCheckbox: true, tooltip: "If your browser supports the Speech API, this is a convenience method for simply speaking a message." },
+                        { title: "isSpeechAvailable", key: "isSpeechAvailable", hideCheckbox: true, tooltip: "(boolean) indicates if the Speech API is supported by your browser" }
+                    ]
+                },
+                {
+                    title: "ui",
+                    isFolder: true,
+                    hideCheckbox: true,
+                    tooltip: "This contains methods for controlling your program's user interface.",
+                    children: [
+                        { title: "setDarkTheme()", key: "setDarkTheme", hideCheckbox: true, tooltip: "This will set background color to dark grey and text color to white." },
+                        { title: "setLightTheme()", key: "setLightTheme", hideCheckbox: true, tooltip: "This will set background color to white and text color to black." },
+                        { title: "setBackgroundColor(colorCode)", key: "setBackgroundColor", hideCheckbox: true, tooltip: "Use this to change background color." },
+                        { title: "clearMain()", key: "clearMain", hideCheckbox: true, tooltip: "Clears the main tab of all UI/DOM elements." },
+                        { title: "fullscreen(elem)", key: "fullscreen", hideCheckbox: true, tooltip: "Requests that the browser go fullscreen.  If you pass in an optional DOM element, it will just fullscreen that element.  Most browsers require this to be executed during a button click event." },
+                        { title: "fullscreenExit()", key: "fullscreenExit", hideCheckbox: true, tooltip: "Exits fullscreen mode via code.  ESC key should always escape fullscreen but this method might be additional convenience." },
+                        { title: "fullscreenToggle()", key: "fullscreenToggle", hideCheckbox: true, tooltip: "Toggles fullscreen." },
+                        { title: "showPasswordDialog(callback)", key: "showPasswordDialog", hideCheckbox: true, tooltip: "Brings up a dialog for password entry.  When the user enters a password and clicks ok, this dialog will call your provided callback function, passing the password into it as a string." }
+                    ]
+                },
+                {
+                    title: "units",
+                    isFolder: true,
+                    hideCheckbox: true,
+                    tooltip: "This contains methods for interacting with the Library Unit subsystem.  This subsystem allows reusability of scripts or markup by saving them into the trident database, to be recalled within your programs.  While there is a 'utility sample' which performs much of this maintenance, these methods allow you to recall within your programs. ",
+                    children: [
+                        { title: "logMarkupUnits()", key: "logMarkupUnits", hideCheckbox: true, tooltip: "Mostly for console use.  This will dump a list of markup units in the trident database to the text log." },
+                        { title: "saveMarkupUnit(unitName)", key: "saveMarkupUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will save the contents of the Markup editor as a markup unit within the trident database." },
+                        { title: "loadMarkupUnit(unitName)", key: "loadMarkupUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will load the markup unit from the trident database into the Markup editor of the IDE." },
+                        { title: "getMarkupUnit(unitName, callback)", key: "getMarkupUnit", hideCheckbox: true, tooltip: "Use this within you programs to recall markup units as a string which you can then insert into your web pages." },
+                        { title: "logScriptUnits()", key: "logScriptUnits", hideCheckbox: true, tooltip: "Mostly for console use.  This will dump a list of script units in the trident database to the text log." },
+                        { title: "saveScriptUnit(unitName)", key: "saveScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will save the contents of the Script editor as a script unit within the trident database." },
+                        { title: "loadScriptUnit(unitName)", key: "loadScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will load the script unit from the trident database into the Script editor of the IDE." },
+                        { title: "importScriptUnit(unitName, callback)", key: "importScriptUnit", hideCheckbox: true, tooltip: "This command will load your script unit from the trident database and automatically add it to the page for use.  Pass in a callback to be notified when this is done." },
+                        { title: "appendScriptUnit(scriptText, callback)", key: "appendScriptUnit", hideCheckbox: true, tooltip: "If you already have the script text and do not need to load it from the trident database, this will just append it for use." },
+                        { title: "clearScriptUnits()", key: "clearScriptUnits", hideCheckbox: true, tooltip: "Can be used to clear out old scripts but scripts often get attached to the DOM via the window object and will remain until page is reloaded, so do not depend too much on this." }
+                    ]
+                },
+                {
+                    title: "volatile",
+                    isFolder: true,
+                    hideCheckbox: true,
+                    tooltip: "This contains properties which are either hardcoded or just not saved or loaded.",
+                    children: [
+                        { title: "version", key: "version", hideCheckbox: true, tooltip: "(string) variable containing the version label of the trident sandbox environment, such as \"2.1.0\"" },
+                        { title: "env", key: "env", hideCheckbox: true, tooltip: "(string) variable containing either \"IDE\", \"IDE WJS\", \"SBL\", or \"SBL WJS\".  This indiciates which trident sandbox page your program is running under." }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    $(document).ready(function () {
+        $("#sandboxTree").dynatree({
+            checkbox: true,
+            // Override class name for checkbox icon:
+            classNames: { checkbox: "dynatree-radio" },
+            selectMode: 1,
+            children: treeData,
+            onActivate: function (node) {
+                $("#nodeInfo").text(node.data.tooltip);
+            },
+            onKeydown: function (node, event) {
+            },
+            // The following options are only required, if we have more than one tree on one page:
+            //initId: "treeData",
+            cookieId: "dynatree-Cb1",
+            idPrefix: "dynatree-Cb1-"
+        });
+    });
 
 
+</script>
 
 </body>
 </html>

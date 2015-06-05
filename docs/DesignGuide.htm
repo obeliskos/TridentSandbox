@@ -20,6 +20,15 @@ save files to a Trident Database with less user interaction than the file picker
 can also make internet web requests (ajax) to websites to get data with no security concerns or settings to change (the AppCache environment requires workaround discussed in Hosting and AppCache section). &nbsp; 
 The local filesystem environment is also very portable and wont accidentally get erased if you delete your browsing history without adding TridentSandbox to your favorites.&nbsp; You can use both environments, but for any given program your first design choice might be which environment to use.</p>
 
+<h3><b>* Now with built in Grammar Nazi! *</b></h3>
+
+<p>
+The Codemirror syntax highlighting editors which Trident Sandbox uses have proven excellent, providing many features which even now have yet to be tapped into.  Two of the more powerful and recent features unlocked are autocompletion and linting.  If you put your mouse cursor on an empty line in the script editor and press Ctrl-Space you will bring 
+up an autocomplete list of variables which is updated as you type.  You can navigate the entire sandbox object hierarchy in this way.  Since it runs in the browser space, if you run your program it will even see your functions and global variables.  The other feature, linting, offers real time suggestions for possible syntax errors.  The errors and warnings 
+which the linter warns you about aren't necessarily errors which the browser would raise, but 'best-practice' and early warning type issues to promote good code.  You can choose to ignore them if you wish but they add additional layer of help which you might expect from more powerful development environments.  Codemirror actually hooks into a separate library, 
+jshint.js to act as Ordnungspolizei.
+</p>
+
 <h3><b>Web design in a div shell</b></h3>
 
 <p>When you load Trident Sandbox, you will see alot of User Interface elements.&nbsp; The screen is divided into many different regions such as Title bar, Loader Bar, Dev Bar, Code Editor Areas, and Output Area.&nbsp;&nbsp;All of these&nbsp;regions are constructed using&nbsp;HTML&nbsp;Document Object Model (DOM) elements (many elements per region) 
@@ -81,12 +90,9 @@ you go in and out of many programs.</p>
 
 <p>Ideally, you would <b>create a stub global javascript object variable</b> (see Proper Cleanup Method.prg).&nbsp; You can uniquely name this variable, or use a 
 common &#39;sandboxVars&#39; or &#39;sbv&#39; name.&nbsp; That object can&#39;t be deleted either but its contents can. So within that stub variable you can create your variables/object 
-references, even functions etc.&nbsp; To fulfill the cleanup process you will implement a callback function <b>EVT_CleanSandbox()</b> where you will delete the variables within that stub variable (or at least the 
+references, even functions etc.&nbsp; To fulfill the cleanup process you will implement and attach a callback function to <b>sandbox.events.clean</b> where you will delete the variables within that stub variable (or at least the 
 ones which may conflict or consume alot of memory).&nbsp; You might also release timers, stop animation loops, etc.&nbsp; Trident Sandbox will then call your cleanup function between each 
 program &#39;Run&#39;, before it unloads your program (for instance if you press the &#39;New&#39; toolbar button or open another program).</p>
-
-<p>The Random Dungeon Generator is a good example of creating a structured javascript object which can easily be cleaned up, and the Digital Clock and Easel JS sample show how you 
-might clean up timers.</p>
 
 <h3><b>A Martian diagnosing an Earth Rover</b></h3> 
 

@@ -498,6 +498,8 @@ var sandboxDashboard = {
     },
 
     show: function () {
+        $("#sb_txt_adapter_service_loc").val(sandbox.settings.databaseServiceLocation);
+
         // no reason to call this under sandbox loaders
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
@@ -2029,7 +2031,7 @@ var sandboxIDE = {
         }
 
         if (sandbox.volatile.env == "IDE WJS") {
-            used += $("#UI_TxtLogConsole").height() + 4 + 14; // 14 compensate for padding?
+            used += ($("#UI_TxtLogConsole").height() + 70); // 14 compensate for padding?
         }
 
         $("#UI_TxtLogText").height($(window).height() - used);
@@ -2376,15 +2378,6 @@ var sandboxIDE = {
 
 //#endregion ide
 
-// aliases for backwards compatibility (set in sandbox.initialize())
-var API_GetURLParameter,
-    API_PlaySoundURI,
-    API_LogMessage,
-    API_LogObject,
-    API_ClearLog,
-    VAR_TRIDENT_API,
-    VAR_TRIDENT_VERSION;
-
 //#region sandbox obejct
 
 var sandbox = {
@@ -2401,7 +2394,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.02",
+        version: "2.10",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,
@@ -2514,6 +2507,8 @@ var sandbox = {
     nullFunction: function() {
     },
     dbInit: function (callback) {
+        var dbChanged = sandbox.events.databaseChanged || sandbox.nullFunction;
+
         callback = callback || this.nullFunction;
 
         if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
@@ -2537,16 +2532,17 @@ var sandbox = {
 
                             // load slots now that db is initialized and then do post init
                             sandbox.ide.refreshSlots(callback);
+                            dbChanged();
                         }
                         else {
                             callback();
+                            dbChanged();
                         }
                     },
                     errorCallback: function () { sandbox.logger.log("Error opening TridentSandboxDB (indexedDB)."); }
 
                 });
                 // allow legacy variable support for a version or two
-                VAR_TRIDENT_API = sandbox.db;
 
                 break;
 
@@ -2561,13 +2557,14 @@ var sandbox = {
 
                             // load slots now and do post init
                             sandbox.ide.refreshSlots(callback);
+                            dbChanged();
                         }
                         else {
                             callback();
+                            dbChanged();
                         }
                     }
                 });
-                VAR_TRIDENT_API = sandbox.db;
 
                 break;
             case "":
@@ -2576,6 +2573,7 @@ var sandbox = {
                     successCallback: function () {
                         sandbox.logger.log("In-memory database adapter initialized.");
                         sandbox.logger.log("You may use database backup and restore to save keys to a file, if needed.");
+                        dbChanged();
                     }
                 });
                 break;
@@ -2587,11 +2585,11 @@ var sandbox = {
                         if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
                             // load slots now that db is initialized and then do post init
                             sandbox.ide.refreshSlots(callback);
+                            dbChanged();
                         }
                     },
                     errorCallback: function () { sandbox.logger.log("Error opening adapter " + sandbox.settings.databaseAdapter); }
                 });
-                VAR_TRIDENT_API = sandbox.db;
 
                 break;
         }
@@ -2609,15 +2607,6 @@ var sandbox = {
 
     },
     initialize: function (options) {
-        // aliases for (temporary) backwards compatibility
-        API_LogMessage = this.logger.log;
-        API_LogObject = this.logger.logObject;
-        API_GetURLParameter = sandbox.hashparams.getParameter;
-        API_PlaySoundURI = sandbox.media.playAudio;
-        API_ClearLog = sandbox.logger.clearLog;
-        VAR_TRIDENT_API = sandbox.db;
-        VAR_TRIDENT_VERSION = sandbox.volatile.version;
-
         options = options || {};
 
         // begin normal initialization
@@ -2672,11 +2661,11 @@ var sandbox = {
 
             if (sandbox.volatile.env === "IDE") {
                 document.title = "Trident Sandbox v" + sandbox.volatile.version;
-                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
+                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect highlighted symbol/variable\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
             }
             else {
                 document.title = "Trident Sandbox WJS v" + sandbox.volatile.version;
-                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
+                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect highlighted symbol/variable\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
             }
 
             $("#sb_txt_Script").val("// script editor tips : \r\n// autoindenting is turned on\r\n// the horizontal slashes indicate forced tabs (instead of smart indenting)\r\n// use shift-tab to use auto-indention for a line instead (cleans up tab slashes)\r\n// use ctrl-a or select multiple lines and then press shift-tab to smart indent them\r\n// the javascript linter may notify you of issues with your code, such as : \r\n\r\nfunction badCode() {\r\n\tvar test=[]\r\n\r\n\tvar test = 'a';\r\n}");
