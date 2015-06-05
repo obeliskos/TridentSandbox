@@ -2,7 +2,7 @@
 
 ## An In-Browser Scripting IDE for HTML5/Javascript
 
-![trident preview](http://www.obeliskos.com/surface/trident_sandbox_193.png)
+![trident preview](http://www.obeliskos.com/surface/trident_sandbox_210.png)
 
 This project is an offline browser-app development environment which itself runs within a web browser.  It utilizes HTML 5 appcache functionality to allow offline use.
 
@@ -14,10 +14,12 @@ This environment provides an IDE for creating and editing apps which run within 
 
 This project aims to utilize the newer HTML 5 interfaces such as File API, Fullscreen API, LocalStorage/IndexedDB as well as newer ECMA 5/6 constructs to fully explore and experiment with their integration into a sandboxed app ecosystem. 
 
+This project is a pure HTML5/Javascript project.  It's support of Visual Studio is optional, allowing for intellisense and web bundles.  It targets Visual Studio 2013 (Community) with Web Essentials.  If you do not wish to use Visual Studio and you wish to modify the bundles, you will need to examine the .bundle files and regenerate them yourself.  I will possibly add node/gulp alternatives in the future for this bundling.
+
 Trident Sandbox makes use of its own app/key/value indexeddb object store (when available) for storing programs, library units, and user data.  This 'Trident Database' now supports a web service mode you can use if you configure and implement the web services needed.
 
 
-Copyright (c) 2014, David Easterday (admin@obeliskos.com)
+Copyright (c) 2015, David Easterday (admin@obeliskos.com)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
