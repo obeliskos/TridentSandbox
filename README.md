@@ -16,7 +16,7 @@ This project aims to utilize the newer HTML 5 interfaces such as File API, Fulls
 
 This project is a pure HTML5/Javascript project.  It's support of Visual Studio is optional, allowing for intellisense and web bundles.  It targets Visual Studio 2013 (Community) with Web Essentials.  If you do not wish to use Visual Studio and you wish to modify the bundles, you will need to examine the .bundle files and regenerate them yourself.  I will possibly add node/gulp alternatives in the future for this bundling.
 
-Trident Sandbox makes use of its own app/key/value indexeddb object store (when available) for storing programs, library units, and user data.  This 'Trident Database' now supports a web service mode you can use if you configure and implement the web services needed.
+Trident Sandbox makes use of its own app/key/value indexeddb object store (when available) for storing programs, library units, and user data.  This 'Trident Database' now comes with indexedDB, web service, and in-memory adapters... if you want to use another means of storage, you are able to write your own custom adapter as long as it supports the expected adapter interface.
 
 
 Copyright (c) 2015, David Easterday (admin@obeliskos.com)
