@@ -366,7 +366,7 @@ var sandboxFiles = {
             $("#sb_div_compile_standalone").hide();
         }, 200);
     },
-    exportDatabaseKeys: function () {
+    exportDatabaseKeys: function (filename) {
         filename = filename || "TridentDB.backup";
 
         var keyArray = [];
@@ -1499,23 +1499,16 @@ var sandboxIDE = {
             return;
         }
 
-        var strSelection;
         var scriptSelection = sandbox.volatile.editorScript.getSelection();
-        var markupSelection = sandbox.volatile.editorMarkup.getSelection();
 
-        if (scriptSelection != "" && markupSelection != "") alertify.error("Ambiguous selection; Highlighted code exists in both editors; using Script selection", "", 0);
-
-        if (scriptSelection == "" && markupSelection == "") {
-            alertify.alert("This feature requires you to select a variable or object in the script editor before clicking 'Inspect'.");
+        if (scriptSelection === "") {
+            sandbox.showProtos();
             return;
         }
 
-        if (scriptSelection != "") strSelection = scriptSelection;
-        else strSelection = markupSelection;
-
         var objResult;
         try {
-            objResult = eval(strSelection);
+            objResult = eval(scriptSelection);
         }
         catch (exc) {
             alertify.error("malformed inspection selection");
@@ -1786,7 +1779,7 @@ var sandboxIDE = {
             if (result == null || result.id == 0) return;
 
             sandbox.volatile.autorunActive = true;
-            API_AppendUnitScript(result.val);
+            sandbox.units.appendScriptUnit(result.val);
         });
     },
     loadSlot: function (runAfterLoad) {
@@ -2378,14 +2371,254 @@ var sandboxIDE = {
 
 //#endregion ide
 
+//#region sandboxUtil
+
+var sandboxUtil = {
+    addDate : function (unixDate, offset, offsetType) {
+        var oldDate = new Date();
+        oldDate.setTime(unixDate);
+        var year = parseInt(oldDate.getFullYear());
+        var month = parseInt(oldDate.getMonth());
+        var date = parseInt(oldDate.getDate());
+        var hour = parseInt(oldDate.getHours());
+        var newDate;
+
+        switch (offsetType) {
+            case "years":
+            case "Y":
+            case "y":
+                newDate = new Date(year + offset, month, date, hour);
+                break;
+            case "months":
+            case "M":
+            case "m":
+                newDate = new Date(year, month + offset, date, hour);
+                break;
+            case "days":
+            case "D":
+            case "d":
+                newDate = new Date(year, month, date + offset, hour);
+                break;
+            case "weeks":
+            case "W":
+            case "w":
+                newDate = new Date(year, month, date + offset*7, hour);
+                break;
+            case "hours":
+            case "H":
+            case "h":
+                newDate = new Date(year, month, date, hour + offset);
+                break;
+        }
+
+        return newDate.getTime();            
+    } 
+}
+
+//#endregion
+
+//#region sandboxProtos
+
+var sandboxProtos = [
+    {
+        title: "sandbox",
+        isFolder: true,
+        key: "id3",
+        hideCheckbox: true,
+        tooltip: "sandbox namespace root.  Wraps all the sandbox specific functionality and convenience methods into this namespace-like hierarchy.  It is a singleton and most methods are heavily ui-bound but it provides a common engine used by all page variations and adds cleanliness to sandbox and user program code.",
+        expand: true,
+        children: [
+            {
+                title: "db",
+                isFolder: true,
+                key: "db",
+                hideCheckbox: true,
+                tooltip: "This object reference may point to any number of database adapters such as TridentMemoryAdapter, TridentIndexedAdapter, TridentServiceAdapter.  The sandbox environment uses this as the primary location for saving programs.",
+                children: [
+                    { title: "getAllKeys(callback)", key: "getAllKeys", hideCheckbox: true, tooltip: "(adapter interface function) This will pass into your callback an array of objects representing all database keys (minus the val property and adding a size property)." },
+                    { title: "getAppKeys(app, callback)", key: "getAppKeys", hideCheckbox: true, tooltip: "(adapter interface function) This will pass into your callback an array of objects representing all keys for the specified application (minus the val property and adding a size property)." },
+                    { title: "getAppKey(app, key, callback)", key: "getAppKey", hideCheckbox: true, tooltip: "(adapter interface function) This will retrieve a single key with that app/key combination, returning an object representing it to your callback.  The object returned will contain app, key, val, and id properties." },
+                    { title: "getAppKeyById(id, callback)", key: "getAppKeyById", hideCheckbox: true, tooltip: "(adapter interface function) This will retrieve a single key with the id provided and return to your callback an object representing it." },
+                    { title: "setAppKey(app, key, val, callback)", key: "setAppKey", hideCheckbox: true, tooltip: "(adapter interface function) This will add or update a single key within the database.  You supply app, key, and val, and can optionally implement a callback to be notified when it completes." },
+                    { title: "deleteAppKey(id, callback)", key: "deleteAppKey", hideCheckbox: true, tooltip: "(adapter interface function) This will allow you to delete a database key by providing its 'id'.  You may implement a callback to be notified when it completes." }
+                ]
+            },
+            {
+                title: "events",
+                isFolder: true,
+                key: "events",
+                hideCheckbox: true,
+                tooltip: "This object placeholder allows you to attach, intercept, and respond to sandbox generated events.  Your program may override these to be notified.  These are cleared out when sandbox is cleared.",
+                children: [
+                    { title: "clean()", key: "clean", hideCheckbox: true, tooltip: "You may optionally attach a function to this location (sandbox.events.clean) to be notified when the sandbox is clearing out your program." },
+                    { title: "windowResize", key: "windowResize", hideCheckbox: true, tooltip: "You may optionally attach a function to this location to be notified when the browser is resized." },
+                    { title: "databaseChanged", key: "databaseChanged", hideCheckbox: true, tooltip: "Attach an event to this if you want to be notified of when the database adapter has changed.  Hopefully that won't happen while your program is running." },
+                    { title: "userLoadCallback(filestring, filename)", key: "userLoadCallback", hideCheckbox: true, tooltip: "If you use the user file loader (in files namespace), this event will be fired upon the user picking a file to load.  Your callback will be passed two variables, the first containing the string contents of the text file, and the second containing the file name of the picked file." },
+                    { title: "userdataLoadCallback(dataUrl, filename)", key: "userdataLoadCallback", hideCheckbox: true, tooltip: "If you use the user binary file loader (in files namespace), this event will be fired upon the user picking and loading the file. Your callback will be passed two variables, the first containing a binaryUri representation of the binary data, and the second containing the file name of the picked file." }
+                ]
+            },
+            {
+                title: "files",
+                isFolder: true,
+                hideCheckbox: true,
+                tooltip: "This is the sandbox interface to ease the use of the File API for importing and exporting files.",
+                children: [
+                    { title: "userfileShow()", key: "userfileShow", hideCheckbox: true, tooltip: "Displays a file picker for the user to easily load text files from.  Requires you to implement and attach a callback to sandbox.events.userLoadCallback to receive the loaded text." },
+                    { title: "userfileHide()", key: "userfileHide", hideCheckbox: true, tooltip: "Hides the user file picker." },
+                    { title: "userdataShow()", key: "userdataShow", hideCheckbox: true, tooltip: "Displays a file picker for the user to easily load binary files from.  Requires you to implement and attach a callback to sandbox.events.userdataLoadCallback to receive the dataUri formatted binary file as a string." },
+                    { title: "userdataHide()", key: "userdataHide", hideCheckbox: true, tooltip: "Hides the user data (binary) file picker" },
+                    { title: "exportDatabaseKeys()", key: "exportDatabaseKeys", hideCheckbox: true, tooltip: "Invokes a download containing all of the keys in the database for archival.  More functionality is available from the dashboard but this was left available." },
+                    { title: "dataUrlToBlob(dataURL)", key: "dataUrlToBlob", hideCheckbox: true, tooltip: "Passing this function a dataUri/dataUrl string will convert it into a binary blob format." },
+                    { title: "saveTextFile(fileName, saveString)", key: "saveTextFile", hideCheckbox: true, tooltip: "Pass in a filename and a string containing text to put in a file and this method will invoke a download of that file." },
+                    { title: "saveDataURL(fileName, dataURL)", key: "saveDataURL", hideCheckbox: true, tooltip: "Pass in a filename and a dataUrl/dataUri string and this will invoke a download to save that as a binary file." },
+                    { title: "saveOrOpenTextFile(fileName, saveString)", key: "saveOrOpenTextFile", hideCheckbox: true, tooltip: "Similar to saveTextFile, except it offers the option to open along with save and cancel options." }
+                ]
+            },
+            {
+                title: "ide",
+                isFolder: true,
+                key: "ide",
+                hideCheckbox: true,
+                tooltip: "This contains methods for controlling the sandbox ide environment itself.",
+                children: [
+                    { title: "run()", key: "run", hideCheckbox: true, tooltip: "Identical to pressing the 'run' toolbar button.  Clears sandbox and starts program cleanly." },
+                    { title: "launch()", key: "launch", hideCheckbox: true, tooltip: "Identical to pressing the 'launch' toolbar button.  Runs the program in a new window without an ide." },
+                    { title: "clean()", key: "clean", hideCheckbox: true, tooltip: "Identical to pressing 'new' toolbar button.  Clears editors and output and defaults to new program template." },
+                    { title: "clearOutput()", key: "clearOutput", hideCheckbox: true, tooltip: "Identical to pressing 'clear output' toolbar button.  Clears output and runs clean event but leaves editor text intact for subsequent runs." },
+                    { title: "runApp(progname)", key: "runApp", hideCheckbox: true, tooltip: "Will issue an ajax call to load a sample program.  Used by samples browsers." },
+                    { title: "runSlot(appName)", key: "runSlot", hideCheckbox: true, tooltip: "Will load a program from a save slot in the trident database.  Used by the program save dropdown list." },
+                    { title: "runAutorun()", key: "runAutorun", hideCheckbox: true, tooltip: "Will manually re-run the autorun save slot.  Might be useful if autorun is available but disabled, this would manually run it." },
+                    { title: "setActiveTab(tabId)", key: "setActiveTab", hideCheckbox: true, tooltip: "Switch the active tab to main output (0) or text log (1) " },
+                    { title: "setWindowMode(mode)", key: "setWindowMode", hideCheckbox: true, tooltip: "Switch between window modes : code only (1) code and output (2) or output only (3)" }
+                ]
+            },
+            {
+                title: "logger",
+                isFolder: true,
+                key: "logger",
+                hideCheckbox: true,
+                tooltip: "This contains methods for controlling logging, tracing, and visual inspection of data for diagnostic purposes.",
+                children: [
+                    { title: "log(msg)", key: "log", hideCheckbox: true, tooltip: "The default method for sending text to the text log tab (in IDE).  In sandbox loaders the text will be sent to the console." },
+                    { title: "logObject(objToLog, objName)", key: "logObject", hideCheckbox: true, tooltip: "Dumps an object to the text log tab with formatted indentation." },
+                    { title: "clearLog()", key: "clearLog", hideCheckbox: true, tooltip: "Clears the text log output tab." },
+                    { title: "trace()", key: "trace", hideCheckbox: true, tooltip: "Invokes a browser trace which dumps stack.  Currently goes to browser console." },
+                    { title: "inspect(objVar, caption)", key: "inspect", hideCheckbox: true, tooltip: "Use this method to send an object to the trident variable inspector.  This utilizes the prettyprint.js library to create a dialog which you can drill down into simple or deeply hierarchical objects." },
+                    { title: "notify(msg, caption)", key: "notify", hideCheckbox: true, tooltip: "Alternative to alertify.log() in case i switch to another notification library in the future.  Provided for future proofing, caption is not currently being used." },
+                    { title: "notifySuccess(msg, caption)", key: "notifySuccess", hideCheckbox: true, tooltip: "Alternative to alertify.success() in case i switch to another notification library in the future.  Provided for future proofing, caption is not currently being used." },
+                    { title: "notifyError(msg, caption)", key: "notifyError", hideCheckbox: true, tooltip: "Alternative to alertify.error() in case i switch to another notification library in the future.  Provided for future proofing, caption is not currently being used." }
+                ]
+            },
+            {
+                title: "media",
+                isFolder: true,
+                hideCheckbox: true,
+                tooltip: "Contains methods relevant to playing media.",
+                children: [
+                    { title: "playAudio(uri)", key: "playAudio", hideCheckbox: true, tooltip: "Plays an audio file invisibly, given an internet url or dataUri." },
+                    { title: "speak(msgText)", key: "speak", hideCheckbox: true, tooltip: "If your browser supports the Speech API, this is a convenience method for simply speaking a message." },
+                    { title: "isSpeechAvailable", key: "isSpeechAvailable", hideCheckbox: true, tooltip: "(boolean) indicates if the Speech API is supported by your browser" }
+                ]
+            },
+            {
+                title: "ui",
+                isFolder: true,
+                hideCheckbox: true,
+                tooltip: "This contains methods for controlling your program's user interface.",
+                children: [
+                    { title: "setDarkTheme()", key: "setDarkTheme", hideCheckbox: true, tooltip: "This will set background color to dark grey and text color to white." },
+                    { title: "setLightTheme()", key: "setLightTheme", hideCheckbox: true, tooltip: "This will set background color to white and text color to black." },
+                    { title: "setBackgroundColor(colorCode)", key: "setBackgroundColor", hideCheckbox: true, tooltip: "Use this to change background color." },
+                    { title: "clearMain()", key: "clearMain", hideCheckbox: true, tooltip: "Clears the main tab of all UI/DOM elements." },
+                    { title: "fullscreen(elem)", key: "fullscreen", hideCheckbox: true, tooltip: "Requests that the browser go fullscreen.  If you pass in an optional DOM element, it will just fullscreen that element.  Most browsers require this to be executed during a button click event." },
+                    { title: "fullscreenExit()", key: "fullscreenExit", hideCheckbox: true, tooltip: "Exits fullscreen mode via code.  ESC key should always escape fullscreen but this method might be additional convenience." },
+                    { title: "fullscreenToggle()", key: "fullscreenToggle", hideCheckbox: true, tooltip: "Toggles fullscreen." },
+                    { title: "showPasswordDialog(callback)", key: "showPasswordDialog", hideCheckbox: true, tooltip: "Brings up a dialog for password entry.  When the user enters a password and clicks ok, this dialog will call your provided callback function, passing the password into it as a string." }
+                ]
+            },
+            {
+                title: "units",
+                isFolder: true,
+                hideCheckbox: true,
+                tooltip: "This contains methods for interacting with the Library Unit subsystem.  This subsystem allows reusability of scripts or markup by saving them into the trident database, to be recalled within your programs.  While there is a 'utility sample' which performs much of this maintenance, these methods allow you to recall within your programs. ",
+                children: [
+                    { title: "logMarkupUnits()", key: "logMarkupUnits", hideCheckbox: true, tooltip: "Mostly for console use.  This will dump a list of markup units in the trident database to the text log." },
+                    { title: "saveMarkupUnit(unitName)", key: "saveMarkupUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will save the contents of the Markup editor as a markup unit within the trident database." },
+                    { title: "loadMarkupUnit(unitName)", key: "loadMarkupUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will load the markup unit from the trident database into the Markup editor of the IDE." },
+                    { title: "getMarkupUnit(unitName, callback)", key: "getMarkupUnit", hideCheckbox: true, tooltip: "Use this within you programs to recall markup units as a string which you can then insert into your web pages.  Your callback is passed a string value containing the markup unit text." },
+                    { title: "logScriptUnits()", key: "logScriptUnits", hideCheckbox: true, tooltip: "Mostly for console use.  This will dump a list of script units in the trident database to the text log." },
+                    { title: "saveScriptUnit(unitName)", key: "saveScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will save the contents of the Script editor as a script unit within the trident database." },
+                    { title: "loadScriptUnit(unitName)", key: "loadScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will load the script unit from the trident database into the Script editor of the IDE." },
+                    { title: "importScriptUnit(unitName, callback)", key: "importScriptUnit", hideCheckbox: true, tooltip: "This command will load your script unit from the trident database and automatically add it to the page for use.  Pass in a callback to be notified when this is done." },
+                    { title: "appendScriptUnit(scriptText, callback)", key: "appendScriptUnit", hideCheckbox: true, tooltip: "If you already have the script text and do not need to load it from the trident database, this will just append it for use.  Pass in a callback to be notified when this is done." },
+                    { title: "clearScriptUnits()", key: "clearScriptUnits", hideCheckbox: true, tooltip: "Can be used to clear out old scripts but scripts often get attached to the DOM via the window object and will remain until page is reloaded, so do not depend too much on this." }
+                ]
+            },
+            {
+                title: "util",
+                isFolder: true,
+                hideCheckbox: true,
+                tooltip: "Contains miscellaneous utility functions.",
+                children: [
+                    { title: "addDate(unixDate, offset, offsetType)", key: "addDate", hideCheckbox: true, tooltip: "Utility function for date management. unixDate (number) unixms date format returned by javascript date's getTime() method.  offset (number) # of days/weeks/months/years to add to input date.  offsetType (string) : 'years', 'months', 'days', 'weeks', 'hours', 'y', 'm', 'd', 'w', 'h'. Returns (number) unixms formatted adjusted date. "}
+                ]
+            },
+            {
+                title: "volatile",
+                isFolder: true,
+                hideCheckbox: true,
+                tooltip: "This contains properties which are either hardcoded or just not saved or loaded.",
+                children: [
+                    { title: "version", key: "version", hideCheckbox: true, tooltip: "(string) variable containing the version label of the trident sandbox environment, such as \"2.1.0\"" },
+                    { title: "env", key: "env", hideCheckbox: true, tooltip: "(string) variable containing either \"IDE\", \"IDE WJS\", \"SBL\", or \"SBL WJS\".  This indiciates which trident sandbox page your program is running under." }
+                ]
+            }
+        ]
+    }
+];
+
+//#endregion sandboxProtos
+
 //#region sandbox obejct
 
 var sandbox = {
     db: null,
+    protos: sandboxProtos,
+    showProtos: function() {
+        $("#div-sbx-api").dialog({
+            title: 'Sandbox Library Reference',
+            width: 500,
+            height: 600,
+            open: function () {
+                $("#sandboxTree").dynatree({
+                    checkbox: true,
+                    // Override class name for checkbox icon:
+                    classNames: { checkbox: "dynatree-radio" },
+                    selectMode: 1,
+                    children: sandbox.protos,
+                    onActivate: function (node) {
+                        $("#nodeInfo").text(node.data.tooltip);
+                    },
+                    onKeydown: function (node, event) {
+                    },
+                    // The following options are only required, if we have more than one tree on one page:
+                    //initId: "treeData",
+                    cookieId: "dynatree-Cb1",
+                    idPrefix: "dynatree-Cb1-"
+                });
+            },
+            beforeClose: function () {
+                $("#sandboxTree").dynatree("destroy");
+                $("#sandboxTree").empty();
+                $("#nodeInfo").empty();
+            }
+        });
+    },
     logger: sbxLogger,
     media: sandboxMedia,
     files: sandboxFiles,
     units: sandboxUnits,
+    util: sandboxUtil,
     ide: sandboxIDE,
     ui: sandboxUI,
     events: sandboxEvents,
@@ -2394,7 +2627,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.10",
+        version: "2.11",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,
@@ -2428,7 +2661,8 @@ var sandbox = {
         headerFont: "Heorot",
         editorTheme: "vibrant-ink",
         autorunSlot: "",
-        skipAutorun: "false",   // interpret all properties as strings for dashboard editor
+        skipAutorun: "true",   // interpret all properties as strings for dashboard editor
+        useLinter: "true",
         errorPopups: "true",
         pendingChangesWarning: "true",
         ideMode: "desktop",
@@ -2659,13 +2893,9 @@ var sandbox = {
 
             sandbox.logger.clearLog();
 
-            if (sandbox.volatile.env === "IDE") {
-                document.title = "Trident Sandbox v" + sandbox.volatile.version;
-                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect highlighted symbol/variable\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
-            }
-            else {
-                document.title = "Trident Sandbox WJS v" + sandbox.volatile.version;
-                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect highlighted symbol/variable\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
+            if (sandbox.volatile.envTest(["IDE", "IDE WJS"]) {
+                document.title = "Trident Sandbox " + ((sandbox.volatile.env === "IDE WJS")?"WJS":"") + " v" + sandbox.volatile.version;
+                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect highlighted variable or show api ref\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
             }
 
             $("#sb_txt_Script").val("// script editor tips : \r\n// autoindenting is turned on\r\n// the horizontal slashes indicate forced tabs (instead of smart indenting)\r\n// use shift-tab to use auto-indention for a line instead (cleans up tab slashes)\r\n// use ctrl-a or select multiple lines and then press shift-tab to smart indent them\r\n// the javascript linter may notify you of issues with your code, such as : \r\n\r\nfunction badCode() {\r\n\tvar test=[]\r\n\r\n\tvar test = 'a';\r\n}");
@@ -2699,6 +2929,8 @@ var sandbox = {
             // This will now calculate the initial value based on our Welcome text above
             sandbox.volatile.markupHash = CryptoJS.SHA1($("#sb_txt_Markup").val()).toString();
             sandbox.volatile.scriptHash = CryptoJS.SHA1($("#sb_txt_Script").val()).toString();
+
+            var useLinter = (sandbox.settings.useLinter === "true");
 
             // We are using xml mode for markup so that if we add style tag it wont mess up rendering
             // hopefully in the future we can implement mixed rendering or add separate css
@@ -2736,8 +2968,8 @@ var sandbox = {
                 matchBrackets: true,
                 foldGutter: true,
                 showCursorWhenSelecting: true,
-                gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers", "CodeMirror-foldgutter"],
-                lint: true,
+                gutters: (useLinter)?["CodeMirror-linenumbers", "CodeMirror-lint-markers", "CodeMirror-foldgutter"]:["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                lint: useLinter,
                 indentUnit: 4,
                 tabSize: 4,
                 extraKeys: {
@@ -2984,9 +3216,9 @@ var sandbox = {
         }
 
 
-        //if (!sandbox.hashparams.getParameter("SkipAutorun")) {
-        //    sb_run_autorun();
-        //}
+        if (sandbox.settings.skipAutorun !== "true" && sandbox.hashparams.getParameter("SkipAutorun") !== 'true') {
+            sandbox.ide.runAutorun();
+        }
 
         // Sandbox Loaders : if no runslot/runapp then load SandboxLoader prog
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {

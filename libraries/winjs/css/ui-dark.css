@@ -361,38 +361,44 @@
   font-family: "Symbols";
   src: url(../fonts/Symbols.ttf);
 }
-.win-type-xx-large {
+.win-type-header,
+.win-h1 {
   font-size: 46px;
   font-weight: 200;
   line-height: 1.216;
   letter-spacing: 0px;
 }
-.win-type-x-large {
+.win-type-subheader,
+.win-h2 {
   font-size: 34px;
   font-weight: 200;
   line-height: 1.176;
 }
-.win-type-large {
+.win-type-title,
+.win-h3 {
   font-size: 24px;
   font-weight: 300;
   line-height: 1.167;
 }
-.win-type-medium {
+.win-type-subtitle,
+.win-h4 {
   font-size: 20px;
   font-weight: 400;
   line-height: 1.2;
 }
-.win-type-small {
+.win-type-body,
+.win-h6 {
   font-size: 15px;
   font-weight: 400;
   line-height: 1.333;
 }
-.win-type-x-small {
+.win-type-base,
+.win-h5 {
   font-size: 15px;
   font-weight: 500;
   line-height: 1.333;
 }
-.win-type-xx-small {
+.win-type-caption {
   font-size: 12px;
   font-weight: 400;
   line-height: 1.167;
@@ -474,164 +480,204 @@
   font-weight: 600;
   src: local("Microsoft JhengHei UI Bold");
 }
-body:-ms-lang(am, ti),
-.win-type-xx-large:-ms-lang(am, ti),
-.win-type-x-large:-ms-lang(am, ti),
-.win-type-large:-ms-lang(am, ti),
-.win-type-medium:-ms-lang(am, ti),
-.win-type-small:-ms-lang(am, ti),
-.win-type-x-small:-ms-lang(am, ti),
-.win-type-xx-small:-ms-lang(am, ti),
-input:-ms-lang(am, ti),
-textarea:-ms-lang(am, ti),
-.win-textarea:-ms-lang(am, ti),
-button:-ms-lang(am, ti),
-select:-ms-lang(am, ti),
-option:-ms-lang(am, ti) {
+.win-type-header:-ms-lang(am, ti),
+.win-type-subheader:-ms-lang(am, ti),
+.win-type-title:-ms-lang(am, ti),
+.win-type-subtitle:-ms-lang(am, ti),
+.win-type-base:-ms-lang(am, ti),
+.win-type-body:-ms-lang(am, ti),
+.win-type-caption:-ms-lang(am, ti),
+.win-h1:-ms-lang(am, ti),
+.win-h2:-ms-lang(am, ti),
+.win-h3:-ms-lang(am, ti),
+.win-h4:-ms-lang(am, ti),
+.win-h5:-ms-lang(am, ti),
+.win-h6:-ms-lang(am, ti),
+.win-button:-ms-lang(am, ti),
+.win-dropdown:-ms-lang(am, ti),
+.win-textbox:-ms-lang(am, ti),
+.win-link:-ms-lang(am, ti),
+.win-textarea:-ms-lang(am, ti) {
   font-family: "Ebrima", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-.win-type-xx-large:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-.win-type-x-large:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-.win-type-large:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-.win-type-medium:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-.win-type-small:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-.win-type-x-small:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-.win-type-xx-small:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-input:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-textarea:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-.win-textarea:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-button:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-select:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
-option:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te) {
+.win-type-header:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-type-subheader:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-type-title:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-type-subtitle:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-type-base:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-type-body:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-type-caption:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-h1:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-h2:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-h3:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-h4:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-h5:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-h6:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-button:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-dropdown:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-textbox:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-link:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te),
+.win-textarea:-ms-lang(as, bn, gu, hi, kn, kok, ml, mr, ne, or, pa, sat-Olck, si, srb-Sora, ta, te) {
   font-family: "Nirmala UI", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(chr-CHER-US),
-.win-type-xx-large:-ms-lang(chr-CHER-US),
-.win-type-x-large:-ms-lang(chr-CHER-US),
-.win-type-large:-ms-lang(chr-CHER-US),
-.win-type-medium:-ms-lang(chr-CHER-US),
-.win-type-small:-ms-lang(chr-CHER-US),
-.win-type-x-small:-ms-lang(chr-CHER-US),
-.win-type-xx-small:-ms-lang(chr-CHER-US),
-input:-ms-lang(chr-CHER-US),
-textarea:-ms-lang(chr-CHER-US),
-.win-textarea:-ms-lang(chr-CHER-US),
-button:-ms-lang(chr-CHER-US),
-select:-ms-lang(chr-CHER-US),
-option:-ms-lang(chr-CHER-US) {
+.win-type-header:-ms-lang(chr-CHER-US),
+.win-type-subheader:-ms-lang(chr-CHER-US),
+.win-type-title:-ms-lang(chr-CHER-US),
+.win-type-subtitle:-ms-lang(chr-CHER-US),
+.win-type-base:-ms-lang(chr-CHER-US),
+.win-type-body:-ms-lang(chr-CHER-US),
+.win-type-caption:-ms-lang(chr-CHER-US),
+.win-h1:-ms-lang(chr-CHER-US),
+.win-h2:-ms-lang(chr-CHER-US),
+.win-h3:-ms-lang(chr-CHER-US),
+.win-h4:-ms-lang(chr-CHER-US),
+.win-h5:-ms-lang(chr-CHER-US),
+.win-h6:-ms-lang(chr-CHER-US),
+.win-button:-ms-lang(chr-CHER-US),
+.win-dropdown:-ms-lang(chr-CHER-US),
+.win-textbox:-ms-lang(chr-CHER-US),
+.win-link:-ms-lang(chr-CHER-US),
+.win-textarea:-ms-lang(chr-CHER-US) {
   font-family: "Gadugi", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(ja),
-.win-type-xx-large:-ms-lang(ja),
-.win-type-x-large:-ms-lang(ja),
-.win-type-large:-ms-lang(ja),
-.win-type-medium:-ms-lang(ja),
-.win-type-small:-ms-lang(ja),
-.win-type-x-small:-ms-lang(ja),
-.win-type-xx-small:-ms-lang(ja),
-input:-ms-lang(ja),
-textarea:-ms-lang(ja),
-.win-textarea:-ms-lang(ja),
-button:-ms-lang(ja),
-select:-ms-lang(ja),
-option:-ms-lang(ja) {
+.win-type-header:-ms-lang(ja),
+.win-type-subheader:-ms-lang(ja),
+.win-type-title:-ms-lang(ja),
+.win-type-subtitle:-ms-lang(ja),
+.win-type-base:-ms-lang(ja),
+.win-type-body:-ms-lang(ja),
+.win-type-caption:-ms-lang(ja),
+.win-h1:-ms-lang(ja),
+.win-h2:-ms-lang(ja),
+.win-h3:-ms-lang(ja),
+.win-h4:-ms-lang(ja),
+.win-h5:-ms-lang(ja),
+.win-h6:-ms-lang(ja),
+.win-button:-ms-lang(ja),
+.win-dropdown:-ms-lang(ja),
+.win-textbox:-ms-lang(ja),
+.win-link:-ms-lang(ja),
+.win-textarea:-ms-lang(ja) {
   font-family: "Yu Gothic UI", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(km, lo, th, bug-Bugi),
-.win-type-xx-large:-ms-lang(km, lo, th, bug-Bugi),
-.win-type-x-large:-ms-lang(km, lo, th, bug-Bugi),
-.win-type-large:-ms-lang(km, lo, th, bug-Bugi),
-.win-type-medium:-ms-lang(km, lo, th, bug-Bugi),
-.win-type-small:-ms-lang(km, lo, th, bug-Bugi),
-.win-type-x-small:-ms-lang(km, lo, th, bug-Bugi),
-.win-type-xx-small:-ms-lang(km, lo, th, bug-Bugi),
-input:-ms-lang(km, lo, th, bug-Bugi),
-textarea:-ms-lang(km, lo, th, bug-Bugi),
-.win-textarea:-ms-lang(km, lo, th, bug-Bugi),
-button:-ms-lang(km, lo, th, bug-Bugi),
-select:-ms-lang(km, lo, th, bug-Bugi),
-option:-ms-lang(km, lo, th, bug-Bugi) {
+.win-type-header:-ms-lang(km, lo, th, bug-Bugi),
+.win-type-subheader:-ms-lang(km, lo, th, bug-Bugi),
+.win-type-title:-ms-lang(km, lo, th, bug-Bugi),
+.win-type-subtitle:-ms-lang(km, lo, th, bug-Bugi),
+.win-type-base:-ms-lang(km, lo, th, bug-Bugi),
+.win-type-body:-ms-lang(km, lo, th, bug-Bugi),
+.win-type-caption:-ms-lang(km, lo, th, bug-Bugi),
+.win-h1:-ms-lang(km, lo, th, bug-Bugi),
+.win-h2:-ms-lang(km, lo, th, bug-Bugi),
+.win-h3:-ms-lang(km, lo, th, bug-Bugi),
+.win-h4:-ms-lang(km, lo, th, bug-Bugi),
+.win-h5:-ms-lang(km, lo, th, bug-Bugi),
+.win-h6:-ms-lang(km, lo, th, bug-Bugi),
+.win-button:-ms-lang(km, lo, th, bug-Bugi),
+.win-dropdown:-ms-lang(km, lo, th, bug-Bugi),
+.win-textbox:-ms-lang(km, lo, th, bug-Bugi),
+.win-link:-ms-lang(km, lo, th, bug-Bugi),
+.win-textarea:-ms-lang(km, lo, th, bug-Bugi) {
   font-family: "Leelawadee UI", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(ko),
-.win-type-xx-large:-ms-lang(ko),
-.win-type-x-large:-ms-lang(ko),
-.win-type-large:-ms-lang(ko),
-.win-type-medium:-ms-lang(ko),
-.win-type-small:-ms-lang(ko),
-.win-type-x-small:-ms-lang(ko),
-.win-type-xx-small:-ms-lang(ko),
-input:-ms-lang(ko),
-textarea:-ms-lang(ko),
-.win-textarea:-ms-lang(ko),
-button:-ms-lang(ko),
-select:-ms-lang(ko),
-option:-ms-lang(ko) {
+.win-type-header:-ms-lang(ko),
+.win-type-subheader:-ms-lang(ko),
+.win-type-title:-ms-lang(ko),
+.win-type-subtitle:-ms-lang(ko),
+.win-type-base:-ms-lang(ko),
+.win-type-body:-ms-lang(ko),
+.win-type-caption:-ms-lang(ko),
+.win-h1:-ms-lang(ko),
+.win-h2:-ms-lang(ko),
+.win-h3:-ms-lang(ko),
+.win-h4:-ms-lang(ko),
+.win-h5:-ms-lang(ko),
+.win-h6:-ms-lang(ko),
+.win-button:-ms-lang(ko),
+.win-dropdown:-ms-lang(ko),
+.win-textbox:-ms-lang(ko),
+.win-link:-ms-lang(ko),
+.win-textarea:-ms-lang(ko) {
   font-family: "Malgun Gothic", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(jv-Java),
-.win-type-xx-large:-ms-lang(jv-Java),
-.win-type-x-large:-ms-lang(jv-Java),
-.win-type-large:-ms-lang(jv-Java),
-.win-type-medium:-ms-lang(jv-Java),
-.win-type-small:-ms-lang(jv-Java),
-.win-type-x-small:-ms-lang(jv-Java),
-.win-type-xx-small:-ms-lang(jv-Java),
-input:-ms-lang(jv-Java),
-textarea:-ms-lang(jv-Java),
-.win-textarea:-ms-lang(jv-Java),
-button:-ms-lang(jv-Java),
-select:-ms-lang(jv-Java),
-option:-ms-lang(jv-Java) {
+.win-type-header:-ms-lang(jv-Java),
+.win-type-subheader:-ms-lang(jv-Java),
+.win-type-title:-ms-lang(jv-Java),
+.win-type-subtitle:-ms-lang(jv-Java),
+.win-type-base:-ms-lang(jv-Java),
+.win-type-body:-ms-lang(jv-Java),
+.win-type-caption:-ms-lang(jv-Java),
+.win-h1:-ms-lang(jv-Java),
+.win-h2:-ms-lang(jv-Java),
+.win-h3:-ms-lang(jv-Java),
+.win-h4:-ms-lang(jv-Java),
+.win-h5:-ms-lang(jv-Java),
+.win-h6:-ms-lang(jv-Java),
+.win-button:-ms-lang(jv-Java),
+.win-dropdown:-ms-lang(jv-Java),
+.win-textbox:-ms-lang(jv-Java),
+.win-link:-ms-lang(jv-Java),
+.win-textarea:-ms-lang(jv-Java) {
   font-family: "Javanese Text", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(cop-Copt),
-.win-type-xx-large:-ms-lang(cop-Copt),
-.win-type-x-large:-ms-lang(cop-Copt),
-.win-type-large:-ms-lang(cop-Copt),
-.win-type-medium:-ms-lang(cop-Copt),
-.win-type-small:-ms-lang(cop-Copt),
-.win-type-x-small:-ms-lang(cop-Copt),
-.win-type-xx-small:-ms-lang(cop-Copt),
-input:-ms-lang(cop-Copt),
-textarea:-ms-lang(cop-Copt),
-.win-textarea:-ms-lang(cop-Copt),
-button:-ms-lang(cop-Copt),
-select:-ms-lang(cop-Copt),
-option:-ms-lang(cop-Copt) {
+.win-type-header:-ms-lang(cop-Copt),
+.win-type-subheader:-ms-lang(cop-Copt),
+.win-type-title:-ms-lang(cop-Copt),
+.win-type-subtitle:-ms-lang(cop-Copt),
+.win-type-base:-ms-lang(cop-Copt),
+.win-type-body:-ms-lang(cop-Copt),
+.win-type-caption:-ms-lang(cop-Copt),
+.win-h1:-ms-lang(cop-Copt),
+.win-h2:-ms-lang(cop-Copt),
+.win-h3:-ms-lang(cop-Copt),
+.win-h4:-ms-lang(cop-Copt),
+.win-h5:-ms-lang(cop-Copt),
+.win-h6:-ms-lang(cop-Copt),
+.win-button:-ms-lang(cop-Copt),
+.win-dropdown:-ms-lang(cop-Copt),
+.win-textbox:-ms-lang(cop-Copt),
+.win-link:-ms-lang(cop-Copt),
+.win-textarea:-ms-lang(cop-Copt) {
   font-family: "Segoe MDL2 Assets", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(zh-CN, zh-Hans, zh-SG),
-.win-type-xx-large:-ms-lang(zh-CN, zh-Hans, zh-SG),
-.win-type-x-large:-ms-lang(zh-CN, zh-Hans, zh-SG),
-.win-type-large:-ms-lang(zh-CN, zh-Hans, zh-SG),
-.win-type-medium:-ms-lang(zh-CN, zh-Hans, zh-SG),
-.win-type-small:-ms-lang(zh-CN, zh-Hans, zh-SG),
-.win-type-x-small:-ms-lang(zh-CN, zh-Hans, zh-SG),
-.win-type-xx-small:-ms-lang(zh-CN, zh-Hans, zh-SG),
-input:-ms-lang(zh-CN, zh-Hans, zh-SG),
-textarea:-ms-lang(zh-CN, zh-Hans, zh-SG),
-.win-textarea:-ms-lang(zh-CN, zh-Hans, zh-SG),
-button:-ms-lang(zh-CN, zh-Hans, zh-SG),
-select:-ms-lang(zh-CN, zh-Hans, zh-SG),
-option:-ms-lang(zh-CN, zh-Hans, zh-SG) {
+.win-type-header:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-type-subheader:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-type-title:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-type-subtitle:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-type-base:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-type-body:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-type-caption:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-h1:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-h2:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-h3:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-h4:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-h5:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-h6:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-button:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-dropdown:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-textbox:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-link:-ms-lang(zh-CN, zh-Hans, zh-SG),
+.win-textarea:-ms-lang(zh-CN, zh-Hans, zh-SG) {
   font-family: "Microsoft YaHei UI", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
-body:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-.win-type-xx-large:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-.win-type-x-large:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-.win-type-large:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-.win-type-medium:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-.win-type-small:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-.win-type-x-small:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-.win-type-xx-small:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-input:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-textarea:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-.win-textarea:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-button:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-select:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
-option:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO) {
+.win-type-header:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-type-subheader:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-type-title:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-type-subtitle:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-type-base:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-type-body:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-type-caption:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-h1:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-h2:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-h3:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-h4:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-h5:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-h6:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-button:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-dropdown:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-textbox:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-link:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO),
+.win-textarea:-ms-lang(zh-HK, zh-TW, zh-Hant, zh-MO) {
   font-family: "Microsoft JhengHei UI", "Ebrima", "Nirmala UI", "Gadugi", "Segoe UI Emoji", "Segoe MDL2 Assets", "Symbols", "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Leelawadee UI", "Microsoft YaHei UI", "Microsoft JhengHei UI", "Malgun Gothic", "Segoe UI Historic", "Estrangelo Edessa", "Microsoft Himalaya", "Microsoft New Tai Lue", "Microsoft PhagsPa", "Microsoft Tai Le", "Microsoft Yi Baiti", "Mongolian Baiti", "MV Boli", "Myanmar Text", "Javanese Text", "Cambria Math";
 }
 html,
@@ -640,11 +686,7 @@ body {
   height: 100%;
   margin: 0px;
   cursor: default;
-  -moz-user-select: none;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -ms-user-select: none;
   -ms-scroll-translation: vertical-to-horizontal;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -669,39 +711,31 @@ html:lang(qps-plocm) {
 }
 body {
   -ms-content-zooming: none;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.333;
 }
 iframe {
   border: 0;
 }
-body,
-.win-type-xx-large,
-.win-type-x-large,
-.win-type-large,
-.win-type-medium,
-.win-type-small,
-.win-type-x-small,
-.win-type-xx-small,
-input,
-textarea,
-.win-textarea,
-button,
-select,
-option {
+.win-type-header,
+.win-type-subheader,
+.win-type-title,
+.win-type-subtitle,
+.win-type-base,
+.win-type-body,
+.win-type-caption,
+.win-h1,
+.win-h2,
+.win-h3,
+.win-h4,
+.win-h5,
+.win-h6,
+.win-button,
+.win-dropdown,
+.win-textbox,
+.win-link,
+.win-textarea {
   font-family: "Segoe UI", sans-serif, "Segoe MDL2 Assets", "Symbols";
 }
-input:not([type]),
-input[type=""],
-input[type=text],
-input[type=password],
-input[type=email],
-input[type=number],
-input[type=tel],
-input[type=url],
-input[type=search],
-textarea,
+.win-textbox,
 .win-textarea {
   -ms-user-select: element;
   border-style: solid;
@@ -719,63 +753,98 @@ textarea,
   font-weight: 400;
   line-height: 1.333;
 }
-input::-ms-value {
+.win-textbox::-ms-value {
   margin: 0;
   padding: 0;
 }
-textarea,
+.win-textbox::-ms-clear,
+.win-textbox::-ms-reveal {
+  padding-right: 2px;
+  margin-right: -8px;
+  margin-left: 2px;
+  margin-top: -8px;
+  margin-bottom: -8px;
+  width: 30px;
+  height: 32px;
+}
+.win-textbox:lang(ar)::-ms-clear,
+.win-textbox:lang(dv)::-ms-clear,
+.win-textbox:lang(fa)::-ms-clear,
+.win-textbox:lang(he)::-ms-clear,
+.win-textbox:lang(ku-Arab)::-ms-clear,
+.win-textbox:lang(pa-Arab)::-ms-clear,
+.win-textbox:lang(prs)::-ms-clear,
+.win-textbox:lang(ps)::-ms-clear,
+.win-textbox:lang(sd-Arab)::-ms-clear,
+.win-textbox:lang(syr)::-ms-clear,
+.win-textbox:lang(ug)::-ms-clear,
+.win-textbox:lang(ur)::-ms-clear,
+.win-textbox:lang(qps-plocm)::-ms-clear,
+.win-textbox:lang(ar)::-ms-reveal,
+.win-textbox:lang(dv)::-ms-reveal,
+.win-textbox:lang(fa)::-ms-reveal,
+.win-textbox:lang(he)::-ms-reveal,
+.win-textbox:lang(ku-Arab)::-ms-reveal,
+.win-textbox:lang(pa-Arab)::-ms-reveal,
+.win-textbox:lang(prs)::-ms-reveal,
+.win-textbox:lang(ps)::-ms-reveal,
+.win-textbox:lang(sd-Arab)::-ms-reveal,
+.win-textbox:lang(syr)::-ms-reveal,
+.win-textbox:lang(ug)::-ms-reveal,
+.win-textbox:lang(ur)::-ms-reveal,
+.win-textbox:lang(qps-plocm)::-ms-reveal {
+  margin-left: -8px;
+  margin-right: 2px;
+}
 .win-textarea {
   resize: none;
   overflow-y: auto;
 }
-input[type=radio],
-input[type=checkbox] {
+.win-radio,
+.win-checkbox {
   width: 20px;
   height: 20px;
   margin-right: 8px;
   margin-top: 12px;
   margin-bottom: 12px;
 }
-input[type=radio]:lang(ar),
-input[type=checkbox]:lang(ar),
-input[type=radio]:lang(dv),
-input[type=checkbox]:lang(dv),
-input[type=radio]:lang(fa),
-input[type=checkbox]:lang(fa),
-input[type=radio]:lang(he),
-input[type=checkbox]:lang(he),
-input[type=radio]:lang(ku-Arab),
-input[type=checkbox]:lang(ku-Arab),
-input[type=radio]:lang(pa-Arab),
-input[type=checkbox]:lang(pa-Arab),
-input[type=radio]:lang(prs),
-input[type=checkbox]:lang(prs),
-input[type=radio]:lang(ps),
-input[type=checkbox]:lang(ps),
-input[type=radio]:lang(sd-Arab),
-input[type=checkbox]:lang(sd-Arab),
-input[type=radio]:lang(syr),
-input[type=checkbox]:lang(syr),
-input[type=radio]:lang(ug),
-input[type=checkbox]:lang(ug),
-input[type=radio]:lang(ur),
-input[type=checkbox]:lang(ur),
-input[type=radio]:lang(qps-plocm),
-input[type=checkbox]:lang(qps-plocm) {
+.win-radio:lang(ar),
+.win-checkbox:lang(ar),
+.win-radio:lang(dv),
+.win-checkbox:lang(dv),
+.win-radio:lang(fa),
+.win-checkbox:lang(fa),
+.win-radio:lang(he),
+.win-checkbox:lang(he),
+.win-radio:lang(ku-Arab),
+.win-checkbox:lang(ku-Arab),
+.win-radio:lang(pa-Arab),
+.win-checkbox:lang(pa-Arab),
+.win-radio:lang(prs),
+.win-checkbox:lang(prs),
+.win-radio:lang(ps),
+.win-checkbox:lang(ps),
+.win-radio:lang(sd-Arab),
+.win-checkbox:lang(sd-Arab),
+.win-radio:lang(syr),
+.win-checkbox:lang(syr),
+.win-radio:lang(ug),
+.win-checkbox:lang(ug),
+.win-radio:lang(ur),
+.win-checkbox:lang(ur),
+.win-radio:lang(qps-plocm),
+.win-checkbox:lang(qps-plocm) {
   margin-left: 8px;
   margin-right: 0px;
 }
-input::-ms-check {
+.win-radio::-ms-check,
+.win-checkbox::-ms-check {
   border-style: solid;
   display: inline-block;
   border-width: 2px;
   background-clip: border-box;
 }
-button,
-input[type=button],
-input[type=reset],
-input[type=submit],
-button[type=submit] {
+.win-button {
   border-style: solid;
   margin: 0px;
   min-height: 32px;
@@ -790,46 +859,7 @@ button[type=submit] {
   font-weight: 400;
   line-height: 1.333;
 }
-input::-ms-clear,
-input::-ms-reveal {
-  padding-right: 2px;
-  margin-right: -8px;
-  margin-left: 2px;
-  margin-top: -8px;
-  margin-bottom: -8px;
-  width: 30px;
-  height: 32px;
-}
-input:lang(ar)::-ms-clear,
-input:lang(dv)::-ms-clear,
-input:lang(fa)::-ms-clear,
-input:lang(he)::-ms-clear,
-input:lang(ku-Arab)::-ms-clear,
-input:lang(pa-Arab)::-ms-clear,
-input:lang(prs)::-ms-clear,
-input:lang(ps)::-ms-clear,
-input:lang(sd-Arab)::-ms-clear,
-input:lang(syr)::-ms-clear,
-input:lang(ug)::-ms-clear,
-input:lang(ur)::-ms-clear,
-input:lang(qps-plocm)::-ms-clear,
-input:lang(ar)::-ms-reveal,
-input:lang(dv)::-ms-reveal,
-input:lang(fa)::-ms-reveal,
-input:lang(he)::-ms-reveal,
-input:lang(ku-Arab)::-ms-reveal,
-input:lang(pa-Arab)::-ms-reveal,
-input:lang(prs)::-ms-reveal,
-input:lang(ps)::-ms-reveal,
-input:lang(sd-Arab)::-ms-reveal,
-input:lang(syr)::-ms-reveal,
-input:lang(ug)::-ms-reveal,
-input:lang(ur)::-ms-reveal,
-input:lang(qps-plocm)::-ms-reveal {
-  margin-left: -8px;
-  margin-right: 2px;
-}
-input[type=file] {
+.win-button.win-button-file {
   border: none;
   min-width: 100px;
   min-height: 20px;
@@ -839,7 +869,7 @@ input[type=file] {
   margin: 7px 8px 21px 8px;
   background-clip: padding-box;
 }
-input[type=file]::-ms-value {
+.win-button.win-button-file::-ms-value {
   margin: 0;
   border-width: 2px;
   border-style: solid;
@@ -850,23 +880,23 @@ input[type=file]::-ms-value {
   font-weight: 400;
   line-height: 1.333;
 }
-input[type=file]:lang(ar)::-ms-value,
-input[type=file]:lang(dv)::-ms-value,
-input[type=file]:lang(fa)::-ms-value,
-input[type=file]:lang(he)::-ms-value,
-input[type=file]:lang(ku-Arab)::-ms-value,
-input[type=file]:lang(pa-Arab)::-ms-value,
-input[type=file]:lang(prs)::-ms-value,
-input[type=file]:lang(ps)::-ms-value,
-input[type=file]:lang(sd-Arab)::-ms-value,
-input[type=file]:lang(syr)::-ms-value,
-input[type=file]:lang(ug)::-ms-value,
-input[type=file]:lang(ur)::-ms-value,
-input[type=file]:lang(qps-plocm)::-ms-value {
+.win-button.win-button-file:lang(ar)::-ms-value,
+.win-button.win-button-file:lang(dv)::-ms-value,
+.win-button.win-button-file:lang(fa)::-ms-value,
+.win-button.win-button-file:lang(he)::-ms-value,
+.win-button.win-button-file:lang(ku-Arab)::-ms-value,
+.win-button.win-button-file:lang(pa-Arab)::-ms-value,
+.win-button.win-button-file:lang(prs)::-ms-value,
+.win-button.win-button-file:lang(ps)::-ms-value,
+.win-button.win-button-file:lang(sd-Arab)::-ms-value,
+.win-button.win-button-file:lang(syr)::-ms-value,
+.win-button.win-button-file:lang(ug)::-ms-value,
+.win-button.win-button-file:lang(ur)::-ms-value,
+.win-button.win-button-file:lang(qps-plocm)::-ms-value {
   border-left-style: none;
   border-right-style: solid;
 }
-input[type=file]::-ms-browse {
+.win-button.win-button-file::-ms-browse {
   margin: 0;
   padding: 0 18px;
   border-width: 2px;
@@ -876,7 +906,7 @@ input[type=file]::-ms-browse {
   font-weight: 400;
   line-height: 1.333;
 }
-select {
+.win-dropdown {
   min-width: 56px;
   max-width: 368px;
   min-height: 32px;
@@ -891,68 +921,88 @@ select {
   font-weight: 400;
   line-height: 1.333;
 }
-select::-ms-value {
+.win-dropdown::-ms-value {
   padding: 5px 12px 7px 12px;
   margin: 0;
 }
-select::-ms-expand {
+.win-dropdown::-ms-expand {
   border: none;
   margin-right: 5px;
   margin-left: 3px;
   margin-bottom: -2px;
   font-size: 20px;
 }
-select[multiple] {
+select[multiple].win-dropdown {
   padding: 0 0 0 12px;
   vertical-align: bottom;
 }
-option {
+.win-dropdown option {
   font-size: 15px;
   font-weight: 400;
   line-height: 1.333;
 }
-progress {
+.win-progress-bar,
+.win-progress-ring,
+.win-ring {
   width: 180px;
   height: 4px;
   -webkit-appearance: none;
 }
-progress:not(:indeterminate) {
+.win-progress-bar:not(:indeterminate),
+.win-progress-ring:not(:indeterminate),
+.win-ring:not(:indeterminate) {
   border-style: none;
 }
-progress::-ms-fill {
+.win-progress-bar::-ms-fill,
+.win-progress-ring::-ms-fill,
+.win-ring::-ms-fill {
   border-style: none;
 }
-progress.win-medium {
+.win-progress-bar.win-medium,
+.win-progress-ring.win-medium,
+.win-ring.win-medium {
   width: 296px;
 }
-progress.win-large {
+.win-progress-bar.win-large,
+.win-progress-ring.win-large,
+.win-ring.win-large {
   width: 100%;
 }
-progress:indeterminate::-webkit-progress-value {
+.win-progress-bar:indeterminate::-webkit-progress-value,
+.win-progress-ring:indeterminate::-webkit-progress-value,
+.win-ring:indeterminate::-webkit-progress-value {
   position: relative;
   -webkit-animation: win-progress-indeterminate 3s linear infinite;
 }
-progress.win-paused:not(:indeterminate) {
+.win-progress-bar.win-paused:not(:indeterminate),
+.win-progress-ring.win-paused:not(:indeterminate),
+.win-ring.win-paused:not(:indeterminate) {
   animation-name: win-progress-fade-out;
   animation-duration: 3s;
   animation-timing-function: cubic-bezier(0.03, 0.76, 0.31, 1);
   opacity: 0.5;
 }
-progress.win-error::-ms-fill {
+.win-progress-bar.win-error::-ms-fill,
+.win-progress-ring.win-error::-ms-fill,
+.win-ring.win-error::-ms-fill {
   opacity: 0;
 }
-progress.win-ring:indeterminate::-ms-fill {
-  animation-name: -ms-ring;
-}
-progress.win-ring {
+.win-progress-ring,
+.win-ring {
   width: 20px;
   height: 20px;
 }
-progress.win-medium.win-ring {
+.win-progress-ring:indeterminate::-ms-fill,
+.win-ring:indeterminate::-ms-fill {
+  animation-name: -ms-ring;
+}
+.win-progress-ring.win-medium,
+.win-ring.win-medium {
   width: 40px;
   height: 40px;
 }
-progress.win-large.win-ring {
+.win-progress-ring.win-large,
+.win-ring.win-large {
   width: 60px;
   height: 60px;
 }
@@ -986,32 +1036,32 @@ progress.win-large.win-ring {
     opacity: 0.5;
   }
 }
-input[type=range] {
+.win-slider {
   -webkit-appearance: none;
   width: 280px;
   height: 22px;
   padding-top: 17px;
   padding-bottom: 32px;
 }
-input[type=range]::-ms-track {
+.win-slider::-ms-track {
   height: 2px;
   border-style: none;
 }
-input[type=range]::-webkit-slider-runnable-track {
+.win-slider::-webkit-slider-runnable-track {
   height: 2px;
   border-style: none;
 }
-input[type=range]::-moz-range-track {
+.win-slider::-moz-range-track {
   height: 2px;
   border-style: none;
 }
-input[type=range]::-ms-thumb {
+.win-slider::-ms-thumb {
   width: 24px;
   height: 8px;
   border-radius: 4px;
   border-style: none;
 }
-input[type=range]::-webkit-slider-thumb {
+.win-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   margin-top: -4px;
   width: 24px;
@@ -1019,74 +1069,50 @@ input[type=range]::-webkit-slider-thumb {
   border-radius: 4px;
   border-style: none;
 }
-input[type=range]::-moz-range-thumb {
+.win-slider::-moz-range-thumb {
   width: 24px;
   height: 8px;
   border-radius: 4px;
   border-style: none;
 }
-input[type=range].win-vertical {
+.win-slider.win-vertical {
   writing-mode: bt-lr;
   width: 22px;
   height: 280px;
 }
-input[type=range].win-vertical::-ms-track {
+.win-slider.win-vertical::-ms-track {
   width: 2px;
   height: auto;
 }
-input[type=range].win-vertical::-ms-thumb {
+.win-slider.win-vertical::-ms-thumb {
   width: 8px;
   height: 24px;
 }
-input[type=range].win-vertical:lang(ar),
-input[type=range].win-vertical:lang(dv),
-input[type=range].win-vertical:lang(fa),
-input[type=range].win-vertical:lang(he),
-input[type=range].win-vertical:lang(ku-Arab),
-input[type=range].win-vertical:lang(pa-Arab),
-input[type=range].win-vertical:lang(prs),
-input[type=range].win-vertical:lang(ps),
-input[type=range].win-vertical:lang(sd-Arab),
-input[type=range].win-vertical:lang(syr),
-input[type=range].win-vertical:lang(ug),
-input[type=range].win-vertical:lang(ur),
-input[type=range].win-vertical:lang(qps-plocm) {
+.win-slider.win-vertical:lang(ar),
+.win-slider.win-vertical:lang(dv),
+.win-slider.win-vertical:lang(fa),
+.win-slider.win-vertical:lang(he),
+.win-slider.win-vertical:lang(ku-Arab),
+.win-slider.win-vertical:lang(pa-Arab),
+.win-slider.win-vertical:lang(prs),
+.win-slider.win-vertical:lang(ps),
+.win-slider.win-vertical:lang(sd-Arab),
+.win-slider.win-vertical:lang(syr),
+.win-slider.win-vertical:lang(ug),
+.win-slider.win-vertical:lang(ur),
+.win-slider.win-vertical:lang(qps-plocm) {
   writing-mode: bt-rl;
 }
-a {
+.win-link {
   text-decoration: underline;
   cursor: pointer;
   touch-action: manipulation;
 }
-img {
-  border-style: none;
-}
-form {
-  margin: 0px;
-  padding: 0px;
-}
-legend {
-  margin: 0px 0px 10px 0px;
-  padding: 0px;
-  color: inherit;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.333;
-}
-code,
-pre,
-samp {
+.win-code {
   font-family: "Consolas", "Menlo", "Monaco", "Courier New", monospace;
   font-size: 15px;
   font-weight: 400;
   line-height: 1.333;
-}
-caption,
-figcaption,
-small {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.167;
 }
 .win-type-ellipsis {
   overflow: hidden;
@@ -1094,40 +1120,14 @@ small {
   white-space: nowrap;
 }
 h1.win-type-ellipsis,
-.win-type-xx-large.win-type-ellipsis {
+.win-type-header.win-type-ellipsis,
+.win-h1.win-type-ellipsis {
   line-height: 1.4286;
 }
 h2.win-type-ellipsis,
-.win-type-x-large.win-type-ellipsis {
+.win-type-subheader.win-type-ellipsis,
+.win-h2.win-type-ellipsis {
   line-height: 1.5;
-}
-dt,
-th {
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1.3636;
-}
-abbr,
-acronym,
-address,
-blockquote,
-cite,
-dl,
-dd,
-li,
-ol,
-p,
-q,
-td,
-tr {
-  font-weight: 300;
-}
-b,
-strong {
-  font-weight: 700;
-}
-em {
-  font-style: italic;
 }
 .win-scrollview {
   overflow-x: auto;
@@ -1135,45 +1135,24 @@ em {
   height: 400px;
   width: 100%;
 }
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1.win-type-header,
+h2.win-type-subheader,
+h3.win-type-title,
+h4.win-type-subtitle,
+h5.win-type-base,
+h6.win-type-body,
+h1.win-h1,
+h2.win-h2,
+h3.win-h3,
+h4.win-h4,
+h5.win-h5,
+h6.win-h6 {
   margin-top: 0px;
   margin-bottom: 0px;
 }
-h1 {
-  font-size: 46px;
-  font-weight: 200;
-  line-height: 1.216;
-  letter-spacing: 0px;
-}
-h2 {
-  font-size: 34px;
-  font-weight: 200;
-  line-height: 1.176;
-}
-h3 {
-  font-size: 24px;
+.win-type-body p,
+p.win-type-body {
   font-weight: 300;
-  line-height: 1.167;
-}
-h4 {
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 1.2;
-}
-h5 {
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.333;
-}
-h6 {
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.333;
 }
 .win-listview {
   overflow: hidden;
@@ -2101,6 +2080,7 @@ html.win-hoverable .win-itemcontainer.win-selectionstylefilled.win-selected a:ho
   margin-top: -36px;
 }
 .win-flipview .win-navbutton {
+  touch-action: manipulation;
   border: none;
   width: 20px;
   height: 36px;
@@ -2316,6 +2296,7 @@ body > .win-navigation-backbutton {
 .win-backbutton,
 .win-navigation-backbutton,
 .win-back {
+  touch-action: manipulation;
   display: inline-block;
   min-width: 0;
   min-height: 0;
@@ -2733,6 +2714,7 @@ button.win-navigation-backbutton:enabled:hover:active {
   touch-action: manipulation;
 }
 .win-pivot .win-pivot-navbutton {
+  touch-action: manipulation;
   position: absolute;
   width: 20px;
   height: 36px;
@@ -2758,10 +2740,11 @@ button.win-navigation-backbutton:enabled:hover:active {
   -ms-flex: 0 0 auto;
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
-  font-size: 14px;
-  font-weight: 600;
+  font-family: "Segoe UI", sans-serif, "Segoe MDL2 Assets", "Symbols";
+  font-size: 15px;
+  font-weight: bold;
   white-space: nowrap;
-  margin: 12px 0 -8px 18px;
+  margin: 14px 0 13px 24px;
 }
 .win-pivot .win-pivot-title:lang(ar),
 .win-pivot .win-pivot-title:lang(dv),
@@ -2776,7 +2759,7 @@ button.win-navigation-backbutton:enabled:hover:active {
 .win-pivot .win-pivot-title:lang(ug),
 .win-pivot .win-pivot-title:lang(ur),
 .win-pivot .win-pivot-title:lang(qps-plocm) {
-  margin: 12px 18px -8px 0;
+  margin: 14px 24px 13px 0;
 }
 .win-pivot > .win-pivot-item {
   /*
@@ -2796,7 +2779,8 @@ button.win-navigation-backbutton:enabled:hover:active {
   -webkit-flex-direction: row;
   flex-direction: row;
 }
-.win-pivot .win-pivot-header-customcontent {
+.win-pivot .win-pivot-header-leftcustom,
+.win-pivot .win-pivot-header-rightcustom {
   -ms-flex: 0 0 auto;
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
@@ -2807,6 +2791,7 @@ button.win-navigation-backbutton:enabled:hover:active {
   -webkit-flex: 1 1 0%;
   flex: 1 1 0%;
   overflow-x: hidden;
+  padding: 1px;
 }
 .win-pivot .win-pivot-headers {
   white-space: nowrap;
@@ -2817,10 +2802,16 @@ button.win-navigation-backbutton:enabled:hover:active {
   -ms-touch-action: none;
   outline: 0;
 }
-.win-pivot .win-pivot-header {
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.333;
+.win-pivot .win-pivot-headers.win-keyboard:focus {
+  outline-style: dotted;
+  outline-width: 1px;
+}
+.win-pivot .win-pivot-header,
+.win-pivot .win-pivot-header.win-pivot-header:hover:active {
+  touch-action: manipulation;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1.167;
   display: inline-block;
   transition: opacity linear 167ms;
   -webkit-transition: opacity linear 167ms;
@@ -2829,21 +2820,9 @@ button.win-navigation-backbutton:enabled:hover:active {
   border: 0;
   padding: 0;
   outline: 0;
-  margin: 13px 12px 0px 12px;
-}
-.win-pivot button.win-pivot-header,
-.win-pivot button.win-pivot-header:hover:active {
-  background-color: transparent;
-  border: 0;
-  padding: 0;
-  letter-spacing: 0px;
-  margin: 13px 12px 0px 12px;
+  margin: 12px 12px 0px 12px;
   min-height: 0;
   min-width: 0;
-}
-.win-pivot button.win-pivot-header.win-keyboard:focus {
-  outline-style: dotted;
-  outline-width: 1px;
 }
 .win-pivot.win-pivot-locked .win-pivot-header {
   opacity: 0;
@@ -2851,11 +2830,6 @@ button.win-navigation-backbutton:enabled:hover:active {
 }
 .win-pivot .win-pivot-header.win-pivot-header-selected,
 .win-pivot.win-pivot-locked .win-pivot-header.win-pivot-header-selected {
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.333;
-  font-weight: 600;
-  /* Font-weight 500 provided by .win-type-base() is indistinguishable from the default 400 in some fonts */
   opacity: 1.0;
   visibility: inherit;
 }
@@ -2892,7 +2866,7 @@ html.win-hoverable .win-pivot button.win-pivot-header:hover {
   border: 0;
   padding: 0;
   letter-spacing: 0px;
-  margin: 13px 12px 0px 12px;
+  margin: 12px 12px 0px 12px;
   min-height: 0;
   min-width: 0;
 }
@@ -2917,8 +2891,7 @@ html.win-hoverable .win-pivot .win-pivot-navbutton:hover {
   height: 100%;
   overflow-y: auto;
   -ms-overflow-style: -ms-autohiding-scrollbar;
-  padding: 0px 19px;
-  width: calc(100% - 28px);
+  padding: 0px 24px;
 }
 /*
     Modified styles for when the Pivot is in nosnap mode
@@ -2998,6 +2971,7 @@ html.win-hoverable .win-pivot .win-pivot-navbutton:hover {
 button.win-hub-section-header-tabstop,
 html.win-hoverable button.win-hub-section-header-tabstop:hover,
 button.win-hub-section-header-tabstop:hover:active {
+  touch-action: manipulation;
   width: 100%;
   background-color: transparent;
   border: 0;
@@ -3055,9 +3029,6 @@ button.win-hub-section-header-tabstop:-ms-keyboard-active {
 .win-hub-section-header-content:lang(qps-plocm) {
   text-align: right;
 }
-.win-semanticzoom-zoomedoutview .win-hub-section-header-interactive .win-hub-section-header-content {
-  color: #0078d7;
-}
 .win-hub-section-header-chevron {
   display: none;
 }
@@ -3069,7 +3040,6 @@ button.win-hub-section-header-tabstop:-ms-keyboard-active {
   margin-left: 24px;
   line-height: 1.5;
   padding-top: 7px;
-  color: #0078d7;
   text-align: right;
   vertical-align: bottom;
 }
@@ -3130,6 +3100,7 @@ button.win-hub-section-header-tabstop:-ms-keyboard-active {
 Command buttons.
 */
 button.win-command {
+  touch-action: manipulation;
   background: none;
   background-clip: border-box;
   height: auto;
@@ -3257,6 +3228,10 @@ button[aria-checked=true]:disabled:active .win-commandimage {
 Command button labels.
 */
 button.win-command .win-label {
+  font-family: "Segoe UI", sans-serif, "Segoe MDL2 Assets", "Symbols";
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.167;
   position: relative;
   line-height: 16px;
   display: block;
@@ -3362,6 +3337,7 @@ AppBar
   visibility: visible;
 }
 .win-navbar .win-navbar-invokebutton {
+  touch-action: manipulation;
   width: 32px;
   height: 100%;
   min-height: 25px;
@@ -3654,15 +3630,15 @@ Flyout control.
   padding: 12px;
   border-style: solid;
   border-width: 1px;
-  margin: 5px;
-  min-width: 68px;
-  /* 96px - padding - border */
-  max-width: 428px;
-  /* 456px - padding - border */
+  margin: 4px;
+  min-width: 70px;
+  /* 96px - 2px border - 24px padding */
+  max-width: 430px;
+  /* 456px - 2px border - 24px padding */
   min-height: 16px;
-  /* 44px - padding - border */
+  /* 44px - 2px border - 24px padding */
   max-height: 730px;
-  /* 758px - padding - border */
+  /* 758px - 2px border - 24px padding */
   width: auto;
   height: auto;
   word-wrap: break-word;
@@ -3680,6 +3656,12 @@ Flyout control.
 .win-flyout.win-scrolls {
   overflow: auto;
 }
+@media (max-width: 464px) {
+  .win-flyout {
+    max-width: calc(100% - 34px);
+    /* 100% - 8px margin - 2px border - 24px padding */
+  }
+}
 /*
 Menu control.
 */
@@ -3688,11 +3670,13 @@ Menu control.
   line-height: 33px;
   text-align: left;
   /* Set explicitly in case our parent has different alignment, like appbar overflow. */
-  min-height: 46px;
-  /* 44px -  2px in border = 46px */
+  min-height: 42px;
+  /* 44px - 2px border */
   max-height: calc(100% - 26px);
-  min-width: 136px;
-  max-width: 456px;
+  min-width: 134px;
+  /* 136px - 2px border */
+  max-width: 454px;
+  /* 456px - 2px border */
 }
 /*
 Menu commands.
@@ -3852,6 +3836,12 @@ Menu toggle and flyout commands.
 .win-menu-containstogglecommand button.win-command-toggle[aria-checked=true] .win-menucommand-liner .win-toggleicon,
 .win-menu-containsflyoutcommand button.win-command-flyout .win-menucommand-liner .win-flyouticon {
   visibility: visible;
+}
+@media (max-width: 464px) {
+  .win-menu {
+    max-width: calc(100% - 10px);
+    /* 100% - 8px margin - 2px border */
+  }
 }
 /*
 Grippers in touch selection do not dissapear when focus moves to an element outside of the selection range and they are always drawn on a layer above all HTML elemements.
@@ -4145,6 +4135,7 @@ Settings Pane
 }
 .win-commandingsurface .win-commandingsurface-actionarea .win-command,
 .win-commandingsurface .win-commandingsurface-actionarea .win-commandingsurface-overflowbutton {
+  touch-action: manipulation;
   -ms-flex: 0 0 auto;
   -webkit-flex: 0 0 auto;
   flex: 0 0 auto;
@@ -4290,411 +4281,6 @@ Settings Pane
 }
 .win-toolbar.win-toolbar-opened {
   position: fixed;
-}
-.win-mediaplayer {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  /* We make this a slightly strong than normal style rule so that it will override any sizes the
-   developer has set. */
-  /* Note: The back button will only be visible in full screen playback on platforms such as desktop where there
-       is not a well known convention for back.
-    */
-  /* We use 2 levels of class specificity, because otherwise there is a very easy to hit case where the app developer sets a style like
-       display: flex on an item that has .win-mediaplayer-hidden and now the element is no longer hidden, which wasn't the app developer's
-       intention. */
-}
-.win-mediaplayer.win-mediaplayer-fullscreen {
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  height: 100vh;
-  width: 100vw;
-}
-.win-mediaplayer .win-navigation-backbutton {
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-.win-mediaplayer .win-toolbar .win-toolbar-actionarea .win-command {
-  flex-basis: 48px;
-}
-.win-mediaplayer button.win-command {
-  height: 48px;
-  width: 48px;
-}
-.win-mediaplayer .win-toolbar .win-toolbar-actionarea {
-  justify-content: center;
-}
-.win-mediaplayer .win-mediaplayer-hidden,
-.win-mediaplayer .win-menu button.win-command.win-mediaplayer-hidden {
-  display: none;
-}
-.win-mediaplayer .win-commandicon {
-  margin: 0;
-  height: 48px;
-  width: 40px;
-}
-.win-mediaplayer .win-commandimage {
-  font-size: 20px;
-  line-height: 48px;
-  width: 48px;
-  height: 48px;
-  margin: 0;
-}
-.win-mediaplayer-container {
-  height: 100%;
-  width: 100%;
-}
-.win-mediaplayer-video {
-  height: 100%;
-  width: 100%;
-}
-.win-mediaplayer-fullscreen .win-mediaplayer-video {
-  position: fixed;
-  top: 0;
-  left: 0;
-}
-/* In both the single and double row layouts we adjust the margin-bottom so that the bottom of the flyout 
- will appear just above the timeline. */
-.win-mediaplayer-singlerow .win-flyout,
-.win-mediaplayer-singlerow.win-flyout {
-  margin-bottom: 0;
-}
-.win-mediaplayer-singlerow .win-mediaplayer-timeline {
-  width: auto;
-}
-.win-mediaplayer-singlerow .win-toolbar {
-  width: 100%;
-}
-.win-mediaplayer-singlerow .win-mediaplayer-thumbnail {
-  margin-top: -50px;
-}
-.win-mediaplayer-doublerow .win-flyout,
-.win-mediaplayer-doublerow.win-flyout {
-  margin-bottom: 48px;
-}
-.win-mediaplayer-doublerow .win-mediaplayer-transportcontrols {
-  display: flex;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  align-items: center;
-  height: auto;
-  padding: 0 12px 24px 12px;
-  width: calc(100% - 24px);
-}
-.win-mediaplayer-doublerow .win-mediaplayer-timeline,
-.win-mediaplayer-doublerow .win-mediaplayer-commands {
-  height: 48px;
-}
-.win-mediaplayer-doublerow .win-mediaplayer-currenttimeindicator,
-.win-mediaplayer-doublerow .win-mediaplayer-totaltimeindicator {
-  display: inline-block;
-  margin-top: 12px;
-}
-.win-mediaplayer-doublerow .win-mediaplayer-totaltimeindicator {
-  float: right;
-}
-/* The indefinite progress indicator displayed while media is loading */
-progress.win-mediaplayer-busy {
-  position: absolute;
-  top: calc(50% - 30px);
-  /*30px = height of the progress ring / 2*/
-  left: calc(50% - 30px);
-  /*30px = width of the progress ring / 2*/
-}
-.win-mediaplayer-fullscreen progress.win-mediaplayer-busy {
-  position: absolute;
-  top: calc(50% - 80px);
-  /*80px = height of the progress ring / 2*/
-  left: calc(50% - 80px);
-  /*80px = width of the progress ring / 2*/
-  height: 160px;
-  width: 160px;
-}
-.win-mediaplayer-controls {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  justify-content: flex-end;
-  /* These styles are needed for the controls to show up in the correct
-       place for non-fullscreen mode. */
-  position: absolute;
-  bottom: 0;
-}
-/* Title and description */
-.win-mediaplayer-mediatitle,
-.win-mediaplayer-mediadescription {
-  height: auto;
-  padding-left: 12px;
-}
-.win-mediaplayer-mediadescription {
-  padding-bottom: 48px;
-  width: 100%;
-}
-.win-mediaplayer-transportcontrols {
-  width: 100%;
-  height: 48px;
-  display: flex;
-  min-width: 296px;
-}
-.win-mediaplayer-primary,
-.win-mediaplayer-secondary {
-  height: 100%;
-  width: auto;
-  display: flex;
-}
-.win-mediaplayer-timeline {
-  height: 100%;
-  width: 100%;
-  margin: 0 12px;
-}
-.win-mediaplayer-currenttimeindicator,
-.win-mediaplayer-timeremainingindicator,
-.win-mediaplayer-totaltimeindicator {
-  display: none;
-}
-.win-mediaplayer-progresscontainer {
-  width: 100%;
-  height: 2px;
-  padding: 22px 0;
-  -moz-transform: scaleX(1);
-  -ms-transform: scaleX(1);
-  -o-transform: scaleX(1);
-  -webkit-transform: scaleX(1);
-  transform: scaleX(1);
-}
-.win-mediaplayer-seekbar {
-  width: 100%;
-  height: 2px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin-top: 22px;
-}
-.win-mediaplayer-seekprogress,
-.win-mediaplayer-buffer {
-  position: absolute;
-  height: 2px;
-  width: 100%;
-  -moz-transform-origin: left;
-  -ms-transform-origin: left;
-  -o-transform-origin: left;
-  -webkit-transform-origin: left;
-  transform-origin: left;
-}
-.win-mediaplayer-seekbar-disabled .win-mediaplayer-buffer {
-  display: none;
-}
-.win-mediaplayer-seek-mark {
-  -moz-background-clip: border-box;
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  border-radius: 50%;
-  border-width: 2px;
-  border-style: solid;
-  position: absolute;
-  height: 24px;
-  width: 24px;
-  margin-top: -11px;
-  margin-left: 8px;
-}
-.win-mediaplayer-scrubbing .win-mediaplayer-seek-mark,
-.win-mediaplayer-fastforward .win-mediaplayer-seek-mark,
-.win-mediaplayer-rewind .win-mediaplayer-seek-mark {
-  margin-top: 17px;
-}
-.win-mediaplayer-scrubbing .win-mediaplayer-thumbnailmode .win-mediaplayer-seek-mark,
-.win-mediaplayer-fastforward .win-mediaplayer-thumbnailmode .win-mediaplayer-seek-mark,
-.win-mediaplayer-rewind .win-mediaplayer-thumbnailmode .win-mediaplayer-seek-mark {
-  margin-top: 15px;
-}
-.win-mediaplayer-thumb.win-mediaplayer-hidden .win-mediaplayer-thumbvisual {
-  opacity: 0;
-  -moz-transform: scale(1, 0.3);
-  -ms-transform: scale(1, 0.3);
-  -o-transform: scale(1, 0.3);
-  -webkit-transform: scale(1, 0.3);
-  transform: scale(1, 0.3);
-  -moz-transition-property: opacity transform;
-  -o-transition-property: opacity transform;
-  -webkit-transition-property: opacity transform;
-  transition-property: opacity transform;
-  -moz-transition-duration: 100ms;
-  -o-transition-duration: 100ms;
-  -webkit-transition-duration: 100ms;
-  transition-duration: 100ms;
-  -moz-transition-timing-function: linear;
-  -o-transition-timing-function: linear;
-  -webkit-transition-timing-function: linear;
-  transition-timing-function: linear;
-}
-.win-mediaplayer-thumb:not(.win-mediaplayer-hidden) .win-mediaplayer-thumbvisual {
-  opacity: 1;
-  -moz-transform: scale(1, 1);
-  -ms-transform: scale(1, 1);
-  -o-transform: scale(1, 1);
-  -webkit-transform: scale(1, 1);
-  transform: scale(1, 1);
-  -moz-transition-property: opacity transform;
-  -o-transition-property: opacity transform;
-  -webkit-transition-property: opacity transform;
-  transition-property: opacity transform;
-  -moz-transition-duration: 100ms;
-  -o-transition-duration: 100ms;
-  -webkit-transition-duration: 100ms;
-  transition-duration: 100ms;
-  -moz-transition-timing-function: linear;
-  -o-transition-timing-function: linear;
-  -webkit-transition-timing-function: linear;
-  transition-timing-function: linear;
-}
-/* Thumb visuals */
-.win-mediaplayer-seekbarvisualelements-container {
-  margin-left: -11px;
-}
-.win-mediaplayer-thumbnail {
-  height: auto;
-  width: 42px;
-  margin-top: -54px;
-  margin-left: -2px;
-}
-.win-mediaplayer-thumbnailmode .win-mediaplayer-thumbnail {
-  height: 64px;
-  width: 112px;
-  margin-top: -92px;
-  margin-left: -37px;
-}
-.win-mediaplayer-thumbnailmode .win-mediaplayer-thumbnailmode .win-mediaplayer-seektimeindicator {
-  margin-left: 0;
-  margin-right: 0;
-}
-.win-mediaplayer-thumbnailmode .win-mediaplayer-playbackspeedindicator {
-  display: block;
-}
-.win-mediaplayer-thumb,
-.win-mediaplayer-thumbnailvisual {
-  height: 100%;
-  width: 100%;
-}
-.win-mediaplayer-thumbnailvisual {
-  display: flex;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-}
-.win-mediaplayer-playbackspeedindicator {
-  height: 100%;
-  align-self: flex-end;
-  padding-top: 4px;
-  padding-right: 8px;
-  display: none;
-}
-/* Markers */
-.win-mediaplayer-chaptermarker,
-.win-mediaplayer-advertisementmarker {
-  height: 6px;
-  width: 6px;
-  -moz-border-radius: 50%;
-  -webkit-border-radius: 50%;
-  border-radius: 50%;
-  -moz-background-clip: border-box;
-  -webkit-background-clip: border-box;
-  background-clip: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
-  margin-top: -2px;
-}
-/* Shared overlay styles */
-.win-mediaplayer-overlay.win-flyout {
-  padding: 0;
-}
-.win-mediaplayer-overlay > button {
-  display: block;
-  padding: 11px 12px 13px 12px;
-  min-height: 44px;
-  margin-left: 0;
-  margin-right: 0;
-  text-align: left;
-  width: 100%;
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.333;
-  outline: none;
-  border: none;
-}
-/* Error overlay */
-.win-mediaplayer-errortext {
-  margin: 8px 12px;
-}
-/* Volume overlay */
-.win-mediaplayer-volume.win-mediaplayer-overlay {
-  display: flex;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  height: 86px;
-  max-width: 360px;
-  padding: 12px 16px;
-}
-.win-mediaplayer-volume .win-mediaplayer-volume-slider {
-  height: 48px;
-  padding: 0 16px;
-}
-.win-mediaplayer-volume input[type=range]::-ms-tooltip {
-  display: none;
-}
-.win-mediaplayer-volume-heading {
-  padding: 10px 0 6px 0;
-}
-.win-mediaplayer-volume-controls {
-  display: flex;
-  -ms-flex-direction: row;
-  flex-direction: row;
-}
-.win-mediaplayer-volume-icon::after {
-  font-family: 'Segoe UI Symbol';
-  font-size: 15pt;
-  content: '\E15D';
-}
-/* We need to set a width explicitly on the value of the volume control
-   otherwise the layout will move when the value is a single digit number 
-   (eg. 0) vs. a multi-digit number (eg. 100). */
-.win-mediaplayer-volume-value {
-  width: 32px;
-  line-height: 48px;
-}
-/* Unless we have an explicit rule, the focus accessibility outline won't show up. */
-button.win-mediaplayer-mutebutton:focus {
-  outline: 1px dotted;
-}
-/* Toolbar overrides */
-.win-mediaplayer-commands button.win-command .win-label {
-  display: none;
-}
-.win-toolbar .win-toolbar-actionarea .win-mediaplayer-timeline.win-command {
-  flex-grow: 5;
-  padding: 0;
-  font-size: 15px;
-}
-.win-mediaplayer-seektimeindicator {
-  padding: 2px 6px;
-  margin-left: 6px;
-  margin-right: 6px;
-}
-.win-mediaplayer-inputfeedback {
-  display: none;
-}
-.win-toolbar-overflowarea button.win-command.win-mediaplayer-hidden {
-  display: none;
 }
 .win-autosuggestbox {
   white-space: normal;
@@ -5104,6 +4690,7 @@ Hide clear button in search box control.
   padding: 12px 0;
 }
 .win-navbarcontainer-navarrow {
+  touch-action: manipulation;
   position: absolute;
   z-index: 2;
   top: 24px;
@@ -5546,6 +5133,9 @@ Hide clear button in search box control.
   display: -webkit-flex;
   display: flex;
 }
+.win-splitview .win-splitview-pane {
+  outline: none;
+}
 .win-splitview .win-splitview-pane,
 .win-splitview .win-splitview-paneplaceholder {
   -ms-flex: 0 0 auto;
@@ -5655,6 +5245,26 @@ Hide clear button in search box control.
 .win-splitview.win-splitview-openeddisplayinline .win-splitview-paneplaceholder {
   display: none;
 }
+button.win-splitviewpanetoggle {
+  touch-action: manipulation;
+  box-sizing: border-box;
+  height: 48px;
+  width: 48px;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  border: 1px dotted transparent;
+  margin: 0;
+  outline: none;
+  background-color: transparent;
+}
+button.win-splitviewpanetoggle:after {
+  font-size: 24px;
+  font-family: 'Segoe MDL2 Assets', 'Symbols';
+  font-weight: 400;
+  line-height: 1.333;
+  content: "\E700";
+}
 .win-appbar {
   width: 100%;
   min-width: 32px;
@@ -5683,375 +5293,272 @@ body {
   background-color: #ffffff;
   color: #000000;
 }
+winjs-themedetection-tag {
+  opacity: 0;
+}
 ::selection {
-  background-color: #0078d7;
   color: #fff;
 }
-a {
-  color: #0078d7;
-}
-a:hover {
+.win-link:hover {
   color: rgba(255, 255, 255, 0.6);
 }
-a:active {
+.win-link:active {
   color: rgba(255, 255, 255, 0.4);
 }
-a[disabled] {
+.win-link[disabled] {
   color: rgba(255, 255, 255, 0.2);
 }
-input[type=checkbox]::-ms-check {
+.win-checkbox::-ms-check {
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.8);
   background-color: transparent;
 }
-input[type=checkbox]:indeterminate::-ms-check {
+.win-checkbox:indeterminate::-ms-check {
   color: rgba(255, 255, 255, 0.8);
-  border-color: #0078d7;
 }
-input[type=checkbox]:checked::-ms-check {
+.win-checkbox:checked::-ms-check {
   color: #fff;
-  background-color: #0078d7;
   border-color: transparent;
 }
-input[type=checkbox]:hover::-ms-check {
+.win-checkbox:hover::-ms-check {
   border-color: #ffffff;
 }
-input[type=checkbox]:hover:indeterminate::-ms-check {
+.win-checkbox:hover:indeterminate::-ms-check {
   color: #ffffff;
-  border-color: #0078d7;
 }
-input[type=checkbox]:active::-ms-check {
+.win-checkbox:active::-ms-check {
   border-color: transparent;
   background-color: rgba(255, 255, 255, 0.6);
 }
-input[type=checkbox]:indeterminate:active::-ms-check {
+.win-checkbox:indeterminate:active::-ms-check {
   color: rgba(255, 255, 255, 0.6);
   border-color: rgba(255, 255, 255, 0.8);
   background-color: transparent;
 }
-input[type=checkbox]:disabled::-ms-check,
-input[type=checkbox]:indeterminate:disabled::-ms-check {
+.win-checkbox:disabled::-ms-check,
+.win-checkbox:indeterminate:disabled::-ms-check {
   color: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.2);
   background-color: transparent;
 }
-input[type=radio]::-ms-check {
+.win-radio::-ms-check {
   color: rgba(255, 255, 255, 0.8);
   border-color: rgba(255, 255, 255, 0.8);
   background-color: transparent;
 }
-input[type=radio]:hover::-ms-check {
+.win-radio:hover::-ms-check {
   border-color: #ffffff;
 }
-input[type=radio]:checked::-ms-check {
-  border-color: #0078d7;
-}
-input[type=radio]:hover::-ms-check {
+.win-radio:hover::-ms-check {
   color: #ffffff;
 }
-input[type=radio]:active::-ms-check {
+.win-radio:active::-ms-check {
   color: rgba(255, 255, 255, 0.6);
   border-color: rgba(255, 255, 255, 0.6);
 }
-input[type=radio]:disabled::-ms-check {
+.win-radio:disabled::-ms-check {
   color: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.2);
 }
-progress {
-  color: #0078d7;
-}
-progress:not(:indeterminate) {
+.win-progress-bar:not(:indeterminate),
+.win-progress-ring:not(:indeterminate),
+.win-ring:not(:indeterminate) {
   background-color: rgba(255, 255, 255, 0.2);
 }
-progress::-webkit-progress-value {
-  background-color: #0078d7;
-}
-progress:not(:indeterminate)::-moz-progress-bar {
-  background-color: #0078d7;
-}
-progress.win-ring {
+.win-progress-bar::-webkit-progress-bar,
+.win-progress-ring::-webkit-progress-bar,
+.win-ring::-webkit-progress-bar {
   background-color: transparent;
 }
-progress::-webkit-progress-bar {
+.win-progress-ring,
+.win-ring {
   background-color: transparent;
 }
-button,
-input[type=button],
-input[type=reset],
-input[type=submit],
-button[type=submit] {
+.win-button {
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.2);
   border-color: transparent;
 }
-button:hover,
-input[type=button]:hover,
-input[type=reset]:hover,
-input[type=submit]:hover,
-button[type=submit]:hover {
+.win-button:hover {
   border-color: rgba(255, 255, 255, 0.4);
 }
-button:active,
-input[type=button]:active,
-input[type=reset]:active,
-input[type=submit]:active,
-button[type=submit]:active {
+.win-button:active {
   background-color: rgba(255, 255, 255, 0.4);
 }
-button:disabled,
-input[type=button]:disabled,
-input[type=reset]:disabled,
-input[type=submit]:disabled,
-button[type=submit]:disabled {
+.win-button:disabled {
   color: rgba(255, 255, 255, 0.2);
   background-color: rgba(255, 255, 255, 0.2);
   border-color: transparent;
 }
-input[type=submit],
-button[type=submit] {
+.win-button.win-button-primary {
   color: #fff;
-  background-color: #0078d7;
 }
-select {
+.win-dropdown {
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.4);
 }
-select::-ms-expand {
+.win-dropdown::-ms-expand {
   color: rgba(255, 255, 255, 0.8);
   background-color: transparent;
 }
-select:hover {
+.win-dropdown:hover {
   background-color: #2b2b2b;
   border-color: rgba(255, 255, 255, 0.6);
 }
-select:disabled {
+.win-dropdown:disabled {
   color: rgba(255, 255, 255, 0.2);
   background-color: rgba(255, 255, 255, 0.2);
 }
-select:disabled::-ms-expand {
+.win-dropdown:disabled::-ms-expand {
   color: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.2);
 }
-option {
+.win-dropdown option {
   color: #ffffff;
   background-color: #2b2b2b;
 }
-option:checked {
+.win-dropdown option:checked {
   color: #ffffff;
-  background-color: #0078d7;
 }
-option:hover,
-option:active {
+.win-dropdown option:hover,
+.win-dropdown option:active {
   background-color: rgba(0, 0, 0, 0.2);
   color: #ffffff;
 }
-optgroup {
+.win-dropdown optgroup {
   color: #ffffff;
   background-color: #2b2b2b;
 }
-optgroup:disabled {
+.win-dropdown optgroup:disabled {
   color: rgba(255, 255, 255, 0.2);
 }
-select[multiple] {
+select[multiple].win-dropdown {
   border: none;
   background-color: #2b2b2b;
 }
-select[multiple] option {
+select[multiple].win-dropdown option {
   color: #ffffff;
 }
-select[multiple] option:hover {
+select[multiple].win-dropdown option:hover {
   color: #ffffff;
 }
-select[multiple] option:checked {
+select[multiple].win-dropdown option:checked {
   color: #ffffff;
-  background-color: #0078d7;
 }
-input[type=range] {
+.win-slider {
   background-color: transparent;
 }
-input[type=range]::-ms-thumb {
-  background: #0078d7;
-}
-input[type=range]::-webkit-slider-thumb {
-  background: #0078d7;
-}
-input[type=range]::-moz-range-thumb {
-  background: #0078d7;
-}
-input[type=range]:hover::-ms-thumb {
+.win-slider:hover::-ms-thumb {
   background: #f9f9f9;
 }
-input[type=range]:hover::-webkit-slider-thumb {
+.win-slider:hover::-webkit-slider-thumb {
   background: #f9f9f9;
 }
-input[type=range]:hover::-moz-range-thumb {
+.win-slider:hover::-moz-range-thumb {
   background: #f9f9f9;
 }
-input[type=range]:active::-ms-thumb {
+.win-slider:active::-ms-thumb {
   background: #767676;
 }
-input[type=range]:active::-webkit-slider-thumb {
+.win-slider:active::-webkit-slider-thumb {
   background: #767676;
 }
-input[type=range]:active::-moz-range-thumb {
+.win-slider:active::-moz-range-thumb {
   background: #767676;
 }
-input[type=range]:disabled::-ms-thumb {
+.win-slider:disabled::-ms-thumb {
   background: #333333;
 }
-input[type=range]:disabled::-webkit-slider-thumb {
+.win-slider:disabled::-webkit-slider-thumb {
   background: #333333;
 }
-input[type=range]:disabled::-moz-range-thumb {
+.win-slider:disabled::-moz-range-thumb {
   background: #333333;
 }
-input[type=range]::-ms-fill-lower {
-  background: #0078d7;
-}
-input[type=range]:disabled::-ms-fill-lower {
+.win-slider:disabled::-ms-fill-lower {
   background: rgba(255, 255, 255, 0.2);
 }
-input[type=range]::-ms-fill-upper {
+.win-slider::-ms-fill-upper {
   background: rgba(255, 255, 255, 0.4);
 }
-input[type=range]::-webkit-slider-runnable-track {
+.win-slider::-webkit-slider-runnable-track {
   background: rgba(255, 255, 255, 0.4);
 }
-input[type=range]::-moz-range-track {
+.win-slider::-moz-range-track {
   background: rgba(255, 255, 255, 0.4);
 }
-input[type=range]:hover::-ms-fill-upper {
+.win-slider:hover::-ms-fill-upper {
   background: rgba(255, 255, 255, 0.6);
 }
-input[type=range]:hover::-webkit-slider-runnable-track {
+.win-slider:hover::-webkit-slider-runnable-track {
   background: rgba(255, 255, 255, 0.6);
 }
-input[type=range]:hover::-moz-range-track {
+.win-slider:hover::-moz-range-track {
   background: rgba(255, 255, 255, 0.6);
 }
-input[type=range]:active::-ms-fill-upper {
+.win-slider:active::-ms-fill-upper {
   background: rgba(255, 255, 255, 0.4);
 }
-input[type=range]:active::-webkit-slider-runnable-track {
+.win-slider:active::-webkit-slider-runnable-track {
   background: rgba(255, 255, 255, 0.4);
 }
-input[type=range]:active::-moz-range-track {
+.win-slider:active::-moz-range-track {
   background: rgba(255, 255, 255, 0.4);
 }
-input[type=range]:disabled::-ms-fill-upper {
+.win-slider:disabled::-ms-fill-upper {
   background: rgba(255, 255, 255, 0.2);
 }
-input[type=range]:disabled::-webkit-slider-runnable-track {
+.win-slider:disabled::-webkit-slider-runnable-track {
   background: rgba(255, 255, 255, 0.2);
 }
-input[type=range]:disabled::-moz-range-track {
+.win-slider:disabled::-moz-range-track {
   background: rgba(255, 255, 255, 0.2);
 }
-input[type=range]::-ms-track {
+.win-slider::-ms-track {
   color: transparent;
   background-color: transparent;
 }
-input[type=range]::-ms-ticks-before,
-input[type=range]::-ms-ticks-after {
+.win-slider::-ms-ticks-before,
+.win-slider::-ms-ticks-after {
   color: rgba(255, 255, 255, 0.4);
 }
-input:not([type]),
-input[type=""],
-input[type=text],
-input[type=password],
-input[type=email],
-input[type=number],
-input[type=tel],
-input[type=url],
-input[type=search],
-textarea,
+.win-textbox,
 .win-textarea {
   color: #ffffff;
   background-color: rgba(0, 0, 0, 0.4);
   border-color: rgba(255, 255, 255, 0.4);
 }
-input:not([type]):-ms-input-placeholder,
-input[type=""]:-ms-input-placeholder,
-input[type=text]:-ms-input-placeholder,
-input[type=password]:-ms-input-placeholder,
-input[type=email]:-ms-input-placeholder,
-input[type=number]:-ms-input-placeholder,
-input[type=tel]:-ms-input-placeholder,
-input[type=url]:-ms-input-placeholder,
-input[type=search]:-ms-input-placeholder,
-textarea:-ms-input-placeholder,
+.win-textbox:-ms-input-placeholder,
 .win-textarea:-ms-input-placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
-input:not([type])::-webkit-input-placeholder,
-input[type=""]::-webkit-input-placeholder,
-input[type=text]::-webkit-input-placeholder,
-input[type=password]::-webkit-input-placeholder,
-input[type=email]::-webkit-input-placeholder,
-input[type=number]::-webkit-input-placeholder,
-input[type=tel]::-webkit-input-placeholder,
-input[type=url]::-webkit-input-placeholder,
-input[type=search]::-webkit-input-placeholder,
-textarea::-webkit-input-placeholder,
+.win-textbox::-webkit-input-placeholder,
 .win-textarea::-webkit-input-placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
-input:not([type])::-moz-input-placeholder,
-input[type=""]::-moz-input-placeholder,
-input[type=text]::-moz-input-placeholder,
-input[type=password]::-moz-input-placeholder,
-input[type=email]::-moz-input-placeholder,
-input[type=number]::-moz-input-placeholder,
-input[type=tel]::-moz-input-placeholder,
-input[type=url]::-moz-input-placeholder,
-input[type=search]::-moz-input-placeholder,
-textarea::-moz-input-placeholder,
+.win-textbox::-moz-input-placeholder,
 .win-textarea::-moz-input-placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
-input:not([type]):hover,
-input[type=""]:hover,
-input[type=text]:hover,
-input[type=password]:hover,
-input[type=email]:hover,
-input[type=number]:hover,
-input[type=tel]:hover,
-input[type=url]:hover,
-input[type=search]:hover,
-textarea:hover,
+.win-textbox:hover,
 .win-textarea:hover {
   background-color: rgba(0, 0, 0, 0.6);
   border-color: rgba(255, 255, 255, 0.6);
 }
-input:not([type]):focus,
-input[type=""]:focus,
-input[type=text]:focus,
-input[type=password]:focus,
-input[type=email]:focus,
-input[type=number]:focus,
-input[type=tel]:focus,
-input[type=url]:focus,
-input[type=search]:focus,
-textarea:focus,
+.win-textbox:focus,
 .win-textarea:focus {
   color: #000000;
   background-color: #ffffff;
-  border-color: #0078d7;
 }
-input::-ms-clear,
-input::-ms-reveal {
+.win-textbox::-ms-clear,
+.win-textbox::-ms-reveal {
   display: block;
   color: rgba(0, 0, 0, 0.6);
 }
-input::-ms-clear:hover,
-input::-ms-reveal:hover {
-  color: #0078d7;
-}
-input::-ms-clear:active,
-input::-ms-reveal:active {
+.win-textbox::-ms-clear:active,
+.win-textbox::-ms-reveal:active {
   color: #ffffff;
-  background-color: #0078d7;
 }
 .win-xbox :focus {
   outline: 2px solid white;
@@ -6064,19 +5571,6 @@ input::-ms-reveal:active {
 }
 .win-selectioncheckmark {
   color: #ffffff;
-}
-.win-listview:not(.win-selectionstylefilled) .win-selectioncheckmarkbackground,
-.win-itemcontainer:not(.win-selectionstylefilled) .win-selectioncheckmarkbackground {
-  border-color: #0078d7;
-  background-color: #0078d7;
-}
-.win-listview:not(.win-selectionstylefilled) .win-container.win-selected .win-selectionborder,
-.win-itemcontainer:not(.win-selectionstylefilled).win-container.win-selected .win-selectionborder {
-  border-color: #0078d7;
-}
-.win-listview.win-selectionstylefilled .win-selected .win-selectionbackground,
-.win-itemcontainer.win-selectionstylefilled.win-selected .win-selectionbackground {
-  background-color: #0078d7;
 }
 html.win-hoverable .win-listview.win-selectionstylefilled .win-container.win-pressed .win-itembox,
 html.win-hoverable .win-itemcontainer.win-selectionstylefilled.win-container .win-itembox,
@@ -6148,10 +5642,6 @@ html.win-hoverable .win-flipview .win-navbutton:hover {
   border-color: #767676;
   background-color: #2b2b2b;
 }
-.win-rating .win-star.win-user.win-full,
-.win-rating .win-star.win-user.win-full.win-disabled {
-  color: #0078d7;
-}
 .win-rating .win-star.win-tentative.win-full {
   color: rgba(255, 255, 255, 0.8);
 }
@@ -6170,9 +5660,6 @@ html.win-hoverable .win-flipview .win-navbutton:hover {
 }
 .win-toggleswitch-thumb {
   background-color: rgba(255, 255, 255, 0.8);
-}
-.win-toggleswitch-on .win-toggleswitch-track {
-  border-color: #0078d7;
 }
 .win-toggleswitch-off .win-toggleswitch-track {
   border-color: rgba(255, 255, 255, 0.8);
@@ -6201,6 +5688,9 @@ button.win-semanticzoom-button.win-semanticzoom-button:active,
 button.win-semanticzoom-button.win-semanticzoom-button:hover:active {
   background-color: #ffffff;
 }
+.win-pivot .win-pivot-title {
+  color: #ffffff;
+}
 .win-pivot .win-pivot-navbutton {
   background-color: rgba(255, 255, 255, 0.4);
   color: rgba(0, 0, 0, 0.8);
@@ -6208,10 +5698,19 @@ button.win-semanticzoom-button.win-semanticzoom-button:hover:active {
 .win-pivot .win-pivot-navbutton.win-pivot-navbutton:hover:active {
   color: rgba(255, 255, 255, 0.8);
 }
-.win-pivot button.win-pivot-header,
+.win-pivot button.win-pivot-header {
+  color: rgba(255, 255, 255, 0.6);
+  background-color: transparent;
+}
 .win-pivot button.win-pivot-header:focus,
 .win-pivot button.win-pivot-header.win-pivot-header:hover:active {
+  color: rgba(255, 255, 255, 0.8);
+}
+.win-pivot button.win-pivot-header.win-pivot-header-selected {
   color: #ffffff;
+}
+.win-pivot-header[disabled] {
+  color: rgba(255, 255, 255, 0.4);
 }
 button.win-hub-section-header-tabstop,
 button.win-hub-section-header-tabstop:hover:active {
@@ -6266,6 +5765,9 @@ button:disabled .win-commandimage,
 button:disabled:active .win-commandimage {
   color: rgba(255, 255, 255, 0.2);
 }
+button .win-label {
+  color: #ffffff;
+}
 button[aria-checked=true]:enabled .win-label,
 button[aria-checked=true]:enabled .win-commandimage,
 button[aria-checked=true]:enabled:hover:active .win-commandimage.win-commandimage {
@@ -6278,13 +5780,13 @@ button[aria-checked=true].win-command:before {
   position: absolute;
   height: 100%;
   width: 100%;
-  background-color: #0078d7;
   opacity: 0.6;
   box-sizing: content-box;
   content: "";
   /* We want this pseudo element to cover the border of its parent. */
   /* Put a 1px border on this element to make it larger and then set its top/left to -1px.*/
-  border: 1px solid #0078d7;
+  border-width: 1px;
+  border-style: solid;
   top: -1px;
   left: -1px;
 }
@@ -6365,15 +5867,10 @@ button.win-command:disabled:active .win-label {
 }
 .win-flyout,
 .win-flyout {
-  border-color: #0078d7;
   background-color: #000000;
 }
 .win-settingsflyout {
   background-color: #000000;
-}
-.win-settingsflyout,
-.win-settingsflyout {
-  border-color: #0078d7;
 }
 .win-menu button,
 .win-menu button {
@@ -6390,13 +5887,13 @@ button.win-command:disabled:active .win-label {
   position: absolute;
   height: 100%;
   width: 100%;
-  background-color: #0078d7;
   opacity: 0.6;
   content: "";
   box-sizing: content-box;
   /* We want this pseudo element to cover the border of its parent. */
   /* Put a 1px border on this element to make it larger and then set its top/left to -1px.*/
-  border: #0078d7 1px solid;
+  border-width: 1px;
+  border-style: solid;
   top: -1px;
   left: -1px;
 }
@@ -6446,59 +5943,6 @@ button.win-command:disabled:active .win-label {
   color: #ffffff;
   background-color: rgba(255, 255, 255, 0.2);
 }
-/* The MediaPlayer uses the same colors in light and dark themes which is why we don't use
-   the light / dark theme color values. */
-.win-mediaplayer.win-mediaplayer-fullscreen {
-  background-color: #000000;
-}
-.win-mediaplayer .win-toolbar {
-  background-color: transparent;
-}
-progress.win-mediaplayer-busy {
-  color: #ffffff;
-}
-.win-mediaplayer-transportcontrols {
-  background-color: #000000;
-}
-.win-mediaplayer-seekbar {
-  background-color: rgba(194, 194, 194, 0.35);
-}
-.win-mediaplayer-seekprogress {
-  background-color: #0078d7;
-}
-.win-mediaplayer-buffer {
-  background-color: #ffffff;
-}
-.win-mediaplayer-seekbar-disabled .win-mediaplayer-seekprogress {
-  background-color: #6b6b6b;
-}
-.win-mediaplayer-seek-mark {
-  border-color: #0078d7;
-  background-color: #000000;
-}
-.win-mediaplayer-scrubbing .win-mediaplayer-seek-mark:hover {
-  border-color: #0078d7;
-}
-.win-mediaplayer-scrubbing .win-mediaplayer-seek-mark {
-  background-color: #0078d7;
-}
-.win-mediaplayer-thumbnail {
-  background-color: #1f1f1f;
-  border: 1px solid #565656;
-}
-.win-mediaplayer-thumbnailmode .win-mediaplayer-seektimeindicator {
-  background-color: rgba(0, 0, 0, 0.6);
-}
-.win-mediaplayer-chaptermarker,
-.win-mediaplayer-advertisementmarker {
-  background-color: rgba(255, 255, 255, 0.7);
-}
-.win-mediaplayer-overlay > button:hover {
-  background-color: #1f1f1f;
-}
-.win-mediaplayer-seektimeindicator {
-  background-color: transparent;
-}
 .win-autosuggestbox-flyout-highlighttext {
   color: #4617b4;
 }
@@ -6515,15 +5959,9 @@ progress.win-mediaplayer-busy {
   background-color: #2b2b2b;
   color: #ffffff;
 }
-.win-autosuggestbox-suggestion-selected {
-  background-color: rgba(0, 120, 215, 0.6);
-}
 .win-autosuggestbox-suggestion-result:hover:active,
 .win-autosuggestbox-suggestion-query:hover:active {
   background-color: rgba(255, 255, 255, 0.2);
-}
-.win-autosuggestbox-suggestion-selected.win-autosuggestbox-suggestion-selected:hover:active {
-  background-color: rgba(0, 120, 215, 0.9);
 }
 .win-searchbox-button {
   color: rgba(255, 255, 255, 0.4);
@@ -6531,11 +5969,7 @@ progress.win-mediaplayer-busy {
 .win-searchbox-button-input-focus {
   color: rgba(0, 0, 0, 0.4);
 }
-.win-searchbox-button.win-searchbox-button:not(.win-searchbox-button-disabled):hover {
-  color: #0078d7;
-}
 .win-searchbox-button.win-searchbox-button:not(.win-searchbox-button-disabled):hover:active {
-  background-color: #0078d7;
   color: #ffffff;
 }
 .win-navbarcontainer-pageindicator {
@@ -6560,12 +5994,6 @@ progress.win-mediaplayer-busy {
 .win-navbarcommand-splitbutton.win-pressed {
   background-color: rgba(255, 255, 255, 0.28);
 }
-.win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-opened {
-  background-color: rgba(0, 120, 215, 0.6);
-}
-.win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-opened.win-pressed {
-  background-color: rgba(0, 120, 215, 0.9);
-}
 .win-navbarcommand-button.win-keyboard:focus::before {
   content: "";
   pointer-events: none;
@@ -6582,7 +6010,6 @@ progress.win-mediaplayer-busy {
 }
 .win-contentdialog-dialog {
   background-color: #2b2b2b;
-  outline-color: #0078d7;
 }
 .win-contentdialog-title {
   color: #ffffff;
@@ -6596,6 +6023,16 @@ progress.win-mediaplayer-busy {
 }
 .win-splitview-pane {
   background-color: #171717;
+}
+button.win-splitviewpanetoggle {
+  color: #ffffff;
+}
+button.win-splitviewpanetoggle:active,
+button.win-splitviewpanetoggle.win-splitviewpanetoggle:active:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+button.win-splitviewpanetoggle.win-keyboard:focus {
+  border-color: #ffffff;
 }
 html.win-hoverable {
   /* LegacyAppBar control colors */
@@ -6627,7 +6064,7 @@ html.win-hoverable .win-pivot .win-pivot-navbutton:hover {
   color: rgba(255, 255, 255, 0.6);
 }
 html.win-hoverable .win-pivot button.win-pivot-header:hover {
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.8);
 }
 html.win-hoverable button.win-hub-section-header-tabstop:hover {
   color: #ffffff;
@@ -6699,14 +6136,7 @@ html.win-hoverable .win-autosuggestbox-suggestion-result:hover,
 html.win-hoverable .win-autosuggestbox-suggestion-query:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
-html.win-hoverable .win-autosuggestbox-suggestion-selected:hover {
-  background-color: rgba(0, 120, 215, 0.8);
-}
-html.win-hoverable .win-searchbox-button:not(.win-searchbox-button-disabled):hover {
-  color: #0078d7;
-}
 html.win-hoverable .win-searchbox-button:not(.win-searchbox-button-disabled):hover:active {
-  background-color: #0078d7;
   color: #ffffff;
 }
 html.win-hoverable .win-navbarcontainer-navarrow:hover {
@@ -6720,15 +6150,8 @@ html.win-hoverable .win-navbarcommand-button:hover.win-pressed,
 html.win-hoverable .win-navbarcommand-splitbutton:hover.win-pressed {
   background-color: rgba(255, 255, 255, 0.28);
 }
-html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-opened:hover {
-  background-color: rgba(0, 120, 215, 0.8);
-}
-html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-opened:hover.win-pressed {
-  background-color: rgba(0, 120, 215, 0.9);
-}
-.win-ui-light {
-  /* The MediaPlayer uses the same colors in light and dark themes which is why we don't use
-   the light / dark theme color values. */
+html.win-hoverable button.win-splitviewpanetoggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .win-ui-light body {
   background-color: #ffffff;
@@ -6743,374 +6166,268 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
   color: #ffffff;
 }
 .win-ui-light ::selection {
-  background-color: #0078d7;
   color: #fff;
 }
-.win-ui-light a {
-  color: #0078d7;
-}
-.win-ui-light a:hover {
+.win-ui-light .win-link:hover {
   color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light a:active {
+.win-ui-light .win-link:active {
   color: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light a[disabled] {
+.win-ui-light .win-link[disabled] {
   color: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light input[type=checkbox]::-ms-check {
+.win-ui-light .win-checkbox::-ms-check {
   color: #000000;
   border-color: rgba(0, 0, 0, 0.8);
   background-color: transparent;
 }
-.win-ui-light input[type=checkbox]:indeterminate::-ms-check {
+.win-ui-light .win-checkbox:indeterminate::-ms-check {
   color: rgba(0, 0, 0, 0.8);
-  border-color: #0078d7;
 }
-.win-ui-light input[type=checkbox]:checked::-ms-check {
+.win-ui-light .win-checkbox:checked::-ms-check {
   color: #fff;
-  background-color: #0078d7;
   border-color: transparent;
 }
-.win-ui-light input[type=checkbox]:hover::-ms-check {
+.win-ui-light .win-checkbox:hover::-ms-check {
   border-color: #000000;
 }
-.win-ui-light input[type=checkbox]:hover:indeterminate::-ms-check {
+.win-ui-light .win-checkbox:hover:indeterminate::-ms-check {
   color: #000000;
-  border-color: #0078d7;
 }
-.win-ui-light input[type=checkbox]:active::-ms-check {
+.win-ui-light .win-checkbox:active::-ms-check {
   border-color: transparent;
   background-color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input[type=checkbox]:indeterminate:active::-ms-check {
+.win-ui-light .win-checkbox:indeterminate:active::-ms-check {
   color: rgba(0, 0, 0, 0.6);
   border-color: rgba(0, 0, 0, 0.8);
   background-color: transparent;
 }
-.win-ui-light input[type=checkbox]:disabled::-ms-check,
-.win-ui-light input[type=checkbox]:indeterminate:disabled::-ms-check {
+.win-ui-light .win-checkbox:disabled::-ms-check,
+.win-ui-light .win-checkbox:indeterminate:disabled::-ms-check {
   color: rgba(0, 0, 0, 0.2);
   border-color: rgba(0, 0, 0, 0.2);
   background-color: transparent;
 }
-.win-ui-light input[type=radio]::-ms-check {
+.win-ui-light .win-radio::-ms-check {
   color: rgba(0, 0, 0, 0.8);
   border-color: rgba(0, 0, 0, 0.8);
   background-color: transparent;
 }
-.win-ui-light input[type=radio]:hover::-ms-check {
+.win-ui-light .win-radio:hover::-ms-check {
   border-color: #000000;
 }
-.win-ui-light input[type=radio]:checked::-ms-check {
-  border-color: #0078d7;
-}
-.win-ui-light input[type=radio]:hover::-ms-check {
+.win-ui-light .win-radio:hover::-ms-check {
   color: #000000;
 }
-.win-ui-light input[type=radio]:active::-ms-check {
+.win-ui-light .win-radio:active::-ms-check {
   color: rgba(0, 0, 0, 0.6);
   border-color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input[type=radio]:disabled::-ms-check {
+.win-ui-light .win-radio:disabled::-ms-check {
   color: rgba(0, 0, 0, 0.2);
   border-color: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light progress {
-  color: #0078d7;
-}
-.win-ui-light progress:not(:indeterminate) {
+.win-ui-light .win-progress-bar:not(:indeterminate),
+.win-ui-light .win-progress-ring:not(:indeterminate),
+.win-ui-light .win-ring:not(:indeterminate) {
   background-color: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light progress::-webkit-progress-value {
-  background-color: #0078d7;
-}
-.win-ui-light progress:not(:indeterminate)::-moz-progress-bar {
-  background-color: #0078d7;
-}
-.win-ui-light progress.win-ring {
+.win-ui-light .win-progress-bar::-webkit-progress-bar,
+.win-ui-light .win-progress-ring::-webkit-progress-bar,
+.win-ui-light .win-ring::-webkit-progress-bar {
   background-color: transparent;
 }
-.win-ui-light progress::-webkit-progress-bar {
+.win-ui-light .win-progress-ring,
+.win-ui-light .win-ring {
   background-color: transparent;
 }
-.win-ui-light button,
-.win-ui-light input[type=button],
-.win-ui-light input[type=reset],
-.win-ui-light input[type=submit],
-.win-ui-light button[type=submit] {
+.win-ui-light .win-button {
   color: #000000;
   background-color: rgba(0, 0, 0, 0.2);
   border-color: transparent;
 }
-.win-ui-light button:hover,
-.win-ui-light input[type=button]:hover,
-.win-ui-light input[type=reset]:hover,
-.win-ui-light input[type=submit]:hover,
-.win-ui-light button[type=submit]:hover {
+.win-ui-light .win-button:hover {
   border-color: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light button:active,
-.win-ui-light input[type=button]:active,
-.win-ui-light input[type=reset]:active,
-.win-ui-light input[type=submit]:active,
-.win-ui-light button[type=submit]:active {
+.win-ui-light .win-button:active {
   background-color: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light button:disabled,
-.win-ui-light input[type=button]:disabled,
-.win-ui-light input[type=reset]:disabled,
-.win-ui-light input[type=submit]:disabled,
-.win-ui-light button[type=submit]:disabled {
+.win-ui-light .win-button:disabled {
   color: rgba(0, 0, 0, 0.2);
   background-color: rgba(0, 0, 0, 0.2);
   border-color: transparent;
 }
-.win-ui-light input[type=submit],
-.win-ui-light button[type=submit] {
+.win-ui-light .win-button.win-button-primary {
   color: #fff;
-  background-color: #0078d7;
 }
-.win-ui-light select {
+.win-ui-light .win-dropdown {
   color: #000000;
   background-color: rgba(0, 0, 0, 0.2);
   border-color: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light select::-ms-expand {
+.win-ui-light .win-dropdown::-ms-expand {
   color: rgba(0, 0, 0, 0.8);
   background-color: transparent;
 }
-.win-ui-light select:hover {
+.win-ui-light .win-dropdown:hover {
   background-color: #f2f2f2;
   border-color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light select:disabled {
+.win-ui-light .win-dropdown:disabled {
   color: rgba(0, 0, 0, 0.2);
   background-color: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light select:disabled::-ms-expand {
+.win-ui-light .win-dropdown:disabled::-ms-expand {
   color: rgba(0, 0, 0, 0.2);
   border-color: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light option {
+.win-ui-light .win-dropdown option {
   color: #000000;
   background-color: #f2f2f2;
 }
-.win-ui-light option:checked {
+.win-ui-light .win-dropdown option:checked {
   color: #ffffff;
-  background-color: #0078d7;
 }
-.win-ui-light option:hover,
-.win-ui-light option:active {
+.win-ui-light .win-dropdown option:hover,
+.win-ui-light .win-dropdown option:active {
   background-color: rgba(0, 0, 0, 0.2);
   color: #000000;
 }
-.win-ui-light optgroup {
+.win-ui-light .win-dropdown optgroup {
   color: #000000;
   background-color: #f2f2f2;
 }
-.win-ui-light optgroup:disabled {
+.win-ui-light .win-dropdown optgroup:disabled {
   color: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light select[multiple] {
+.win-ui-light select[multiple].win-dropdown {
   border: none;
   background-color: #f2f2f2;
 }
-.win-ui-light select[multiple] option {
+.win-ui-light select[multiple].win-dropdown option {
   color: #000000;
 }
-.win-ui-light select[multiple] option:hover {
+.win-ui-light select[multiple].win-dropdown option:hover {
   color: #000000;
 }
-.win-ui-light select[multiple] option:checked {
+.win-ui-light select[multiple].win-dropdown option:checked {
   color: #ffffff;
-  background-color: #0078d7;
 }
-.win-ui-light input[type=range] {
+.win-ui-light .win-slider {
   background-color: transparent;
 }
-.win-ui-light input[type=range]::-ms-thumb {
-  background: #0078d7;
-}
-.win-ui-light input[type=range]::-webkit-slider-thumb {
-  background: #0078d7;
-}
-.win-ui-light input[type=range]::-moz-range-thumb {
-  background: #0078d7;
-}
-.win-ui-light input[type=range]:hover::-ms-thumb {
+.win-ui-light .win-slider:hover::-ms-thumb {
   background: #1f1f1f;
 }
-.win-ui-light input[type=range]:hover::-webkit-slider-thumb {
+.win-ui-light .win-slider:hover::-webkit-slider-thumb {
   background: #1f1f1f;
 }
-.win-ui-light input[type=range]:hover::-moz-range-thumb {
+.win-ui-light .win-slider:hover::-moz-range-thumb {
   background: #1f1f1f;
 }
-.win-ui-light input[type=range]:active::-ms-thumb {
+.win-ui-light .win-slider:active::-ms-thumb {
   background: #cccccc;
 }
-.win-ui-light input[type=range]:active::-webkit-slider-thumb {
+.win-ui-light .win-slider:active::-webkit-slider-thumb {
   background: #cccccc;
 }
-.win-ui-light input[type=range]:active::-moz-range-thumb {
+.win-ui-light .win-slider:active::-moz-range-thumb {
   background: #cccccc;
 }
-.win-ui-light input[type=range]:disabled::-ms-thumb {
+.win-ui-light .win-slider:disabled::-ms-thumb {
   background: #cccccc;
 }
-.win-ui-light input[type=range]:disabled::-webkit-slider-thumb {
+.win-ui-light .win-slider:disabled::-webkit-slider-thumb {
   background: #cccccc;
 }
-.win-ui-light input[type=range]:disabled::-moz-range-thumb {
+.win-ui-light .win-slider:disabled::-moz-range-thumb {
   background: #cccccc;
 }
-.win-ui-light input[type=range]::-ms-fill-lower {
-  background: #0078d7;
-}
-.win-ui-light input[type=range]:disabled::-ms-fill-lower {
+.win-ui-light .win-slider:disabled::-ms-fill-lower {
   background: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light input[type=range]::-ms-fill-upper {
+.win-ui-light .win-slider::-ms-fill-upper {
   background: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light input[type=range]::-webkit-slider-runnable-track {
+.win-ui-light .win-slider::-webkit-slider-runnable-track {
   background: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light input[type=range]::-moz-range-track {
+.win-ui-light .win-slider::-moz-range-track {
   background: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light input[type=range]:hover::-ms-fill-upper {
+.win-ui-light .win-slider:hover::-ms-fill-upper {
   background: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input[type=range]:hover::-webkit-slider-runnable-track {
+.win-ui-light .win-slider:hover::-webkit-slider-runnable-track {
   background: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input[type=range]:hover::-moz-range-track {
+.win-ui-light .win-slider:hover::-moz-range-track {
   background: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input[type=range]:active::-ms-fill-upper {
+.win-ui-light .win-slider:active::-ms-fill-upper {
   background: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light input[type=range]:active::-webkit-slider-runnable-track {
+.win-ui-light .win-slider:active::-webkit-slider-runnable-track {
   background: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light input[type=range]:active::-moz-range-track {
+.win-ui-light .win-slider:active::-moz-range-track {
   background: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light input[type=range]:disabled::-ms-fill-upper {
+.win-ui-light .win-slider:disabled::-ms-fill-upper {
   background: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light input[type=range]:disabled::-webkit-slider-runnable-track {
+.win-ui-light .win-slider:disabled::-webkit-slider-runnable-track {
   background: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light input[type=range]:disabled::-moz-range-track {
+.win-ui-light .win-slider:disabled::-moz-range-track {
   background: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light input[type=range]::-ms-track {
+.win-ui-light .win-slider::-ms-track {
   color: transparent;
   background-color: transparent;
 }
-.win-ui-light input[type=range]::-ms-ticks-before,
-.win-ui-light input[type=range]::-ms-ticks-after {
+.win-ui-light .win-slider::-ms-ticks-before,
+.win-ui-light .win-slider::-ms-ticks-after {
   color: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light input:not([type]),
-.win-ui-light input[type=""],
-.win-ui-light input[type=text],
-.win-ui-light input[type=password],
-.win-ui-light input[type=email],
-.win-ui-light input[type=number],
-.win-ui-light input[type=tel],
-.win-ui-light input[type=url],
-.win-ui-light input[type=search],
-.win-ui-light textarea,
+.win-ui-light .win-textbox,
 .win-ui-light .win-textarea {
   color: #000000;
   background-color: rgba(255, 255, 255, 0.4);
   border-color: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light input:not([type]):-ms-input-placeholder,
-.win-ui-light input[type=""]:-ms-input-placeholder,
-.win-ui-light input[type=text]:-ms-input-placeholder,
-.win-ui-light input[type=password]:-ms-input-placeholder,
-.win-ui-light input[type=email]:-ms-input-placeholder,
-.win-ui-light input[type=number]:-ms-input-placeholder,
-.win-ui-light input[type=tel]:-ms-input-placeholder,
-.win-ui-light input[type=url]:-ms-input-placeholder,
-.win-ui-light input[type=search]:-ms-input-placeholder,
-.win-ui-light textarea:-ms-input-placeholder,
+.win-ui-light .win-textbox:-ms-input-placeholder,
 .win-ui-light .win-textarea:-ms-input-placeholder {
   color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input:not([type])::-webkit-input-placeholder,
-.win-ui-light input[type=""]::-webkit-input-placeholder,
-.win-ui-light input[type=text]::-webkit-input-placeholder,
-.win-ui-light input[type=password]::-webkit-input-placeholder,
-.win-ui-light input[type=email]::-webkit-input-placeholder,
-.win-ui-light input[type=number]::-webkit-input-placeholder,
-.win-ui-light input[type=tel]::-webkit-input-placeholder,
-.win-ui-light input[type=url]::-webkit-input-placeholder,
-.win-ui-light input[type=search]::-webkit-input-placeholder,
-.win-ui-light textarea::-webkit-input-placeholder,
+.win-ui-light .win-textbox::-webkit-input-placeholder,
 .win-ui-light .win-textarea::-webkit-input-placeholder {
   color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input:not([type])::-moz-input-placeholder,
-.win-ui-light input[type=""]::-moz-input-placeholder,
-.win-ui-light input[type=text]::-moz-input-placeholder,
-.win-ui-light input[type=password]::-moz-input-placeholder,
-.win-ui-light input[type=email]::-moz-input-placeholder,
-.win-ui-light input[type=number]::-moz-input-placeholder,
-.win-ui-light input[type=tel]::-moz-input-placeholder,
-.win-ui-light input[type=url]::-moz-input-placeholder,
-.win-ui-light input[type=search]::-moz-input-placeholder,
-.win-ui-light textarea::-moz-input-placeholder,
+.win-ui-light .win-textbox::-moz-input-placeholder,
 .win-ui-light .win-textarea::-moz-input-placeholder {
   color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input:not([type]):hover,
-.win-ui-light input[type=""]:hover,
-.win-ui-light input[type=text]:hover,
-.win-ui-light input[type=password]:hover,
-.win-ui-light input[type=email]:hover,
-.win-ui-light input[type=number]:hover,
-.win-ui-light input[type=tel]:hover,
-.win-ui-light input[type=url]:hover,
-.win-ui-light input[type=search]:hover,
-.win-ui-light textarea:hover,
+.win-ui-light .win-textbox:hover,
 .win-ui-light .win-textarea:hover {
   background-color: rgba(255, 255, 255, 0.6);
   border-color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input:not([type]):focus,
-.win-ui-light input[type=""]:focus,
-.win-ui-light input[type=text]:focus,
-.win-ui-light input[type=password]:focus,
-.win-ui-light input[type=email]:focus,
-.win-ui-light input[type=number]:focus,
-.win-ui-light input[type=tel]:focus,
-.win-ui-light input[type=url]:focus,
-.win-ui-light input[type=search]:focus,
-.win-ui-light textarea:focus,
+.win-ui-light .win-textbox:focus,
 .win-ui-light .win-textarea:focus {
   color: #000000;
   background-color: #ffffff;
-  border-color: #0078d7;
 }
-.win-ui-light input::-ms-clear,
-.win-ui-light input::-ms-reveal {
+.win-ui-light .win-textbox::-ms-clear,
+.win-ui-light .win-textbox::-ms-reveal {
   display: block;
   color: rgba(0, 0, 0, 0.6);
 }
-.win-ui-light input::-ms-clear:hover,
-.win-ui-light input::-ms-reveal:hover {
-  color: #0078d7;
-}
-.win-ui-light input::-ms-clear:active,
-.win-ui-light input::-ms-reveal:active {
+.win-ui-light .win-textbox::-ms-clear:active,
+.win-ui-light .win-textbox::-ms-reveal:active {
   color: #ffffff;
-  background-color: #0078d7;
 }
 .win-ui-light .win-xbox :focus {
   outline: 2px solid white;
@@ -7123,19 +6440,6 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 }
 .win-ui-light .win-selectioncheckmark {
   color: #000000;
-}
-.win-ui-light .win-listview:not(.win-selectionstylefilled) .win-selectioncheckmarkbackground,
-.win-ui-light .win-itemcontainer:not(.win-selectionstylefilled) .win-selectioncheckmarkbackground {
-  border-color: #0078d7;
-  background-color: #0078d7;
-}
-.win-ui-light .win-listview:not(.win-selectionstylefilled) .win-container.win-selected .win-selectionborder,
-.win-ui-light .win-itemcontainer:not(.win-selectionstylefilled).win-container.win-selected .win-selectionborder {
-  border-color: #0078d7;
-}
-.win-ui-light .win-listview.win-selectionstylefilled .win-selected .win-selectionbackground,
-.win-ui-light .win-itemcontainer.win-selectionstylefilled.win-selected .win-selectionbackground {
-  background-color: #0078d7;
 }
 .win-ui-light html.win-hoverable .win-listview.win-selectionstylefilled .win-container.win-pressed .win-itembox,
 .win-ui-light html.win-hoverable .win-itemcontainer.win-selectionstylefilled.win-container .win-itembox,
@@ -7207,10 +6511,6 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
   border-color: #cccccc;
   background-color: #f2f2f2;
 }
-.win-ui-light .win-rating .win-star.win-user.win-full,
-.win-ui-light .win-rating .win-star.win-user.win-full.win-disabled {
-  color: #0078d7;
-}
 .win-ui-light .win-rating .win-star.win-tentative.win-full {
   color: rgba(0, 0, 0, 0.8);
 }
@@ -7229,9 +6529,6 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 }
 .win-ui-light .win-toggleswitch-thumb {
   background-color: rgba(0, 0, 0, 0.8);
-}
-.win-ui-light .win-toggleswitch-on .win-toggleswitch-track {
-  border-color: #0078d7;
 }
 .win-ui-light .win-toggleswitch-off .win-toggleswitch-track {
   border-color: rgba(0, 0, 0, 0.8);
@@ -7260,6 +6557,9 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 .win-ui-light button.win-semanticzoom-button.win-semanticzoom-button:hover:active {
   background-color: #000000;
 }
+.win-ui-light .win-pivot .win-pivot-title {
+  color: #000000;
+}
 .win-ui-light .win-pivot .win-pivot-navbutton {
   background-color: rgba(0, 0, 0, 0.4);
   color: rgba(255, 255, 255, 0.8);
@@ -7267,10 +6567,19 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 .win-ui-light .win-pivot .win-pivot-navbutton.win-pivot-navbutton:hover:active {
   color: rgba(0, 0, 0, 0.8);
 }
-.win-ui-light .win-pivot button.win-pivot-header,
+.win-ui-light .win-pivot button.win-pivot-header {
+  color: rgba(0, 0, 0, 0.6);
+  background-color: transparent;
+}
 .win-ui-light .win-pivot button.win-pivot-header:focus,
 .win-ui-light .win-pivot button.win-pivot-header.win-pivot-header:hover:active {
+  color: rgba(0, 0, 0, 0.8);
+}
+.win-ui-light .win-pivot button.win-pivot-header.win-pivot-header-selected {
   color: #000000;
+}
+.win-ui-light .win-pivot-header[disabled] {
+  color: rgba(0, 0, 0, 0.4);
 }
 .win-ui-light button.win-hub-section-header-tabstop,
 .win-ui-light button.win-hub-section-header-tabstop:hover:active {
@@ -7325,6 +6634,9 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 .win-ui-light button:disabled:active .win-commandimage {
   color: rgba(0, 0, 0, 0.2);
 }
+.win-ui-light button .win-label {
+  color: #000000;
+}
 .win-ui-light button[aria-checked=true]:enabled .win-label,
 .win-ui-light button[aria-checked=true]:enabled .win-commandimage,
 .win-ui-light button[aria-checked=true]:enabled:hover:active .win-commandimage.win-commandimage {
@@ -7337,13 +6649,13 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
   position: absolute;
   height: 100%;
   width: 100%;
-  background-color: #0078d7;
   opacity: 0.4;
   box-sizing: content-box;
   content: "";
   /* We want this pseudo element to cover the border of its parent. */
   /* Put a 1px border on this element to make it larger and then set its top/left to -1px.*/
-  border: 1px solid #0078d7;
+  border-width: 1px;
+  border-style: solid;
   top: -1px;
   left: -1px;
 }
@@ -7424,15 +6736,10 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 }
 .win-ui-light.win-flyout,
 .win-ui-light .win-flyout {
-  border-color: #0078d7;
   background-color: #ffffff;
 }
 .win-ui-light .win-settingsflyout {
   background-color: #ffffff;
-}
-.win-ui-light.win-settingsflyout,
-.win-ui-light .win-settingsflyout {
-  border-color: #0078d7;
 }
 .win-ui-light.win-menu button,
 .win-ui-light .win-menu button {
@@ -7449,13 +6756,13 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
   position: absolute;
   height: 100%;
   width: 100%;
-  background-color: #0078d7;
   opacity: 0.4;
   content: "";
   box-sizing: content-box;
   /* We want this pseudo element to cover the border of its parent. */
   /* Put a 1px border on this element to make it larger and then set its top/left to -1px.*/
-  border: #0078d7 1px solid;
+  border-width: 1px;
+  border-style: solid;
   top: -1px;
   left: -1px;
 }
@@ -7505,57 +6812,6 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
   color: #000000;
   background-color: rgba(0, 0, 0, 0.2);
 }
-.win-ui-light .win-mediaplayer.win-mediaplayer-fullscreen {
-  background-color: #000000;
-}
-.win-ui-light .win-mediaplayer .win-toolbar {
-  background-color: transparent;
-}
-.win-ui-light progress.win-mediaplayer-busy {
-  color: #ffffff;
-}
-.win-ui-light .win-mediaplayer-transportcontrols {
-  background-color: #000000;
-}
-.win-ui-light .win-mediaplayer-seekbar {
-  background-color: rgba(194, 194, 194, 0.35);
-}
-.win-ui-light .win-mediaplayer-seekprogress {
-  background-color: #0078d7;
-}
-.win-ui-light .win-mediaplayer-buffer {
-  background-color: #ffffff;
-}
-.win-ui-light .win-mediaplayer-seekbar-disabled .win-mediaplayer-seekprogress {
-  background-color: #6b6b6b;
-}
-.win-ui-light .win-mediaplayer-seek-mark {
-  border-color: #0078d7;
-  background-color: #000000;
-}
-.win-ui-light .win-mediaplayer-scrubbing .win-mediaplayer-seek-mark:hover {
-  border-color: #0078d7;
-}
-.win-ui-light .win-mediaplayer-scrubbing .win-mediaplayer-seek-mark {
-  background-color: #0078d7;
-}
-.win-ui-light .win-mediaplayer-thumbnail {
-  background-color: #1f1f1f;
-  border: 1px solid #565656;
-}
-.win-ui-light .win-mediaplayer-thumbnailmode .win-mediaplayer-seektimeindicator {
-  background-color: rgba(0, 0, 0, 0.6);
-}
-.win-ui-light .win-mediaplayer-chaptermarker,
-.win-ui-light .win-mediaplayer-advertisementmarker {
-  background-color: rgba(255, 255, 255, 0.7);
-}
-.win-ui-light .win-mediaplayer-overlay > button:hover {
-  background-color: #1f1f1f;
-}
-.win-ui-light .win-mediaplayer-seektimeindicator {
-  background-color: transparent;
-}
 .win-ui-light .win-autosuggestbox-flyout-highlighttext {
   color: #4617b4;
 }
@@ -7572,15 +6828,9 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
   background-color: #f2f2f2;
   color: #000000;
 }
-.win-ui-light .win-autosuggestbox-suggestion-selected {
-  background-color: rgba(0, 120, 215, 0.4);
-}
 .win-ui-light .win-autosuggestbox-suggestion-result:hover:active,
 .win-ui-light .win-autosuggestbox-suggestion-query:hover:active {
   background-color: rgba(0, 0, 0, 0.2);
-}
-.win-ui-light .win-autosuggestbox-suggestion-selected.win-autosuggestbox-suggestion-selected:hover:active {
-  background-color: rgba(0, 120, 215, 0.7);
 }
 .win-ui-light .win-searchbox-button {
   color: rgba(0, 0, 0, 0.4);
@@ -7588,11 +6838,7 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 .win-ui-light .win-searchbox-button-input-focus {
   color: rgba(0, 0, 0, 0.4);
 }
-.win-ui-light .win-searchbox-button.win-searchbox-button:not(.win-searchbox-button-disabled):hover {
-  color: #0078d7;
-}
 .win-ui-light .win-searchbox-button.win-searchbox-button:not(.win-searchbox-button-disabled):hover:active {
-  background-color: #0078d7;
   color: #ffffff;
 }
 .win-ui-light .win-navbarcontainer-pageindicator {
@@ -7617,12 +6863,6 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 .win-ui-light .win-navbarcommand-splitbutton.win-pressed {
   background-color: rgba(0, 0, 0, 0.28);
 }
-.win-ui-light .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-opened {
-  background-color: rgba(0, 120, 215, 0.4);
-}
-.win-ui-light .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-opened.win-pressed {
-  background-color: rgba(0, 120, 215, 0.7);
-}
 .win-ui-light .win-navbarcommand-button.win-keyboard:focus::before {
   content: "";
   pointer-events: none;
@@ -7639,7 +6879,6 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 }
 .win-ui-light .win-contentdialog-dialog {
   background-color: #f2f2f2;
-  outline-color: #0078d7;
 }
 .win-ui-light .win-contentdialog-title {
   color: #000000;
@@ -7653,6 +6892,16 @@ html.win-hoverable .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-
 }
 .win-ui-light .win-splitview-pane {
   background-color: #f2f2f2;
+}
+.win-ui-light button.win-splitviewpanetoggle {
+  color: #000000;
+}
+.win-ui-light button.win-splitviewpanetoggle:active,
+.win-ui-light button.win-splitviewpanetoggle.win-splitviewpanetoggle:active:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.win-ui-light button.win-splitviewpanetoggle.win-keyboard:focus {
+  border-color: #000000;
 }
 html.win-hoverable .win-ui-light {
   /* LegacyAppBar control colors */
@@ -7684,7 +6933,7 @@ html.win-hoverable .win-ui-light .win-pivot .win-pivot-navbutton:hover {
   color: rgba(0, 0, 0, 0.6);
 }
 html.win-hoverable .win-ui-light .win-pivot button.win-pivot-header:hover {
-  color: #000000;
+  color: rgba(0, 0, 0, 0.8);
 }
 html.win-hoverable .win-ui-light button.win-hub-section-header-tabstop:hover {
   color: #000000;
@@ -7756,14 +7005,7 @@ html.win-hoverable .win-ui-light .win-autosuggestbox-suggestion-result:hover,
 html.win-hoverable .win-ui-light .win-autosuggestbox-suggestion-query:hover {
   background-color: rgba(0, 0, 0, 0.1);
 }
-html.win-hoverable .win-ui-light .win-autosuggestbox-suggestion-selected:hover {
-  background-color: rgba(0, 120, 215, 0.6);
-}
-html.win-hoverable .win-ui-light .win-searchbox-button:not(.win-searchbox-button-disabled):hover {
-  color: #0078d7;
-}
 html.win-hoverable .win-ui-light .win-searchbox-button:not(.win-searchbox-button-disabled):hover:active {
-  background-color: #0078d7;
   color: #ffffff;
 }
 html.win-hoverable .win-ui-light .win-navbarcontainer-navarrow:hover {
@@ -7777,11 +7019,8 @@ html.win-hoverable .win-ui-light .win-navbarcommand-button:hover.win-pressed,
 html.win-hoverable .win-ui-light .win-navbarcommand-splitbutton:hover.win-pressed {
   background-color: rgba(255, 255, 255, 0.28);
 }
-html.win-hoverable .win-ui-light .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-opened:hover {
-  background-color: rgba(0, 120, 215, 0.8);
-}
-html.win-hoverable .win-ui-light .win-navbarcommand-splitbutton.win-navbarcommand-splitbutton-opened:hover.win-pressed {
-  background-color: rgba(0, 120, 215, 0.9);
+html.win-hoverable .win-ui-light button.win-splitviewpanetoggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 @media (-ms-high-contrast) {
   .win-overlay {
@@ -7821,6 +7060,9 @@ html.win-hoverable .win-ui-light .win-navbarcommand-splitbutton.win-navbarcomman
   button:disabled:active .win-commandimage {
     color: GrayText;
   }
+  button .win-label {
+    color: #ffffff;
+  }
   button[aria-checked=true]:enabled .win-label,
   button[aria-checked=true]:enabled .win-commandimage,
   button[aria-checked=true]:enabled:hover:active .win-commandimage.win-commandimage {
@@ -7833,13 +7075,13 @@ html.win-hoverable .win-ui-light .win-navbarcommand-splitbutton.win-navbarcomman
     position: absolute;
     height: 100%;
     width: 100%;
-    background-color: ButtonText;
     opacity: 1;
     box-sizing: content-box;
     content: "";
     /* We want this pseudo element to cover the border of its parent. */
     /* Put a 1px border on this element to make it larger and then set its top/left to -1px.*/
-    border: 1px solid ButtonText;
+    border-width: 1px;
+    border-style: solid;
     top: -1px;
     left: -1px;
   }
@@ -7920,15 +7162,10 @@ html.win-hoverable .win-ui-light .win-navbarcommand-splitbutton.win-navbarcomman
   }
   .win-flyout,
   .win-flyout {
-    border-color: Highlight;
     background-color: ButtonFace;
   }
   .win-settingsflyout {
     background-color: ButtonFace;
-  }
-  .win-settingsflyout,
-  .win-settingsflyout {
-    border-color: Highlight;
   }
   .win-menu button,
   .win-menu button {
@@ -7945,13 +7182,13 @@ html.win-hoverable .win-ui-light .win-navbarcommand-splitbutton.win-navbarcomman
     position: absolute;
     height: 100%;
     width: 100%;
-    background-color: ButtonText;
     opacity: 0.6;
     content: "";
     box-sizing: content-box;
     /* We want this pseudo element to cover the border of its parent. */
     /* Put a 1px border on this element to make it larger and then set its top/left to -1px.*/
-    border: ButtonText 1px solid;
+    border-width: 1px;
+    border-style: solid;
     top: -1px;
     left: -1px;
   }

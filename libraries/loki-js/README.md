@@ -1,26 +1,49 @@
 # LokiJS
 
+[![Join the chat at https://gitter.im/techfort/LokiJS](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/techfort/LokiJS?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![alt CI-badge](https://travis-ci.org/techfort/LokiJS.svg?branch=master)
+[![npm version](https://badge.fury.io/js/lokijs.svg)](http://badge.fury.io/js/lokijs)
+[![alt packagequality](http://npm.packagequality.com/shield/lokijs.svg)](http://packagequality.com/#?package=lokijs)
+
 ## Overview
 
-LokiJS is a document oriented client side database written in javascript.
+LokiJS is a document oriented database written in javascript, published under MIT License.
 Its purpose is to store javascript objects as documents in a nosql fashion and retrieve them with a similar mechanism.
-Runs in node and the browser.
+Runs in node (including cordova/phonegap and node-webkit) and the browser.
 LokiJS is ideal for the following scenarios: 
 
-1. where a lightweight in-memory db is ideal
-2. cross-platform mobile apps where you can leverage the power of javascript and avoid interacting with native databases
-3. data sets are not so large that it wouldn't be a problem loading the entire db from a server and synchronising at the end of the work session
+1. client-side in-memory db is ideal (e.g., a session store)
+2. performance critical applications
+3. cordova/phonegap mobile apps where you can leverage the power of javascript and avoid interacting with native databases
+4. data sets loaded into a browser page and synchronised at the end of the work session
+5. node-webkit desktop apps
 
-LokiJS has limited supports for indexing, transactions, couchdb-style views.
+LokiJS supports indexing and views and achieves high-performance through maintaining unique and binary indexes (indices) for data.
 
-In a nodejs/node-webkit environment LokiJS also persists to disk whenever an insert, update or remove is performed.
+## Demo
 
-example usage [here](https://github.com/techfort/LokiJS/wiki)
+The following demos are available:
+- [Sandbox / Playground] (https://rawgit.com/techfort/LokiJS/master/examples/sandbox/LokiSandbox.htm)
+- a node-webkit small demo in the folder demos/desktop_app. You can launch it by running `/path/to/nw demos/desktop_app/'
+
+## Wiki
+Example usage can be found on the [wiki](https://github.com/techfort/LokiJS/wiki)
+
+### Main Features
+
+1. Fast performance NoSQL in-memory database, collections with unique index (1.1M ops/s) and binary-index (500k ops/s)
+2. Runs in multiple environments (browser, node)
+3. Dynamic Views for fast access of data subsets
+4. Built-in persistence adapters, and the ability to support user-defined ones
+5. Changes API
+6. Joins
 
 ## Current state
 
-LokiJS is currently at an alpha stage, it is stable but not 100% feature complete.
-As LokiJS is written in Javascript it can be run on any environment supporting javascript such as browsers, node.js/node-webkit, hybrid mobile apps (such as phonegap/cordova), or the jvm through engines such as rhino.
+LokiJS is at version 1.3 [Eostre].
+As LokiJS is written in Javascript it can be run on any environment supporting javascript such as browsers, node.js/node-webkit, and hybrid mobile apps (such as phonegap/cordova).
+
+Made by [@techfort](http://twitter.com/tech_fort), with the precious help of Dave Easterday. [Leave a tip](https://gratipay.com/techfort/) or give us a star if you find LokiJS useful!
 
 ## Installation
 
@@ -30,42 +53,31 @@ You can use bower to install lokijs with `bower install lokijs`
 
 For node environments you can install through `npm install lokijs`.
 
-## Roadmap
 
-* Wider and more specific support for indexes such as unique, compound.
-* Replication across nodes.
+
+## Roadmap
+* exactIndex
+* key-value datastore
+* MRU cache
+* MongoDB API compatibility
+* server standalone (tcp and http servers and clients)
+* replication and horizontal scaling
 
 ## Contact
 
 For help / enquiries contact joe.minichino@gmail.com
 
+## Commercial Support
+
+For commercial support contact info.techfort@gmail.com
+
 ## License
 
-Copyright (c) 2013, Joe Minichino <joe.minichino@gmail.com>
-All rights reserved.
+Copyright (c) 2015 TechFort <joe.minichino@gmail.com>
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-1. Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-3. All advertising materials mentioning features or use of this software
-   must display the following acknowledgement:
-   This product includes software developed by TechFort.
-4. Neither the name of TechFort nor the
-   names of its contributors may be used to endorse or promote products
-   derived from this software without specific prior written permission.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-THIS SOFTWARE IS PROVIDED BY <COPYRIGHT HOLDER> ''AS IS'' AND ANY
-EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

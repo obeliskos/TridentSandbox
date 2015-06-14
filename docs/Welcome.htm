@@ -11,7 +11,7 @@ Topics : [ Welcome ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href=
 
 <p></p>
 
-<p>Trident Sandbox was developed to turn your browser into a scripting IDE.&nbsp; It was originally created for SurfaceRT devices running Internet Explorer 10/11 to provide an on-device development option for creating simple apps without using the AppStore.&nbsp; Fortunately, Internet Explorer 11 is fairly standards compliant, and TridentSandbox attempts to be browser agnostic as much as possible.&nbsp; It is named after the <a href="http://en.wikipedia.org/wiki/Trident_(layout_engine)" target="_blank">Trident</a> rendering engine within Internet Explorer browsers.&nbsp; Internet Explorer 11 uses Trident engine version 7 (IE 10 uses Trident 6). Trident 6 added the HTML 5 <a href="http://www.html5rocks.com/en/tutorials/file/dndfiles/" target="_blank">File API</a> which allows loading and saving files to local filesystem.&nbsp; Trident 7 added HTML 5 Fullscreen API and WebGL (among other changes).&nbsp; These capabilities along with a number of open source third-party javascript libraries allow the interactive creation of HTML 5 based applications.&nbsp; Although it was inspired by similar online web tools like <a href="http://jsfiddle.net/" target="_blank">jsfiddle</a>, Trident Sandbox is intended to be run primarily from the local filesystem or AppCached for offline use.</p>
+<p>Trident Sandbox was developed to turn your browser into a scripting IDE.&nbsp; It was originally created for SurfaceRT devices running Internet Explorer 10/11 to provide an on-device development option for creating simple apps without using the AppStore.&nbsp; Fortunately, Internet Explorer 11 is fairly standards compliant, and TridentSandbox attempts to be browser agnostic as much as possible.&nbsp; It is named after the <a href="http://en.wikipedia.org/wiki/Trident_(layout_engine)" target="_blank">Trident</a> rendering engine within Internet Explorer browsers.&nbsp; Internet Explorer 11 uses Trident engine version 7 (IE 10 uses Trident 6). Trident 6 added the HTML 5 <a href="http://www.html5rocks.com/en/tutorials/file/dndfiles/" target="_blank">File API</a> which allows loading and saving files to local filesystem.&nbsp; Trident 7 added HTML 5 Fullscreen API and WebGL (among other changes).&nbsp; These capabilities along with a number of open source third-party javascript libraries allow the interactive creation of HTML 5 based applications.&nbsp; Although it was inspired by similar online web tools, Trident Sandbox is intended to be run primarily from the local filesystem or AppCached for offline use.</p>
 
 <h3>WinJS</h3>
 <p>TridentSandbox now includes a new framework called <a href="http://dev.windows.com/en-us/develop/winjs" target="_blank">WinJS</a> which provides several touch-friendly UI controls.&nbsp; To further assist app development, 
@@ -37,6 +37,10 @@ you might read the 'WinJS Controls' section of the <a href="http://aka.ms/611111
 <ul>
 	<li><a href="http://jquery.com/" target="_blank">jQuery</a> : like a query language for the html DOM. It is also needed by most of the other libraries.</li>
 	<li><a href="https://jqueryui.com/" target="_blank">jQuery UI</a> : provides some common controls like datepickers, dialog boxes, etc and supports themes.</li>
+    <li><a href="https://codemirror.net/" target="_blank">CodeMirror</a> : syntax-highlighting editors used for markup and script editing within the ide.</li>
+    <li><a href="http://dev.windows.com/en-us/develop/winjs" target="_blank">WinJS</a> : Microsoft javascript library for creating browser 'apps'.</li>
+    <li><a href="https://facebook.github.io/react/" target="_blank">React.JS</a> : A (Facebook created) JavaScript library for building user interfaces </li>
+    <li><a href="http://knockoutjs.com/" target="_blank">Knockout.js</a> : Simplify Javascript UIs with with the Model-View-View Model (MVVM) pattern.</li>
 	<li><a href="http://www.trirand.com/blog/" target="_blank">jqGrid</a> : a popular versatile grid control</li>
 	<li><a href="http://www.jqplot.com/" target="_blank">jqPlot</a> : awesome charting library</li>
 	<li><a href="http://fabien-d.github.io/alertify.js/" target="_blank">Alertify.JS</a> : Simple way of dispaying message boxes or notifications.</li>
@@ -44,7 +48,7 @@ you might read the 'WinJS Controls' section of the <a href="http://aka.ms/611111
 	<li><a href="https://code.google.com/p/crypto-js/" target="_blank">Crypto.JS</a> : Simple encryption capabilities</li>
 	<li><a href="http://code.google.com/p/dynatree/" target="_blank">Dynatree</a> : a hierarchical tree control</li>
 	<li><a href="http://threejs.org/" target="_blank">Three.JS</a> : Bare minimum distribution included, download the full zip file from their website. Allows higher level use of WebGL.</li>
-	<li><a href="http://lokijs.org/" target="_blank">Loki.JS</a> : A lightweight javascript document oriented database</li>
+	<li><a href="http://lokijs.org/" target="_blank">Loki.JS</a> : A lightweight javascript document oriented database (which I have also contributed to).</li>
 	<li><a href="http://www.drewgreenwell.com/projects/metrojs" target="_blank">Metro.JS</a> : Lets you create Metro-like live tiles within your programs.</li>
 	<li><a href="http://fortawesome.github.io/Font-Awesome/cheatsheet/" target="_blank">Font Awesome</a> : Font based vector icon library... these will scale well.</li>
 	<li><a href="http://www.createjs.com" target="_blank">EaselJS</a> : A Javascript library that makes working with the HTML5 Canvas element easy</li>
@@ -59,7 +63,6 @@ you might read the 'WinJS Controls' section of the <a href="http://aka.ms/611111
 	<li><a href="http://www.babylonjs.com/" target="_blank">Babylon.js</a> : a complete JavaScript framework for building 3D games with HTML 5 and WebGL.</li>
 	<li><a href="https://github.com/jdorn/json-editor" target="_blank">jsoneditor.js</a> : JSON Editor takes a JSON Schema and uses it to generate an HTML form.</li>
 	<li><a href="http://d3js.org/" target="_blank">d3.js</a> : Javascript visualization library.</li>
-	<li><a href="http://dev.windows.com/en-us/develop/winjs" target="_blank">WinJS</a> : Microsoft javascript library for creating browser 'apps'.</li>
 </ul>
 
 <p>If you need to add other javascript libraries you can put them alongside the others... in the libraries subfolder. Then edit the TridentSandbox.htm file and add script include tags (or stylesheet links) similar to the other libraries.</p>

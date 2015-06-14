@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 210
+#rev 211
 
 CACHE:
 TridentSandbox.htm
@@ -8,7 +8,6 @@ SandboxLoader.htm
 SandboxLoaderWJS.htm
 libraries/jquery/jquery-2.1.0.min.js
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js
-libraries/winjs/js/en-US/ui.strings.js
 css/sandbox.css
 libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js
 libraries/jqGrid-4.5.4/js/i18n/grid.locale-en.js
@@ -16,13 +15,15 @@ libraries/codemirror.min.js
 libraries/cryptojs.min.js
 libraries/jqplot.min.js
 libraries/sbx-bundle.min.js
-libraries/winjs/js/WinJS.min.js
 libraries/dynatree/jquery.dynatree.min.js
 libraries/tinymce/tinymce.min.js
 libraries/three.min.js
+libraries/winjs/js/base.min.js
+libraries/winjs/js/ui.min.js
 libraries/winjs/css/ui-dark.css
 libraries/winjs/css/ui-light.css
 libraries/winjs/fonts/Symbols.ttf
+libraries/winjs/js/en-US/ui.strings.js
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/animated-overlay.gif
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/images/ui-bg_flat_0_aaaaaa_40x100.png
@@ -130,6 +131,7 @@ samples/ObeliskJS%20Demo.prg
 samples/PixiJS%20Morph%20Demo.prg
 samples/ProgramClipboard.prg
 samples/Proper%20Cleanup%20Method.prg
+samples/React%20Sample.prg
 samples/Samples%20Browser%20WJS.prg
 samples/SandboxLanding.prg
 samples/SandboxIO.prg

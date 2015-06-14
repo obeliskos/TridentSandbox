@@ -5,9 +5,10 @@
  *
  * @param {string} appname - Application name context can be used to distinguish subdomains or just 'loki'
  */
-function TridentAdapter(appname)
+function TridentAdapter(appname, db)
 {
   this.app = 'loki';
+  this.db = db;
   
   if (typeof (appname) !== 'undefined') 
   {
@@ -29,7 +30,7 @@ TridentAdapter.prototype.loadDatabase = function(dbname, callback)
   var appName = this.app;
   
   // Using functions / variables defined in main page, should probably clean up later
-  VAR_TRIDENT_API.GetAppKey(appName, dbname, function(result) {
+  this.db.getAppKey(appName, dbname, function(result) {
     if (typeof (callback) === 'function') {
       if (result.id === 0) {
         console.warn("trident adapter could not find database");
@@ -57,7 +58,7 @@ TridentAdapter.prototype.saveDatabase = function(dbname, dbstring, callback)
   var appName = this.app;
   
   // set (add/update) entry to AKV database
-  VAR_TRIDENT_API.SetAppKey(appName, dbname, dbstring, callback);
+  this.db.setAppKey(appName, dbname, dbstring, callback);
 }
 
 /**
@@ -70,11 +71,11 @@ TridentAdapter.prototype.deleteDatabase = function(dbname)
   var appName = this.app;
   
   // catalog was already initialized, so just lookup object and delete by id
-  VAR_TRIDENT_API.GetAppKey(appName, dbname, function(result) {
+  this.db.getAppKey(appName, dbname, function(result) {
     var id = result.id;
     
     if (id !== 0) {
-      VAR_TRIDENT_API.DeleteAppKey(id);
+      this.db.deleteAppKey(id);
     }
   });
 }
@@ -90,7 +91,7 @@ TridentAdapter.prototype.getDatabaseList = function(callback)
   
   // catalog already initialized
   // get all keys for current appName, and transpose results so just string array
-  VAR_TRIDENT_API.GetAppKeys(appName, function(results) {
+  this.db.getAppKeys(appName, function(results) {
     var names = [];
     
     for(var idx = 0; idx < results.length; idx++) {
@@ -119,7 +120,7 @@ TridentAdapter.prototype.getCatalogSummary = function(callback)
   
   // catalog already initialized
   // get all keys for current appName, and transpose results so just string array
-  VAR_TRIDENT_API.GetAllKeys(function(results) {
+  this.db.getAllKeys(function(results) {
     var entries = [];
     var obj,
       size,

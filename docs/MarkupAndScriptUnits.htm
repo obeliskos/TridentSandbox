@@ -5,66 +5,78 @@
 <link rel="stylesheet" type="text/css" href="docs.css" />
 </head>
 <body>
-Topics : [ <a href="Welcome.htm">Welcome</a> ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ] [ Markup and Script Units ]
-<h2>Markup and Script Units</h2>
+    Topics : [ <a href="Welcome.htm">Welcome</a> ] [ <a href="ApiReference.htm">API Reference</a> ] [ <a href="DesignGuide.htm">Design Guide</a> ] [ <a href="GenerateStandalone.htm">Generating Standalone Page</a> ] [ <a href="HostingAndAppCache.htm">Hosting and AppCache</a> ] [ Markup and Script Units ]
+    <h2>Markup and Script Units</h2>
 
-<h3>Overview</h3>
-<p>When running in a hosted or appcached environment you are limited as to how to modularize your code.&nbsp;&nbsp;Running off of the local filesystem, you can edit the TridentSandbox main page to add new 
-script references and you can edit the filesystem to add your own .js files to the library.&nbsp;&nbsp;When running in appcache mode, you cannot do this... you cannot alter the underlying webpages or file structure.&nbsp;&nbsp;
-In an effort to add back some level of modularization and expandibility, TridentSandbox now supports saving Markup or Script as a named 'Unit' to the Trident Database which can be called up / loaded dynamically 
-within your programs.&nbsp;&nbsp;You can use this new unit library interface to import a 
-simple third party javascript library, your own javascript library functions, or re-usable HTML fragments you might use within other applications or to 
-easily swap in and out of the HTML Log Tab dynamically.</p>
+    <h3>Overview</h3>
+    <p>
+        When running in a hosted or appcached environment you are limited as to how to modularize your code.&nbsp;&nbsp;Running off of the local filesystem, you can edit the TridentSandbox main page to add new
+        script references and you can edit the filesystem to add your own .js files to the library.&nbsp;&nbsp;When running in appcache mode, you cannot do this... you cannot alter the underlying webpages or file structure.&nbsp;&nbsp;
+        In an effort to add back some level of modularization and expandibility, TridentSandbox now supports saving Markup or Script as a named 'Unit' to the Trident Database which can be called up / loaded dynamically
+        within your programs.&nbsp;&nbsp;You can use this new unit library interface to import a
+        simple third party javascript library, your own javascript library functions, or re-usable HTML fragments you might use within other applications or to
+        easily swap in and out of the HTML Log Tab dynamically.
+    </p>
 
-<h3>Balancing capability and portability</h3>
-<p>This entire Unit library mechanism (as well as all of the Trident Sandbox API calls) are intended to maximize the capability of a Trident Sandbox scripting environment.&nbsp;&nbsp;The more Trident 
-Sandbox specific functionality you utilize, the less portable your program becomes to any environment other than Trident Sandbox.&nbsp;&nbsp;Unit libraries also make it more difficult to move your program from 
-one machine to another since you need to move each of the units as well (see Backup and Restore below for options).&nbsp;&nbsp;If you are using Trident Sandbox as a 'test bed' 
-for web development you might want to limit your API use and specifically unit libraries as they would be very difficult to translate into other web environments.&nbsp;&nbsp;However, if you want to utilize the 
-Trident Sandbox to create real applications that have value in and of themselves then unit libraries might one of those 'custom' API functionalities that allow your program 
-significant more capabilities for growth and code structuring.&nbsp;&nbsp;You might want to build and test your code within a real Trident Sandbox program before saving portions as units since they 
-might be more complicated to debug.</p>
+    <h3>Balancing capability and portability</h3>
+    <p>
+        This entire Unit library mechanism (as well as all of the Trident Sandbox API calls) are intended to maximize the capability of a Trident Sandbox scripting environment.&nbsp;&nbsp;The more Trident
+        Sandbox specific functionality you utilize, the less portable your program becomes to any environment other than Trident Sandbox.&nbsp;&nbsp;Unit libraries also make it more difficult to move your program from
+        one machine to another since you need to move each of the units as well (see Backup and Restore below for options).&nbsp;&nbsp;If you are using Trident Sandbox as a 'test bed'
+        for web development you might want to limit your API use and specifically unit libraries as they would be very difficult to translate into other web environments.&nbsp;&nbsp;However, if you want to utilize the
+        Trident Sandbox to create real applications that have value in and of themselves then unit libraries might one of those 'custom' API functionalities that allow your program
+        significant more capabilities for growth and code structuring.&nbsp;&nbsp;You might want to build and test your code within a real Trident Sandbox program before saving portions as units since they
+        might be more complicated to debug.
+    </p>
 
-<h3>Library Unit Management Utility</h3>
-<p>Currently I do not wish to clutter up the user interface with this added complexity, so i placed this in Samples/Utilities/Library Unit Management.&nbsp; From here you can create all of your script and html units.&nbsp;You can 
-create a script unit with the name <b>autorun</b> and it will execute immediately upon Trident Sandbox page load (unless a <b>SkipAutorun</b> hash param is added.&nbsp; From an autorun script 
-you can initialize the environment by loading other script units (via API_ImportScriptUnits) or perhaps add your own API functions or change the main page layout, etc.&nbsp;If you utilize the autorun to import 
-scripts AND you utilize the launch command to run your apps then you may need to use setTimeout to delay your page initialization logic if it depends on the new scripts.&nbsp; SandboxLoader.htm 
-will also run your autorun script unit (unless you add the SkipAutorun hash param).&nbsp; If your autorun script and/or its imports take over 600ms you might need to add your own delay if your page 
-initialization logic depends on those library imports.</p>
+    <h3>Library Unit Management Utility</h3>
+    <p>
+        Currently I do not wish to clutter up the user interface with this added complexity, so i placed this in Samples/Utilities/Library Unit Management.&nbsp; From here you can create all of your script and html units.&nbsp;You can
+        create a script unit with the name <b>autorun</b> and it will execute immediately upon Trident Sandbox page load (unless a <b>SkipAutorun</b> hash param is added.&nbsp; From an autorun script
+        you can initialize the environment by loading other script units (via API_ImportScriptUnits) or perhaps add your own API functions or change the main page layout, etc.&nbsp;If you utilize the autorun to import
+        scripts AND you utilize the launch command to run your apps then you may need to use setTimeout to delay your page initialization logic if it depends on the new scripts.&nbsp; SandboxLoader.htm
+        will also run your autorun script unit (unless you add the SkipAutorun hash param).&nbsp; If your autorun script and/or its imports take over 600ms you might need to add your own delay if your page
+        initialization logic depends on those library imports.
+    </p>
 
-<h3>Console Command Interface</h3>
-<p>There are a series of lower level API commands added to support library unit management, that may be more useful if you use this feature alot.&nbsp; Primarily they allow using loading into (and saving from) the syntax 
-highlighting editors.&nbsp;</p>
+    <h3>Console Command Interface</h3>
+    <p>
+        There are a series of lower level API commands added to support library unit management, that may be more useful if you use this feature alot.&nbsp; Primarily they allow using loading into (and saving from) the syntax
+        highlighting editors.&nbsp;
+    </p>
 
-<p>Example : You press 'New' to create a blank program, write some Markup into the Markup edit control, and then go to the Text Log console and type 
-API_SaveMarkupUnit('MyFirstMarkupUnit') and hit enter and Trident Sandbox will save your markup 'unit' to the TridentDB.&nbsp;&nbsp;Other functions exist to recall that unit as a string which you 
-might then insert into a div as sort of a user control.&nbsp;&nbsp;Similar functionality exists for scripts except scripts can also be 'imported' which will append it to a new hidden div specifically designed 
-to hold script 'units'.&nbsp;&nbsp;If you use this import function then your scripts will be put into this place that trident sandbox knows how to clean out later.&nbsp;&nbsp;If for some reason you need to pair 
-a Markup with a Script in a single logical entity, you should not use these unit functions but instead just use the Trident Save slots and retrieve that app/key yourself (look at source for 
-sb_load_slot() within the TridentSandbox.htm file itself).</p>
+    <p>
+        Example : You press 'New' to create a blank program, write some Markup into the Markup edit control, and then go to the Text Log console and type
+        API_SaveMarkupUnit('MyFirstMarkupUnit') and hit enter and Trident Sandbox will save your markup 'unit' to the TridentDB.&nbsp;&nbsp;Other functions exist to recall that unit as a string which you
+        might then insert into a div as sort of a user control.&nbsp;&nbsp;Similar functionality exists for scripts except scripts can also be 'imported' which will append it to a new hidden div specifically designed
+        to hold script 'units'.&nbsp;&nbsp;If you use this import function then your scripts will be put into this place that trident sandbox knows how to clean out later.&nbsp;&nbsp;If for some reason you need to pair
+        a Markup with a Script in a single logical entity, you should not use these unit functions but instead just use the Trident Save slots and retrieve that app/key yourself (look at source for
+        sb_load_slot() within the TridentSandbox.htm file itself).
+    </p>
 
-<p>These are the functions added to support Unit library management :</p>
-<ul>
-	<li>(Console) API_LogMarkupUnits()</li>
-	<li>(Console) API_SaveMarkupUnit(unitName)</li>
-	<li>(Console) API_LoadMarkupUnit(unitName)</li>
-	<li>(Program) API_GetMarkupUnit(unitName, callback)</li>
-	<li>(Program) API_ImportMarkupUnit(unitName, clearFirst)</li>
-	<li>(Console) API_LogScriptUnits()</li>
-	<li>(Console) API_SaveScriptUnit(unitName)</li>
-	<li>(Console) API_LoadScriptUnit(unitName)</li>
-	<li>(Program) API_ImportScriptUnit(unitName)</li>
-</ul>
+    <p>These are the functions added to support Unit library management :</p>
+    <ul>
+        <li>(Console) sandbox.units.logMarkupUnits()</li>
+        <li>(Console) sandbox.units.saveMarkupUnit(unitName)</li>
+        <li>(Console) sandbox.units.loadMarkupUnit(unitName)</li>
+        <li>(Program) sandbox.units.getMarkupUnit(unitName, callback)</li>
+        <li>(Console) sandbox.units.logScriptUnits()</li>
+        <li>(Console) sandbox.units.saveScriptUnit(unitName)</li>
+        <li>(Console) sandbox.units.loadScriptUnit(unitName)</li>
+        <li>(Program) sandbox.units.importScriptUnit(unitName)</li>
+    </ul>
 
-<h3>Backing up and Restoring the Trident Database</h3>
-<p>While not limited to just the Markup and Script Unit libraries, new Console API functions and a sample program (<b>Samples/Utilities/Trident BackupRestore</b>) have been added to let you back up and restore the entire Trident Database.  This indexed db app/key/value 
-database is used to store Trident Save slots, Markup and Script Unit libraries described above, as well as any app/key/values you may have stored for your own apps.</p>
-<p>At the console, you can type API_Backup_TridentDB("TDB-040514.backup") or just omit the filename for a default filename and a download prompt will appear for you to save this file to 
-your hard disk.  At a later point in time (perhaps an upgrade or to duplicate onto another machine), you can go to the console and type API_Restore_TridentDB().  This will display a file browser 
-within the Text Log tab where you can pick the file to import.  Upon selecting the file, it will add all the entries into your TridentDB.  As with any Trident DB insert, if a object 
-already exists with that app/key combination, it will overwrite it.  So any Trident Save slots which exist in the backup will overwrite any you already have saved... the same applies to units and your own keys.  The backup file is a 
-'stringified' (serialized) JSON object so if you need to fine tune an import you can edit the backup file which is text, however the file is not very human readable as it lacks formatting.</p>
-<p></p>
+    <h3>Backing up and Restoring the Trident Database</h3>
+    <p>
+        While not limited to just the Markup and Script Unit libraries, new Console API functions (and now dashboard tabs) have been added to let you back up and restore the entire Trident Database.  This indexed db app/key/value
+        database is used to store Trident Save slots, Markup and Script Unit libraries described above, as well as any app/key/values you may have stored for your own apps.
+    </p>
+    <p>
+        At the console, you can type sandbox.files.exportDatabaseKeys("TDB-040514.backup") or just omit the filename for a default filename and a download prompt will appear for you to save this file to
+        your hard disk.  At a later point in time (perhaps an upgrade or to duplicate onto another machine), you can go import that backup in the storage summary dashboard's db restore tab.  Upon selecting the file, it will display all the entries into your backup
+        and you can pick the keys (or all of them) to import.  As with any Trident DB insert, if a object already exists with that app/key combination, it will overwrite it.  Users with no indexed db or service adapter configured (maybe when running page off a filesystem) will default to an 
+        in-memory database adapter and can use this to set up complicated database 'states' which can be persisted as a single entity.
+    </p>
+    <p></p>
 </body>
 </html>

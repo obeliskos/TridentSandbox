@@ -44,7 +44,8 @@
     <script src="libraries/cryptojs.min.js"></script>
     <script src="libraries/jqplot.min.js"></script>
     <script src="libraries/sbx-bundle.min.js"></script>
-    <script src="libraries/winjs/js/WinJS.min.js"></script>
+    <script src="libraries/winjs/js/base.min.js"></script>
+    <script src="libraries/winjs/js/ui.min.js"></script>
     <script src="libraries/dynatree/jquery.dynatree.min.js"></script>
     <script src="libraries/tinymce/tinymce.min.js"></script>
     <script src="libraries/three.min.js"></script>
@@ -52,7 +53,7 @@
     <link rel="stylesheet" type="text/css" href="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/css/redmond/jquery-ui-1.10.3.custom.css" />
     <link rel="stylesheet" type="text/css" href="css/sandbox.css" />
     <link rel="stylesheet" type="text/css" href="css/style-bundle.min.css" />
-    <link rel="stylesheet" type="text/css" href="libraries/winjs/css/ui-dark.css" />
+    <link rel="stylesheet" type="text/css" href="libraries/winjs/css/ui-dark.min.css" />
 
     <style>
         @font-face {
@@ -139,7 +140,11 @@
 
 </head>
 <body bgcolor="#1F7DD0" style="background-color:#1F7DD0">
-
+    <div id='div-sbx-api' style="display:none">
+        <div id='sandboxTree' style='height:400px; border:1px solid'></div><div style='padding: 10px'>
+            <span id='nodeInfo' style='font-size:14pt;'></span>
+        </div>
+    </div>
     <div id="sb_div_caption" style="border:0 solid #333; padding:0 0; background:#556;align:center;">
         <table width="100%" cellpadding="0" cellspacing="0">
             <tr>
@@ -200,7 +205,7 @@
                 </td>
                 <td style="align:'right'">
                     <select onchange="sandbox.ide.selectTheme()" id='selTheme' style='font-size:16px;'>
-                        <option selected>default</option>
+                        <option>default</option>
                         <option>3024-day</option>
                         <option>3024-night</option>
                         <option>ambiance</option>
@@ -212,7 +217,7 @@
                         <option>eclipse</option>
                         <option>elegant</option>
                         <option>erlang-dark</option>
-                        <option>lesser-dark</option>
+                        <option selected="selected">lesser-dark</option>
                         <option>liquibyte</option>
                         <option>mbo</option>
                         <option>mdn-like</option>
@@ -232,7 +237,7 @@
                         <option>tomorrow-night-eighties</option>
                         <option>ttcn</option>
                         <option>twilight</option>
-                        <option selected='selected'>vibrant-ink</option>
+                        <option>vibrant-ink</option>
                         <option>xq-dark</option>
                         <option>xq-light</option>
                         <option>zenburn</option>
@@ -392,9 +397,9 @@
             <ul>
                 <li><a href="#UI_Tab_Summary">Storage Summary</a></li>
                 <li><a href="#UI_Tab_LocalStorageUsage">LocalStorage Usage</a></li>
-                <li><a href="#UI_Tab_TridentDbUsage">TridentDB Usage</a></li>
-                <li><a href="#UI_Tab_DatabaseBackup">Database Backup</a></li>
-                <li><a href="#UI_Tab_DatabaseRestore">Database Restore</a></li>
+                <li><a href="#UI_Tab_TridentDbUsage">DB Usage</a></li>
+                <li><a href="#UI_Tab_DatabaseBackup">DB Backup</a></li>
+                <li><a href="#UI_Tab_DatabaseRestore">DB Restore</a></li>
                 <li><a href="#UI_Tab_AdapterConfig">Adapter</a></li>
             </ul>
             <div id="UI_Tab_Summary" style="overflow: auto;">
@@ -559,9 +564,9 @@
                 <button class="minimal" onclick="$('.sb-adapter-config').hide(); $('#sb_div_adapter_service').show()">WebService</button>
                 <button class="minimal" onclick="$('.sb-adapter-config').hide(); $('#sb_div_adapter_user').show()">User Defined</button>
                 <div class="sb-adapter-config" style="display:none" id="sb_div_adapter_service">
-                    <br/>
+                    <br />
                     <fieldset>
-                    <legend>Service Adapter Configuration</legend>
+                        <legend>Service Adapter Configuration</legend>
                         <p>
                             <i>
                                 Service adapter requires you have implemented the service endpoints specified the service adapter
@@ -574,7 +579,7 @@
                     </fieldset>
                 </div>
                 <div class="sb-adapter-config" style="display:none" id="sb_div_adapter_user">
-                    <br/>
+                    <br />
                     <fieldset>
                         <legend>Custom Adapter Configuration</legend>
                         <p>
