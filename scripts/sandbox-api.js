@@ -1559,6 +1559,16 @@ var sandboxIDE = {
             }
         });
     },
+    toggleLint: function() {
+        if (sandbox.settings.useLinter === "true") {
+            sandbox.settings.set("useLinter", "false");
+            sandbox.volatile.editorScript.setOption("lint", false);
+        }
+        else {
+            sandbox.settings.set("useLinter", "true");
+            sandbox.volatile.editorScript.setOption("lint", true);
+        }
+    },
     runApp: function (progname) {
         var baseUrl = "";
 
@@ -2691,7 +2701,7 @@ var sandbox = {
         appCacheProgress: 0,
         appCached: false,
         autorunActive: false,
-        onlineSamples: true,
+        onlineSamples: false,
         memStats: null,
         memStatsRequestId: null,
         markupCursor: null,
@@ -2728,6 +2738,7 @@ var sandbox = {
         keybindScriptFold: "Ctrl+Alt+C",
         keybindScriptUnfold: "Ctrl+Alt+V",
         keybindLaunch: "Alt+L",
+        keybindToggleLint: "Ctrl+Alt+G",
         load: function () {
             if (!localStorage) return;
 
@@ -2944,6 +2955,7 @@ var sandbox = {
             shortcut.add(sandbox.settings.keybindMarkupUnfold, sandbox.ide.unfoldMarkup);
             shortcut.add(sandbox.settings.keybindScriptFold, sandbox.ide.foldScript);
             shortcut.add(sandbox.settings.keybindScriptUnfold, sandbox.ide.unfoldScript);
+            shortcut.add(sandbox.settings.keybindToggleLint, sandbox.ide.toggleLint);
 
 
             // For some reason IE sometimes 'remembers' this val across loads
@@ -2976,6 +2988,7 @@ var sandbox = {
                 markupInitText += sandbox.settings.keybindScriptFold + " : Fold All (Script)\r\n";
                 markupInitText += sandbox.settings.keybindScriptUnfold + " : Unfold All (Script)\r\n";
                 markupInitText += sandbox.settings.keybindLaunch + " : Run/Launch Program in new window)\r\n";
+                markupInitText += sandbox.settings.keybindToggleLint + " : Toggle Linting\r\n";
 
                 markupInitText += "-->";
                 $("#sb_txt_Markup").val(markupInitText);
