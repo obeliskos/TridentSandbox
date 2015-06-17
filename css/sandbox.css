@@ -1,3 +1,31 @@
+button.TridentAppButton {
+    background-color: #ddd;
+    color: #000;
+    min-width: 10px;
+    letter-spacing: 0;
+    height:40px; 
+    float:right;
+}
+
+button.TridentAppButton:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+button.TridentCodeButton {
+    background-color: #ddd;
+    color: #000;
+    min-width: 10px;
+    letter-spacing: 0;
+    height:32px;
+    min-width:40px;
+}
+
+button.TridentCodeButton:hover {
+    background-color: #fff;
+    color: #000;
+}
+
 a.TridentLink:link
 {
     color: #FFFF99;

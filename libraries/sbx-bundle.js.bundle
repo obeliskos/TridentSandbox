@@ -15,8 +15,8 @@
     <file>react/react-with-addons.js</file>
     <file>react/JSXTransformer.js</file>
     <file>alertify.js-0.3.11/lib/alertify.js</file>
-    
-    <file>loki-js/lokijs.js</file>
+
+      <file>loki-js/lokijs.js</file>
     <file>loki-js/loki-indexed-adapter.js</file>
     <file>loki-js/loki-trident-adapter.js</file>
 

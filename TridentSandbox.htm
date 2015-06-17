@@ -13,25 +13,26 @@
     <meta name="msapplication-wide310x150logo" content="images_ide/live_tile/Poseidon-Wide310.png"/>
     <meta name="msapplication-square310x310logo" content="images_ide/live_tile/Poseidon-Square310.jpg"/>
 
-    <!--	TRIDENT SANDBOX : A 'jsfiddle-like' sandbox for Internet Explorer 10/11
+    <!--	TRIDENT SANDBOX : A browser app development which runs within a browser itself.
             GitHub development at : https://github.com/obeliskos/TridentSandbox
 
-            This original intent of this is for use on Windows RT tablets, but it can be used on any
-            computer running Internet Explorer 10/11 and possibly other browsers.
+            Trident Sandbox is designed to work with most modern browsers.  It depends on AppCache,
+            IndexedDb, FILE API, and can make use of other modern web apis.
 
-            It makes use of the FILE API which still seems to be somewhat browser specific, so to work
-            on other browsers you might need to change the I/O interface functions to work.
+            This original intent of this is for use on Windows RT tablets or tablets in general, but it can be used on any
+            computer running a modern browser.  In fact, you might develop programs on a desktop and send to tablet to run.
+            It allows your programs to leverage the WinJS framework to enable controls which allow targeting
+            'touch-friendly' devices.  The project also uses javascript and css bundles which are an extension of
+            Visual Studio and Web Essentials plugin.  I may provide a parallel gulp-based minifier/bundle in the future,
+            but for now if you wish to remove or update libraries already bundled you will need those tools.  You can
+            add your own libraries outside of those bundles.
 
             Html Files :
             TridentSandbox.htm : this is the main page which supports AppCache autoupdate
             SilentSandbox.htm : Same as the main TridentSandbox.htm page except it doesn't check for updates
             SandboxLoader.htm : For hosted/appcached, this works with Trident Save Slots as a Standalone Launcher of programs
     -->
-    <!--
-    SCRIPT and STYLESHEET includes section
-    If you want to integrate other third party (or your own) javascript libraries to be
-    available for use by the sandbox app, add them here.
-    -->
+
     <script src="libraries/jquery/jquery-2.1.0.min.js"></script>
     <script src="libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js"></script>
@@ -60,6 +61,7 @@
         body {
             margin: 0;
         }
+
     </style>
 
 </head>
@@ -80,22 +82,19 @@
                         <table style="border:1px solid; background-color:#ccc;">
                             <tr>
                                 <td>
-                                    <div class="divWideButtons" style="display:inline">Local Storage : </div>
-                                    <div class="divTinyButtons" style="display:inline">LS : </div>
+                                    <div style="display:inline">Local Storage : </div>
                                     <span id="sb_spn_localstorage_status">N/A</span>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <div class="divWideButtons" style="display:inline">Indexed Db :</div>
-                                    <div class="divTinyButtons" style="display:inline">IDB : </div>
+                                    <div style="display:inline">Database :</div>
                                     <span id="sb_spn_indexeddb_status">N/A</span>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <div class="divWideButtons" style="display:inline">AppCache :</div>
-                                    <div class="divTinyButtons" style="display:inline">AC : </div>
+                                    <div style="display:inline">AppCache :</div>
                                     <span id="sb_spn_appcache_status">N/A</span>&nbsp;<span id="sb_spn_appcache_progress"></span>
                                 </td>
                             </tr>
@@ -103,11 +102,8 @@
                     </div>
                 </td>
                 <td>
-                    <div class="divWideButtons" style="display:inline">
+                    <div style="display:inline">
                         <h1 class="tlt" id='sb_header_caption' title='Trident Sandbox : An HTML / Javascript development sandbox' onclick="sandbox.ide.toggleHeaderFont()" align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0 0 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript dev sandbox</h1>
-                    </div>
-                    <div class="divTinyButtons" style="display:inline">
-                        <h3 id='sb_header_caption2' title='Trident Sandbox : An HTML / Javascript sandbox' align='center' style="width:90%; font-family: 'Heorot'; text-shadow: 0 0 7px rgba(0,0,0,0.75); color:#FFFF99;">Trident Sandbox : An HTML / Javascript sandbox</h3>
                     </div>
                 </td>
                 <td>
@@ -144,7 +140,7 @@
                         <option>elegant</option>
                         <option>erlang-dark</option>
                         <option>lesser-dark</option>
-                        <option>liquibyte</option>
+                        <option selected="selected">liquibyte</option>
                         <option>mbo</option>
                         <option>mdn-like</option>
                         <option>midnight</option>
@@ -178,29 +174,18 @@
                     </div>
                 </td>
                 <td align='center'>
-                    <div class="divWideButtons" style="display:inline">
-                    </div>
-                    <div class="divTinyButtons" style="display:inline">
+                    <div style="display:inline">
                     </div>
                 </td>
                 <td>
-                    <div class="divWideButtons" style="display:inline">
+                    <div style="display:inline">
                         <button style='height:40px; float:right' title='Toggle Maximize' onclick="sandbox.ide.toggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
                         <button style='height:40px; float:right' title="New Program" onclick="sandbox.ide.newProgram()"><i class="fa fa-plus-circle fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_browse_samples" class="ui_browse_samples" onclick="sandbox.ide.browseSamples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_show_dashboard" class="ui_show_dashboard" onclick='sandbox.dashboard.show()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_gen_sa" class="ui_gen_sa" onclick='sandbox.files.templatePrompt()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_mode_desktop" class="ui_mode_desktop" title='Desktop Mode' onclick="sandbox.ide.applyDesktopMode()"><i class="fa fa-desktop fa-2x"></i></button>
-                        <button style='height:40px; width:40px; float:right' id="ui_mode_mobile" class="ui_mode_mobile" title='Mobile Mode' onclick="sandbox.ide.applyMobileMode(true)"><i class="fa fa-mobile fa-2x"></i></button>
-                    </div>
-                    <div class="divTinyButtons" style="display:inline">
-                        <button style='height:40px; float:right' title='Toggle Maximize' onclick="sandbox.ide.toggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
-                        <button style='height:40px; float:right' title="New Program" onclick="sandbox.ide.clean()"><i class="fa fa-plus-circle fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_browse_samples2" class="ui_browse_samples" onclick="sandbox.ide.browseSamples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_show_dashboard2" class="ui_show_dashboard" onclick='sandbox.dashboard.show()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_gen_sa2" class="ui_gen_sa" onclick='sandbox.files.templatePrompt()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_mode_desktop" class="ui_mode_desktop" title='Desktop Mode' onclick="sandbox.ide.applyDesktopMode()"><i class="fa fa-desktop fa-2x"></i></button>
-                        <button style='height:40px; width:40px; float:right' id="ui_mode_mobile" class="ui_mode_mobile" title='Mobile Mode' onclick="sandbox.ide.applyMobileMode(true)"><i class="fa fa-mobile fa-2x"></i></button>
+                        <button style='height:40px; float:right' id="ui_browse_samples" onclick="sandbox.ide.browseSamples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
+                        <button style='height:40px; float:right' id="ui_show_dashboard" onclick='sandbox.dashboard.show()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
+                        <button style='height:40px; float:right' id="ui_gen_sa" onclick='sandbox.files.templatePrompt()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
+                        <button style='height:40px; float:right' id="ui_mode_desktop" title='Desktop Mode' onclick="sandbox.ide.applyDesktopMode()"><i class="fa fa-desktop fa-2x"></i></button>
+                        <button style='height:40px; width:40px; float:right' id="ui_mode_mobile" title='Mobile Mode' onclick="sandbox.ide.applyMobileMode(true)"><i class="fa fa-mobile fa-2x"></i></button>
                     </div>
                 </td>
             </tr>
@@ -212,38 +197,38 @@
             <td colspan="2">
                 <div id="ui_editor_toolbar" style="font-size:4px; display:inline-block">
                     <div id="divDesktopEditorMode" style="display:inline">
-                        <button id="sb_btn_markup" style="height:32px" onclick="sandbox.ide.toggleMarkup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i></button>
-                        <button id="sb_btn_togglesplit" style="height:32px" onclick="sandbox.ide.toggleSplit()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i></button>
-                        <button id="sb_btn_script" style="height:32px" onclick="sandbox.ide.toggleScript()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i></button>
+                        <button class="TridentCodeButton" id="sb_btn_markup" onclick="sandbox.ide.toggleMarkup()" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i></button>
+                        <button class="TridentCodeButton" id="sb_btn_togglesplit" onclick="sandbox.ide.toggleSplit()" title='Toggle split Side-by-Side / Top-Bottom'><i class="fa fa-columns"></i></button>
+                        <button class="TridentCodeButton" id="sb_btn_script" onclick="sandbox.ide.toggleScript()" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i></button>
                         &nbsp;&nbsp;
                     </div>
                     <div id="divMobileWindowMode" style="display:none">
-                        <button id="sb_btn_markup_only" style="height:32px" onclick="sandbox.ide.setMobileMode(1)" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> 1</button>
-                        <button id="sb_btn_script_only" style="height:32px" onclick="sandbox.ide.setMobileMode(2)" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> 2</button>
-                        <button id="sb_btn_output_only" style="height:32px" onclick="sandbox.ide.setMobileMode(3)" title='Show Output only (Alt+O)'><i class="fa fa-film"></i> 3</button>
+                        <button class="TridentCodeButton" id="sb_btn_markup_only" onclick="sandbox.ide.setMobileMode(1)" title='Show Markup only (Alt+Q)'><i class="fa fa-code"></i> 1</button>
+                        <button class="TridentCodeButton" id="sb_btn_script_only" onclick="sandbox.ide.setMobileMode(2)" title='Show Script only (Alt+W)'><i class="fa fa-gears"></i> 2</button>
+                        <button class="TridentCodeButton" id="sb_btn_output_only" onclick="sandbox.ide.setMobileMode(3)" title='Show Output only (Alt+O)'><i class="fa fa-film"></i> 3</button>
                         &nbsp;&nbsp;
                     </div>
-                    <button id="sb_btn_inpect" style="height:32px" onclick="sandbox.ide.inspectSelection()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i></button>
+                    <button class="TridentCodeButton" id="sb_btn_inpect" style="height:32px" onclick="sandbox.ide.inspectSelection()" title='Inspect an object or variable (Alt+I)'><i class="fa fa-eye"></i></button>
                     <div id='sb_div_ls_slots' style='display:none'>
-                        <button style="height:32px" title='Load from selected TridentDB save slot' onclick='sandbox.ide.loadSlot()'><i class="fa fa-arrow-up"></i> <i class="fa fa-database"></i></button>
-                        <button style="height:32px" title='Save to selected TridentDB save slot' onclick='sandbox.ide.saveSlot()'><i class="fa fa-arrow-down"></i> <i class="fa fa-database"></i></button>
+                        <button class="TridentCodeButton" title='Load from selected TridentDB save slot' onclick='sandbox.ide.loadSlot()'><i class="fa fa-arrow-up"></i> <i class="fa fa-database"></i></button>
+                        <button class="TridentCodeButton" title='Save to selected TridentDB save slot' onclick='sandbox.ide.saveSlot()'><i class="fa fa-arrow-down"></i> <i class="fa fa-database"></i></button>
                         <select style="height:24px; font-size: 14px;" id='sb_sel_trident_slot' onchange="sandbox.ide.loadSlot()"></select>
-                        <button style="height:32px" title='Delete the selected TridentDB save' onclick='sandbox.ide.deleteSlot()'><i class="fa fa-remove"></i> <i class="fa fa-database"></i></button>
+                        <button class="TridentCodeButton" title='Delete the selected TridentDB save' onclick='sandbox.ide.deleteSlot()'><i class="fa fa-remove"></i> <i class="fa fa-database"></i></button>
                         &nbsp;&nbsp;
                     </div>
                     <div style="display:inline-block">
-                        <button class="ui_btn_launch" style='height:32px; display:none' onclick="sandbox.ide.launch()" title="Save and Launch in new Window"><i class="fa fa-database"></i> <i class="fa fa-external-link"></i></button>
-                        <button style='height:32px;' onclick="sandbox.files.programSave()" title="Save your program (Alt+S)"><i class="fa fa-save"></i></button>
-                        <button id="sb_btn_fscode" style="height:32px" onclick="sandbox.ide.fullscreenDevArea()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i></button>
-                        <button style='height:32px;' title='Clear Output Tabs' onclick="sandbox.ide.clearOutput()"><i class="fa fa-eraser"></i></button>
+                        <button class="TridentCodeButton" id="ui_btn_launch" style='display:none' onclick="sandbox.ide.launch()" title="Save and Launch in new Window"><i class="fa fa-database"></i> <i class="fa fa-external-link"></i></button>
+                        <button class="TridentCodeButton" style='height:32px;' onclick="sandbox.files.programSave()" title="Save your program (Alt+S)"><i class="fa fa-save"></i></button>
+                        <button class="TridentCodeButton" id="sb_btn_fscode" onclick="sandbox.ide.fullscreenDevArea()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i></button>
+                        <button class="TridentCodeButton" title='Clear Output Tabs' onclick="sandbox.ide.clearOutput()"><i class="fa fa-eraser"></i></button>
                         &nbsp;&nbsp;
-                        <button id="ui_btn_run" style='height:32px; width:80px;' onclick="sandbox.ide.run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
+                        <button class="TridentCodeButton" id="ui_btn_run" style='width:80px;' onclick="sandbox.ide.run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
                         &nbsp;&nbsp;
                     </div>
                     <div id='divDesktopWindowMode' style="display:inline">
-                        <button style='height:32px; width:40px' title='Code Only (Alt-1)' onclick='sandbox.ide.setWindowMode(1)'>1</button>
-                        <button style='height:32px; width:40px' title='Split 50/50 (Alt-2)' onclick='sandbox.ide.setWindowMode(2)'>2</button>
-                        <button style='height:32px; width:40px' title='Output Only (Alt-3)' onclick='sandbox.ide.setWindowMode(3)'>3</button>
+                        <button class="TridentCodeButton" title='Code Only (Alt-1)' onclick='sandbox.ide.setWindowMode(1)'>1</button>
+                        <button class="TridentCodeButton" title='Split 50/50 (Alt-2)' onclick='sandbox.ide.setWindowMode(2)'>2</button>
+                        <button class="TridentCodeButton" title='Output Only (Alt-3)' onclick='sandbox.ide.setWindowMode(3)'>3</button>
                     </div>
                 </div>
             </td>
@@ -295,28 +280,20 @@
     </table>
 
     <div id="UI_PasswordDialog" style="display:none">
-
         <h3><span class="fa"><i class="fa fa-lock"></i></span> Authorization</h3>
-
         <form action="javascript:void(0);" method="POST">
-
             <fieldset>
-
                 <p>
                     <label for="password">Enter Password</label>
-                    <input id="sb_password_text" type="password" id="password" value="" placeholder="password">
+                    <input id="sb_password_text" type="password" value="" placeholder="password">
                 </p>
                 <p>
                     <button id="sb_password_ok" onclick="$('#UI_PasswordDialog').hide();">Ok</button>
                     <button onclick="$('#UI_PasswordDialog').hide();">Cancel</button>
                 </p>
-
             </fieldset>
-
         </form>
-
-    </div> <!-- end login -->
-
+    </div>
 
     <div id='sb_trident_usage' style="display:none">
         <div id="UI_TabsDashboard">

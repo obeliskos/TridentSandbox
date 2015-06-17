@@ -982,7 +982,8 @@ var sandboxDashboard = {
         var key = $("#ui_ls_txtKeyName").val();
         var val = $("#ui_ls_txtLocalStorageValue").val();
 
-        localStorage[key] = val;
+        sandbox.settings.set(key, val)
+        //localStorage[key] = val;
         sandbox.dashboard.calcLocalStorageUsage();
     },
 
@@ -1106,13 +1107,15 @@ var sandboxUnits = {
         });
     },
     importScriptUnit: function (unitName, callback) {
+        var self = this;
+
         sandbox.db.getAppKey("SandboxScriptUnits", unitName, function (result) {
             if (result == null || result.id == 0) {
                 alertify.error("No script unit by that name");
                 return false;
             }
 
-            this.appendScriptUnit(result.val, callback);
+            self.appendScriptUnit(result.val, callback);
         });
     },
     appendScriptUnit: function (scriptText, callback) {
@@ -1152,6 +1155,10 @@ var sandboxAppCache = {
     logACEvent: function (e) {
         sandbox.volatile.appCached = true;  // if any of the events fire we will assume it is successful and running in appcached mode
 
+        if (sandbox.volatile.envTest(["SBL", "SBL WJS"])) {
+            $("#divAppCache").show();
+        }
+
         // Update diagnostic panel
         var statusString = sandbox.appcache.getACStatus();
 
@@ -1167,6 +1174,12 @@ var sandboxAppCache = {
                 setTimeout(function () {
                     $("#divAppCache").hide(500);
                 }, 1000);
+            }
+
+            if (statusString === "Not cached") {
+                setTimeout(function () {
+                    $("#divAppCache").hide(1000);
+                }, 4000);
             }
 
             $("#sb_spn_ac_status").text(statusString);
@@ -1547,6 +1560,8 @@ var sandboxIDE = {
         });
     },
     runApp: function (progname) {
+        var baseUrl = "";
+
         progname = progname.replace("%20", " ");	// handle encoded spaces
         progname = progname.replace(/[^a-zA-Z 0-9\-]+/g, ""); // whitelist alphanumeric
         progname = "samples\\" + progname + ".prg";	// force extension
@@ -1555,9 +1570,15 @@ var sandboxIDE = {
             sandbox.ui.setDarkTheme();
         }
 
+        if (sandbox.volatile.onlineSamples) {
+            baseUrl = "http://www.obeliskos.com/TridentSandbox/";
+            sandbox.settings.set("cacheSamples", "false");
+            alertify.log("Accessing Online Sample");
+        }
+
         jQuery.ajax({
             type: "GET",
-            url: progname,
+            url: baseUrl + progname,
             cache: (sandbox.settings.cacheSamples === "true" || !navigator.onLine),
             dataType: "json",
 
@@ -1720,6 +1741,7 @@ var sandboxIDE = {
 
         if (sandbox.volatile.onlineSamples) {
             baseUrl = "http://www.obeliskos.com/TridentSandbox/";
+            sandbox.settings.set("cacheSamples", "false");
             alertify.log("Accessing Online Samples Browser");
         }
 
@@ -1995,6 +2017,30 @@ var sandboxIDE = {
 
         sandbox.ide.fitEditors();
     },
+    foldMarkup: function() {
+        sandbox.volatile.editorMarkup.operation(function() { 
+            for (var l = sandbox.volatile.editorMarkup.firstLine(); l <= sandbox.volatile.editorMarkup.lastLine(); ++l) 
+                sandbox.volatile.editorMarkup.foldCode({line: l, ch: 0}, null, "fold"); 
+        }); 
+    },
+    unfoldMarkup: function() {
+        sandbox.volatile.editorMarkup.operation(function() { 
+            for (var l = sandbox.volatile.editorMarkup.firstLine(); l <= sandbox.volatile.editorMarkup.lastLine(); ++l) 
+                sandbox.volatile.editorMarkup.foldCode({line: l, ch: 0}, null, "unfold"); 
+        }); 
+    },
+    foldScript: function() {
+        sandbox.volatile.editorScript.operation(function() { 
+            for (var l = sandbox.volatile.editorScript.firstLine(); l <= sandbox.volatile.editorScript.lastLine(); ++l) 
+                sandbox.volatile.editorScript.foldCode({line: l, ch: 0}, null, "fold"); 
+        }); 
+    },
+    unfoldScript: function() {
+        sandbox.volatile.editorScript.operation(function() { 
+            for (var l = sandbox.volatile.editorScript.firstLine(); l <= sandbox.volatile.editorScript.lastLine(); ++l) 
+                sandbox.volatile.editorScript.foldCode({line: l, ch: 0}, null, "unfold"); 
+        }); 
+    },
     fitLog: function () {
         var used = 80;
         var isCaptionVisible = $("#sb_div_caption").is(":visible");
@@ -2036,14 +2082,14 @@ var sandboxIDE = {
             return;
         }
 
-        if ($(window).width() < 1100) {
-            $(".divWideButtons").hide();
-            $(".divTinyButtons").show();
-        }
-        else {
-            $(".divWideButtons").show();
-            $(".divTinyButtons").hide();
-        }
+        //if ($(window).width() < 1100) {
+        //    $(".divWideButtons").hide();
+        //    $(".divTinyButtons").show();
+        //}
+        //else {
+        //    $(".divWideButtons").show();
+        //    $(".divTinyButtons").hide();
+        //}
 
         var used = $("#ui_editor_toolbar").height() + 12;
         var isCaptionVisible = $("#sb_div_caption").is(":visible");
@@ -2627,7 +2673,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.11",
+        version: "2.12",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,
@@ -2659,7 +2705,7 @@ var sandbox = {
         headerText: "Trident Sandbox Development Environment",
         headerTextWJS: "Trident Sandbox with WinJS framework",
         headerFont: "Heorot",
-        editorTheme: "vibrant-ink",
+        editorTheme: "liquibyte",
         autorunSlot: "",
         skipAutorun: "true",   // interpret all properties as strings for dashboard editor
         useLinter: "true",
@@ -2669,6 +2715,19 @@ var sandbox = {
         databaseAdapter: "trident",
         databaseServiceLocation: "",
         cacheSamples: "false",
+        keybindRun: "Alt+R",
+        keybindSave: "Alt+S",
+        keybindInspect: "Alt+I",
+        keybindToggleMarkup: "Alt+Q",
+        keybindToggleScript: "Alt+W",
+        keybindWinMode1: "Alt+1",
+        keybindWinMode2: "Alt+2",
+        keybindWinMode3: "Alt+3",
+        keybindMarkupFold: "Ctrl+Alt+Z",
+        keybindMarkupUnfold: "Ctrl+Alt+X",
+        keybindScriptFold: "Ctrl+Alt+C",
+        keybindScriptUnfold: "Ctrl+Alt+V",
+        keybindLaunch: "Alt+L",
         load: function () {
             if (!localStorage) return;
 
@@ -2762,7 +2821,7 @@ var sandbox = {
                         sandbox.logger.log("Trident indexedDB adapter initialized successfully.");
 
                         if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
-                            $("#sb_spn_indexeddb_status").text("Yes");
+                            $("#sb_spn_indexeddb_status").text("IndexedDB");
 
                             // load slots now that db is initialized and then do post init
                             sandbox.ide.refreshSlots(callback);
@@ -2787,7 +2846,7 @@ var sandbox = {
                         sandbox.logger.log("Trident service adapter initialized successfully.");
 
                         if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
-                            $("#sb_spn_indexeddb_status").html("Yes <span style='font-family:Symbol'>Å</span>");
+                            $("#sb_spn_indexeddb_status").html("Service");
 
                             // load slots now and do post init
                             sandbox.ide.refreshSlots(callback);
@@ -2805,6 +2864,7 @@ var sandbox = {
             case "memory":
                 sandbox.db = new TridentMemoryAdapter({
                     successCallback: function () {
+                        $("#sb_spn_indexeddb_status").html("Memory");
                         sandbox.logger.log("In-memory database adapter initialized.");
                         sandbox.logger.log("You may use database backup and restore to save keys to a file, if needed.");
                         dbChanged();
@@ -2814,7 +2874,7 @@ var sandbox = {
             default:
                 sandbox.db = new window[sandbox.settings.databaseAdapter]({
                     successCallback: function () {
-                        $("#sb_spn_indexeddb_status").text("Yes");
+                        $("#sb_spn_indexeddb_status").text(sandbox.settings.databaseAdapter);
 
                         if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
                             // load slots now that db is initialized and then do post init
@@ -2872,14 +2932,19 @@ var sandbox = {
 
         // For IDE versions, set up some keyboard shortcuts
         if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
-            shortcut.add("Alt+R", function () { sandbox.ide.run(); });
-            shortcut.add("Alt+S", function () { if (indexedDB) { sandbox.ide.saveSlot(); } else { sandbox.files.programSave(); } });
-            shortcut.add("Alt+Q", function () { if (sandbox.volatile.editorMode == sandbox.editorModeEnum.Markup) sandbox.ide.toggleSplit(); else sandbox.ide.toggleMarkup(); });
-            shortcut.add("Alt+W", function () { if (sandbox.volatile.editorMode == sandbox.editorModeEnum.Script) sandbox.ide.toggleSplit(); else sandbox.ide.toggleScript(); });
-            shortcut.add("Alt+I", function () { sandbox.ide.inspectSelection(); });
-            shortcut.add("Alt+1", function () { sandbox.ide.setWindowMode(1); });
-            shortcut.add("Alt+2", function () { sandbox.ide.setWindowMode(2); });
-            shortcut.add("Alt+3", function () { sandbox.ide.setWindowMode(3); });
+            shortcut.add(sandbox.settings.keybindRun, function () { sandbox.ide.run(); });
+            shortcut.add(sandbox.settings.keybindSave, function () { if (indexedDB) { sandbox.ide.saveSlot(); } else { sandbox.files.programSave(); } });
+            shortcut.add(sandbox.settings.keybindToggleMarkup, function () { if (sandbox.volatile.editorMode == sandbox.editorModeEnum.Markup) sandbox.ide.toggleSplit(); else sandbox.ide.toggleMarkup(); });
+            shortcut.add(sandbox.settings.keybindToggleScript, function () { if (sandbox.volatile.editorMode == sandbox.editorModeEnum.Script) sandbox.ide.toggleSplit(); else sandbox.ide.toggleScript(); });
+            shortcut.add(sandbox.settings.keybindInspect, function () { sandbox.ide.inspectSelection(); });
+            shortcut.add(sandbox.settings.keybindWinMode1, function () { sandbox.ide.setWindowMode(1); });
+            shortcut.add(sandbox.settings.keybindWinMode2, function () { sandbox.ide.setWindowMode(2); });
+            shortcut.add(sandbox.settings.keybindWinMode3, function () { sandbox.ide.setWindowMode(3); });
+            shortcut.add(sandbox.settings.keybindMarkupFold, sandbox.ide.foldMarkup);
+            shortcut.add(sandbox.settings.keybindMarkupUnfold, sandbox.ide.unfoldMarkup);
+            shortcut.add(sandbox.settings.keybindScriptFold, sandbox.ide.foldScript);
+            shortcut.add(sandbox.settings.keybindScriptUnfold, sandbox.ide.unfoldScript);
+
 
             // For some reason IE sometimes 'remembers' this val across loads
             $("#sb_txt_ProgramName").val("");
@@ -2895,7 +2960,25 @@ var sandbox = {
 
             if (sandbox.volatile.envTest(["IDE", "IDE WJS"]) {
                 document.title = "Trident Sandbox " + ((sandbox.volatile.env === "IDE WJS")?"WJS":"") + " v" + sandbox.volatile.version;
-                $("#sb_txt_Markup").val("<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nAlt+R : Run\r\nAlt+L : If Hosted/AppCached, Save and Launch in new Window\r\nAlt+S : Save\r\nAlt+Q : Toggle Markup\r\nAlt+W : Toggle Script\r\nAlt+I : Inspect highlighted variable or show api ref\r\nAlt+1/2/3 : Switch between the three window modes\r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n-->");
+                var markupInitText = "";
+                markupInitText += "<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n\r\n");
+                markupInitText += "Rebindable in dashboard (make sure that your browser's own shortcuts don't conflict) :\r\n";
+                markupInitText += sandbox.settings.keybindRun + " : Run\r\n";
+                markupInitText += sandbox.settings.keybindSave + " : Save\r\n";
+                markupInitText += sandbox.settings.keybindToggleMarkup + " : Toggle Markup\r\n";
+                markupInitText += sandbox.settings.keybindToggleScript + " : Toggle Script\r\n";
+                markupInitText += sandbox.settings.keybindInspect + " : Inspect Selection / API Reference\r\n";
+                markupInitText += sandbox.settings.keybindWinMode1 + " : Window Mode 1\r\n";
+                markupInitText += sandbox.settings.keybindWinMode2 + " : Window Mode 2\r\n";
+                markupInitText += sandbox.settings.keybindWinMode3 + " : Window Mode 3\r\n";
+                markupInitText += sandbox.settings.keybindMarkupFold + " : Fold All (Markup)\r\n";
+                markupInitText += sandbox.settings.keybindMarkupUnfold + " : Unfold All (Markup)\r\n";
+                markupInitText += sandbox.settings.keybindScriptFold + " : Fold All (Script)\r\n";
+                markupInitText += sandbox.settings.keybindScriptUnfold + " : Unfold All (Script)\r\n";
+                markupInitText += sandbox.settings.keybindLaunch + " : Run/Launch Program in new window)\r\n";
+
+                markupInitText += "-->";
+                $("#sb_txt_Markup").val(markupInitText);
             }
 
             $("#sb_txt_Script").val("// script editor tips : \r\n// autoindenting is turned on\r\n// the horizontal slashes indicate forced tabs (instead of smart indenting)\r\n// use shift-tab to use auto-indention for a line instead (cleans up tab slashes)\r\n// use ctrl-a or select multiple lines and then press shift-tab to smart indent them\r\n// the javascript linter may notify you of issues with your code, such as : \r\n\r\nfunction badCode() {\r\n\tvar test=[]\r\n\r\n\tvar test = 'a';\r\n}");
@@ -2917,12 +3000,9 @@ var sandbox = {
             // Mozilla supports ajax calls under filesystem
             if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB) {
                 //$(".ui_show_dashboard").show();
-                $(".ui_btn_launch").show();
-                $(".ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
-                shortcut.add("Alt+L", function () { sandbox.ide.launch(); });
-            }
-            else {
-                $("#sb_div_diagnostic").hide();
+                $("#ui_btn_launch").show();
+                $("[id^='ui_gen_sa']").hide();	// no need to generate standalone if hosted/appcached
+                shortcut.add(sandbox.settings.keybindLaunch, function () { sandbox.ide.launch(); });
             }
 
             // We are keeping track of whether the user has pending changes via a Crypto.JS hash on the markup and script
@@ -3020,7 +3100,7 @@ var sandbox = {
 
             if (localStorage) {
                 $("#sb_spn_localstorage_status").text("Yes");
-                $("#ui_show_dashboard").show();
+                $("[id^='ui_show_dashboard'").show();
             }
 
             // only had memstats in wjs version?
