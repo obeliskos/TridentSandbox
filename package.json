@@ -1,0 +1,10 @@
+{
+  "name": "Trident Sandbox for Node Wekbit",
+  "main": "TridentSandboxWJS.htm",
+  "window": {
+    "toolbar": true,
+    "width":1024,
+    "height":768
+  },
+  "chromium-args": "--enable-precise-memory-info"
+}
