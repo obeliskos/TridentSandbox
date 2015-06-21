@@ -1060,7 +1060,7 @@ var sandboxUnits = {
     },
     getMarkupUnit: function (unitName, callback) {
         sandbox.db.getAppKey("SandboxMarkupUnits", unitName, function (result) {
-            if (result == null || result.id == 0) {
+            if (result === null || result.id === 0) {
                 alertify.error("No markup unit by that name");
                 return false;
             }
@@ -1104,6 +1104,16 @@ var sandboxUnits = {
 
             sandbox.volatile.scriptHash = CryptoJS.SHA1(result.val).toString();
             sandbox.volatile.editorScript.setValue(result.val);
+        });
+    },
+    getScriptUnit: function(unitName, callback) {
+        sandbox.db.getAppKey("SandboxScriptUnits", unitName, function (result) {
+            if (result === null || result.id === 0) {
+                alertify.error("No script unit by that name");
+                return false;
+            }
+
+            callback(result.val);
         });
     },
     importScriptUnit: function (unitName, callback) {
@@ -2735,8 +2745,8 @@ var sandbox = {
         keybindWinMode3: "Alt+3",
         keybindMarkupFold: "Ctrl+Alt+Z",
         keybindMarkupUnfold: "Ctrl+Alt+X",
-        keybindScriptFold: "Ctrl+Alt+C",
-        keybindScriptUnfold: "Ctrl+Alt+V",
+        keybindScriptFold: "Ctrl+Alt+M",
+        keybindScriptUnfold: "Ctrl+Alt+N",
         keybindLaunch: "Alt+L",
         keybindToggleLint: "Ctrl+Alt+G",
         load: function () {
@@ -2878,7 +2888,15 @@ var sandbox = {
                         $("#sb_spn_indexeddb_status").html("Memory");
                         sandbox.logger.log("In-memory database adapter initialized.");
                         sandbox.logger.log("You may use database backup and restore to save keys to a file, if needed.");
-                        dbChanged();
+
+                        if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
+                            sandbox.ide.refreshSlots(callback);
+                            dbChanged();
+                        }
+                        else {
+                            callback();
+                            dbChanged();
+                        }
                     }
                 });
                 break;
@@ -2970,12 +2988,13 @@ var sandbox = {
 
             sandbox.logger.clearLog();
 
-            if (sandbox.volatile.envTest(["IDE", "IDE WJS"]) {
+            if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
                 document.title = "Trident Sandbox " + ((sandbox.volatile.env === "IDE WJS")?"WJS":"") + " v" + sandbox.volatile.version;
                 var markupInitText = "";
-                markupInitText += "<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n\r\n");
+                markupInitText += "<!-- Welcome to TridentSandbox v" + sandbox.volatile.version + "\r\n\r\nCtrl-Space : Bring up code completion list\r\nF11 : (while in an editor) will toggle fullscreen editing.\r\nESC : will also exit fullscreen mode. \r\nCtrl+Q : Within an editor (on a code fold line) will toggle fold\r\nCtrl-F : Find text (In editor this will do basic search)\r\nCtrl-G : Find next\r\nShift-Ctrl-F : Replace\r\nShift-Ctrl-R : Replace All\r\n\r\n";
                 markupInitText += "Rebindable in dashboard (make sure that your browser's own shortcuts don't conflict) :\r\n";
                 markupInitText += sandbox.settings.keybindRun + " : Run\r\n";
+                markupInitText += sandbox.settings.keybindLaunch + " : Run/Launch Program in new window\r\n";
                 markupInitText += sandbox.settings.keybindSave + " : Save\r\n";
                 markupInitText += sandbox.settings.keybindToggleMarkup + " : Toggle Markup\r\n";
                 markupInitText += sandbox.settings.keybindToggleScript + " : Toggle Script\r\n";
@@ -2987,7 +3006,6 @@ var sandbox = {
                 markupInitText += sandbox.settings.keybindMarkupUnfold + " : Unfold All (Markup)\r\n";
                 markupInitText += sandbox.settings.keybindScriptFold + " : Fold All (Script)\r\n";
                 markupInitText += sandbox.settings.keybindScriptUnfold + " : Unfold All (Script)\r\n";
-                markupInitText += sandbox.settings.keybindLaunch + " : Run/Launch Program in new window)\r\n";
                 markupInitText += sandbox.settings.keybindToggleLint + " : Toggle Linting\r\n";
 
                 markupInitText += "-->";

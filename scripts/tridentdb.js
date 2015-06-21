@@ -15,6 +15,8 @@ function nullFunction () {
 //#region In-Memory Adapter
 
 function TridentMemoryAdapter(options) {
+    var self = this;
+
     this.name = "memory adapter";
 
     this.successCallback = nullFunction;
@@ -26,7 +28,9 @@ function TridentMemoryAdapter(options) {
     this.db = new loki("trident memory");
     this.kvpColl = this.db.addCollection("kvp");
 
-    this.successCallback();
+    setTimeout(function () {
+        self.successCallback();
+    }, 1);
 }
 
 TridentMemoryAdapter.prototype.getAllKeys = function (callback) {
