@@ -2770,7 +2770,7 @@ var sandbox = {
             }
         },
         set: function (setting, value) {
-            this[setting] = value;
+            sandbox.settings[setting] = value;
 
             if (localStorage) {
                 localStorage[setting] = value;
