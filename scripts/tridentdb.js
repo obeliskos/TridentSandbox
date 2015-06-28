@@ -283,7 +283,7 @@ TridentIndexedAdapter.prototype.getAppKey = function (app, key, callback) {
         return function (e) {
             if (typeof (usercallback) === "function") {
                 var lres = e.target.result;
-                if (typeof (lres) === "undefined") lres = { id: 0, success: false };
+                if (lres == null || typeof (lres) === "undefined") lres = { id: 0, success: false };
 
                 usercallback(lres);
             }

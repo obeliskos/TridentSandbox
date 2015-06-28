@@ -1,5 +1,6 @@
 {
   "name": "TridentSandbox",
+  "version" : "2.1.3",
   "main": "TridentSandboxWJS.htm",
   "window": {
     "toolbar": true,

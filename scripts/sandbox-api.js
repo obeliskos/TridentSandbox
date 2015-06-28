@@ -29,10 +29,10 @@ var sbxLogger = {
         }
     },
     logObject: function (objToLog, objName) {
-        if (objName && (typeof (objName) == "string"))
+        if (objName && (typeof (objName) === "string"))
             this.log(objName + " = ");
 
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.dir(objToLog);
         }
         else {
@@ -41,7 +41,7 @@ var sbxLogger = {
 
     },
     clearLog: function () {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -59,7 +59,7 @@ var sbxLogger = {
 
         stack = stack.split('\n').map(function (line) { return line.trim(); });
 
-        var result = stack.splice(stack[0] == 'Error' ? 2 : 1);
+        var result = stack.splice(stack[0] === 'Error' ? 2 : 1);
         this.log(result);
         return result;
         //return stack.splice(stack[0] == 'Error' ? 2 : 1);
@@ -183,13 +183,13 @@ var sandboxFiles = {
         control.replaceWith(control = control.clone(true));
     },
     programSave: function () {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sb_save");
             return;
         }
 
         var prgName = $("#sb_txt_ProgramName").val();
-        if (prgName == "") {
+        if (prgName === "") {
             alertify.error("You need to enter a program name first");
             return;
         }
@@ -212,7 +212,7 @@ var sandboxFiles = {
         var json_text = JSON.stringify(sandboxObject, null, 2);
 
         // Both IE and polyfill methods seem to rely on blobs
-        if (typeof Blob == "undefined") {
+        if (typeof Blob === "undefined") {
             alert('no blobs available (incompatible browser?)');
             return;
         }
@@ -265,7 +265,7 @@ var sandboxFiles = {
         sandbox.files.userfileHide();
 
         // If user has registered a callback function (for when load is completed), call it
-        if (typeof (sandbox.events.userLoadCallback) == typeof (Function)) {
+        if (typeof (sandbox.events.userLoadCallback) === typeof (Function)) {
             // Give time for the file control replace (done above) to complete
             // before giving the user a chance to interfere with that process
             setTimeout(function () {
@@ -307,7 +307,7 @@ var sandboxFiles = {
         sandbox.files.userdataHide();
 
         // If user has registered a callback function (for when load is completed), call it
-        if (typeof (sandbox.events.userdataLoadCallback) == typeof (Function)) {
+        if (typeof (sandbox.events.userdataLoadCallback) === typeof (Function)) {
             // Give time for the file control replace (done above) to complete
             // before giving the user a chance to interfere with that process
             setTimeout(function () {
@@ -339,7 +339,7 @@ var sandboxFiles = {
 
     },
     templateLoaded: function (evt) {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.files.templateLoaded");
             return;
         }
@@ -351,7 +351,7 @@ var sandboxFiles = {
         templateString = templateString.replace("<!--TRIDENT_HTML-->", htmlString);
         templateString = templateString.replace("/*TRIDENT_SCRIPT*/", scriptString);
 
-        if (typeof Blob == "undefined") {
+        if (typeof Blob === "undefined") {
             alert('no blobs available (incompatible browser?)');
         }
         else {
@@ -373,7 +373,7 @@ var sandboxFiles = {
         var idx, cnt = 0, obj;
 
         sandbox.db.getAllKeys(function (result) {
-            if (result.length == 0) {
+            if (result.length === 0) {
                 alertify.log("Nothing to backup, TridentDB is empty");
             }
 
@@ -382,7 +382,7 @@ var sandboxFiles = {
 
                 sandbox.db.getAppKey(obj.app, obj.key, function (akv) {
                     keyArray.push(akv);
-                    if (++cnt == result.length) {
+                    if (++cnt === result.length) {
                         sandbox.files.saveTextFile(filename, JSON.stringify(keyArray));
                     }
                 });
@@ -415,7 +415,7 @@ var sandboxFiles = {
         var control = $("#sb_user_file");
         control.replaceWith(control = control.clone(true));
 
-        if (typeof Blob == "undefined") {
+        if (typeof Blob === "undefined") {
             alert('no blobs available (incompatible browser?)');
         }
         else {
@@ -447,7 +447,7 @@ var sandboxFiles = {
         var control = $("#sb_user_file");
         control.replaceWith(control = control.clone(true));
 
-        if (typeof Blob == "undefined") {
+        if (typeof Blob === "undefined") {
             alert('no blobs available (incompatible browser?)');
         }
         else {
@@ -514,7 +514,7 @@ var sandboxDashboard = {
             width: dlgWidth,
             title: 'Trident Sandbox Storage Summary',
             open: function () {
-                if ($("#UI_TabsDashboard").tabs("option", "active") != 0) {
+                if ($("#UI_TabsDashboard").tabs("option", "active") !== 0) {
                     $("#UI_TabsDashboard").tabs("option", "active", 0);
                 }
                 else {
@@ -526,7 +526,7 @@ var sandboxDashboard = {
                     $(this).dialog("destroy");
 
                     if (sandbox.db != null) {
-                        if (sandbox.db.name == "indexedDB") {
+                        if (sandbox.db.name === "indexedDB") {
                             $("#sb_spn_indexeddb_status").text("Yes");
                         }
                         else {
@@ -583,7 +583,7 @@ var sandboxDashboard = {
             }
         });
 
-        if ($("#UI_TabsDashboard").tabs("option", "active") != 0) return;
+        if ($("#UI_TabsDashboard").tabs("option", "active") !== 0) return;
 
         $("#ui_gaugeTDBspin").hide();
 
@@ -624,14 +624,14 @@ var sandboxDashboard = {
             var strId = selectedFiles[i].name;
             strId = strId.replace("file", "");
             var objId = parseInt(strId);
-            var isLastItem = (i == (selectedFiles.length - 1));
+            var isLastItem = (i === (selectedFiles.length - 1));
 
             // Added optional data param to this API call so we could 
             // pass extra data to process in the async callback
             // We are passing boolean isLast to determine whether we are done
             // and can go ahead and save
             sandbox.db.getAppKeyById(objId, function (result) {
-                if (result == null || result.id == 0) {
+                if (result == null || result.id === 0) {
                     alertify.log("GetAppKeyById failed");
                     return;
                 }
@@ -639,7 +639,7 @@ var sandboxDashboard = {
                 keyArray.push(result);
 
                 // If this is the last item to be processed then trigger file download 
-                if (keyArray.length == selectedFiles.length) {
+                if (keyArray.length === selectedFiles.length) {
                     var filename = $("#txtBackupName").val();
 
                     sandbox.files.saveTextFile($("#sb_database_backup_filename").val(), JSON.stringify(keyArray));
@@ -675,7 +675,7 @@ var sandboxDashboard = {
 
         sandbox.db.getAllKeys(function (result) {
             tdbu_counter = result.length;
-            if (result.length == 0) {
+            if (result.length === 0) {
                 $("#ui_chartTDBspin").hide();
                 $("#ui_tdb_spnTotalSize").text("0 bytes.");
             }
@@ -692,10 +692,10 @@ var sandboxDashboard = {
 
                 arrayTDB.push([currObject.key.slice(0, 20), currObject.size]);
 
-                if (--tdbu_counter == 0) {
-                    if ($("#UI_TabsDashboard").tabs("option", "active") != 2) return;
+                if (--tdbu_counter === 0) {
+                    if ($("#UI_TabsDashboard").tabs("option", "active") !== 2) return;
 
-                    if (totalSize == 0) $("#ui_div_trident_usage").hide();
+                    if (totalSize === 0) $("#ui_div_trident_usage").hide();
                     else $("#ui_div_trident_usage").show();
 
                     $("#ui_tdb_spnTotalSize").text(
@@ -704,7 +704,7 @@ var sandboxDashboard = {
 
                     $("#ui_chartTDBspin").hide();
 
-                    if (arrayTDB.length == 0) return;
+                    if (arrayTDB.length === 0) return;
 
                     sandbox.dashboard.tdbplot = jQuery.jqplot('ui_tdb_chartTridentUsage', [arrayTDB],
                     {
@@ -829,7 +829,7 @@ var sandboxDashboard = {
     },
 
     doRestore: function () {
-        if (sandbox.dashboard.restoreData == null || sandbox.dashboard.restoreData.length == 0) {
+        if (sandbox.dashboard.restoreData == null || sandbox.dashboard.restoreData.length === 0) {
             alertify.log("nothing selected to restore");
             return;
         }
@@ -876,7 +876,7 @@ var sandboxDashboard = {
         var keyId = $("#ui_tdb_selTridentDB option:selected").val();
 
         sandbox.db.getAppKeyById(parseInt(keyId), function (result) {
-            if (result.app == "TridentFiles") $("#ui_tdb_download").show();
+            if (result.app === "TridentFiles") $("#ui_tdb_download").show();
             else $("#ui_tdb_download").hide();
 
             $("#ui_tdb_txtAppName").val(result.app);
@@ -947,12 +947,12 @@ var sandboxDashboard = {
         });
         $("#ui_ldb_selLocalStorage").empty().append(my_options);
 
-        if (totalSize == 0) $("#ui_div_local_usage").hide();
+        if (totalSize === 0) $("#ui_div_local_usage").hide();
         else $("#ui_div_local_usage").show();
 
         $("#ui_ldb_spnTotalSize").text("Total Size of Local Storage : " + totalSize + " bytes (" + Math.round((totalSize / 1024) / 1024 * 100) / 100 + "MB)");
 
-        if (arrayLS.length == 0) return;
+        if (arrayLS.length === 0) return;
 
         // now (re) plot the data we just accumulated
         sandbox.dashboard.lsplot = jQuery.jqplot('ui_ldb_chartLocalUsage', [arrayLS],
@@ -997,7 +997,7 @@ var sandboxDashboard = {
 
     deleteLSKey: function () {
         var key = $("#ui_ldb_selLocalStorage option:selected").text();
-        if (key == "") {
+        if (key === "") {
             alertify.error("You need to select key from the list before deleting");
             return;
         }
@@ -1029,7 +1029,7 @@ var sandboxUnits = {
         });
     },
     saveMarkupUnit: function (unitName) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -1043,13 +1043,13 @@ var sandboxUnits = {
         });
     },
     loadMarkupUnit: function (unitName) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
 
         sandbox.db.getAppKey("SandboxMarkupUnits", unitName, function (result) {
-            if (result == null || result.id == 0) {
+            if (result == null || result.id === 0) {
                 alertify.error("No markup unit by that name");
                 return false;
             }
@@ -1077,7 +1077,7 @@ var sandboxUnits = {
 
     },
     saveScriptUnit: function (unitName) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -1091,13 +1091,13 @@ var sandboxUnits = {
         });
     },
     loadScriptUnit: function (unitName) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
 
         sandbox.db.getAppKey("SandboxScriptUnits", unitName, function (result) {
-            if (result == null || result.id == 0) {
+            if (result == null || result.id === 0) {
                 alertify.error("No script unit by that name");
                 return false;
             }
@@ -1120,7 +1120,7 @@ var sandboxUnits = {
         var self = this;
 
         sandbox.db.getAppKey("SandboxScriptUnits", unitName, function (result) {
-            if (result == null || result.id == 0) {
+            if (result == null || result.id === 0) {
                 alertify.error("No script unit by that name");
                 return false;
             }
@@ -1134,7 +1134,7 @@ var sandboxUnits = {
 
         document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
 
-        if (typeof (callback) == "function") {
+        if (typeof (callback) === "function") {
             setTimeout(function () {
                 callback();
             }, 200);
@@ -1172,15 +1172,15 @@ var sandboxAppCache = {
         // Update diagnostic panel
         var statusString = sandbox.appcache.getACStatus();
 
-        if (statusString == "Update ready") {
+        if (statusString === "Update ready") {
             $("#sb_spn_appcache_progress").text("");
             setTimeout(function () {
                 sandbox.appcache.promptUpdate();
             }, 200);
         }
 
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
-            if (statusString == "Idle") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
+            if (statusString === "Idle") {
                 setTimeout(function () {
                     $("#divAppCache").hide(500);
                 }, 1000);
@@ -1207,7 +1207,7 @@ var sandboxAppCache = {
                     case oAppCache.UNCACHED: sCacheStatus = "Not cached"; break;
                     case oAppCache.IDLE:
                         sCacheStatus = "Idle"; $("#sb_spn_appcache_progress").text("");
-                        if (sandbox.volatile.env == "IDE" || sandbox.volatile.env == "IDE WJS") {
+                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                             sandbox.ide.fitEditors();
                         }
                         break;
@@ -1253,7 +1253,7 @@ var sandboxUI = {
         $("#UI_MainPlaceholder").css("color", "#000");
     },
     setBackgroundColor: function (colorCode) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             $("body").css("background-color", colorCode);
             $("#UI_MainPlaceholder").css("background-color", colorCode);
         }
@@ -1310,7 +1310,7 @@ var sandboxUI = {
         }
     },
     showPasswordDialog: function (callback) {
-        if (typeof (callback) != "function") sandbox.logger.log("Call to sandbox.ide.showPasswordDialog() with invalid callback param.");
+        if (typeof (callback) !== "function") sandbox.logger.log("Call to sandbox.ide.showPasswordDialog() with invalid callback param.");
 
         $("#UI_PasswordDialog").show();
         $("#sb_password_text").focus();
@@ -1329,7 +1329,7 @@ var sandboxEvents = {
     userLoadCallback: null,
     userdataLoadCallback: null,
     clean: null
-}
+};
 
 //#endregion
 
@@ -1337,7 +1337,7 @@ var sandboxEvents = {
 
 var sandboxIDE = {
     run: function () {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.run");
             return;
         }
@@ -1347,7 +1347,7 @@ var sandboxIDE = {
             sandbox.ide.setMobileMode(3);
         }
         else {
-            if (sandbox.volatile.windowMode == 1) {
+            if (sandbox.volatile.windowMode === 1) {
                 sandbox.ide.setWindowMode(2);
             }
         }
@@ -1363,7 +1363,7 @@ var sandboxIDE = {
         // if it runs in a setTimeout or when executing your code (which i will add later in this method).  So the hack is to 'peek' into
         // the script and if a text string match exists : FLAG_StartPrgFullscreen (even if it is in a comment), i will automatically
         // fullscreen the UI_MainPlaceholder div.  Esc key will exist or you should provide your own means of 'unfullscreen'-ing it.
-        if (scriptString.substring(0, 250).indexOf("FLAG_StartPrgFullscreen") != -1) document.getElementById("UI_MainPlaceholder").msRequestFullscreen();
+        if (scriptString.substring(0, 250).indexOf("FLAG_StartPrgFullscreen") !== -1) document.getElementById("UI_MainPlaceholder").msRequestFullscreen();
 
         // The timeouts are probably not necessary but lets give dom
         // time between our clearing (above), loading html, and loading scripts
@@ -1382,13 +1382,13 @@ var sandboxIDE = {
         }, 250);
     },
     launch: function () {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.launch");
             return;
         }
 
         var progName = $("#sb_txt_ProgramName").val();
-        if (progName == "") {
+        if (progName === "") {
             alertify.log("Load a program or give this one a program name");
             return;
         }
@@ -1399,15 +1399,15 @@ var sandboxIDE = {
         var selSlot = $("#sb_sel_trident_slot").find(":selected").text();
 
         // if no pending changes have been made to the editors then skip save
-        if (progName == selSlot && htmlHash == sandbox.volatile.markupHash && scriptHash == sandbox.volatile.scriptHash) {
+        if (progName === selSlot && htmlHash === sandbox.volatile.markupHash && scriptHash === sandbox.volatile.scriptHash) {
             // ideally we would target progName instead of _blank to reuse existing window
             // but due to hash params they dont refresh correctly and need full reload
             // if you need to side by side dev you will just save in ide and manually refresh sandbox loader page
-            if (sandbox.volatile.env == "IDE") {
+            if (sandbox.volatile.env === "IDE") {
                 window.open('SandboxLoader.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
             }
 
-            if (sandbox.volatile.env == "IDE WJS") {
+            if (sandbox.volatile.env === "IDE WJS") {
                 window.open('SandboxLoaderWJS.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
             }
 
@@ -1415,17 +1415,17 @@ var sandboxIDE = {
         }
 
         sandbox.ide.saveSlot(function () {
-            if (sandbox.volatile.env == "IDE") {
+            if (sandbox.volatile.env === "IDE") {
                 window.open('SandboxLoader.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
             }
 
-            if (sandbox.volatile.env == "IDE WJS") {
+            if (sandbox.volatile.env === "IDE WJS") {
                 window.open('SandboxLoaderWJS.htm#RunSlot=' + $("#sb_txt_ProgramName").val(), '_blank');
             }
         });
     },
     clean: function () {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.clean");
             return;
         }
@@ -1436,7 +1436,7 @@ var sandboxIDE = {
 
         // clear source code
         var markupText = "<h3>My Sandbox Program</h3>\r\n";
-        if (sandbox.volatile.env == "IDE WJS") {
+        if (sandbox.volatile.env === "IDE WJS") {
             markupText = "<h3>My Sandbox WinJS Program</h3>\r\n";
         }
         var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n};\r\n\r\nsandbox.events.clean = function()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n};\r\n";
@@ -1453,7 +1453,7 @@ var sandboxIDE = {
         sandbox.ide.clearOutput();
     },
     clearOutput: function () {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -1470,7 +1470,7 @@ var sandboxIDE = {
         sandbox.files.userfileHide();
 
         // allow user to do any cleanup they might want to do
-        if (typeof (sandbox.events.clean) == typeof (Function)) {
+        if (typeof (sandbox.events.clean) === typeof (Function)) {
             try {
                 try {
                     sandbox.events.clean();
@@ -1517,7 +1517,7 @@ var sandboxIDE = {
         sandbox.ide.setActiveTab(0);
     },
     inspectSelection: function () {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.inspectSelection");
             return;
         }
@@ -1605,7 +1605,7 @@ var sandboxIDE = {
             success: function (response) {
                 var sandboxObject = response;
 
-                if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
+                if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                     $("#sb_txt_ProgramName").val(sandboxObject.progName);
 
                     sandbox.volatile.editorMarkup.setValue(sandboxObject.htmlText);
@@ -1656,7 +1656,7 @@ var sandboxIDE = {
         }
 
         sandbox.db.getAppKey("SandboxSaveSlots", appName, function (result) {
-            if (result == null || result.id == 0) {
+            if (result == null || result.id === 0) {
                 alertify.error("No save at that slot");
                 return;
             }
@@ -1665,7 +1665,7 @@ var sandboxIDE = {
 
             document.title = sandboxObject.progName;
 
-            if (sandboxObject.scriptText.substring(0, 250).indexOf("FLAG_StartPrgFullscreen") != -1) document.getElementById("UI_Tab_Main").msRequestFullscreen();
+            if (sandboxObject.scriptText.substring(0, 250).indexOf("FLAG_StartPrgFullscreen") !== -1) document.getElementById("UI_Tab_Main").msRequestFullscreen();
 
             setTimeout(function () {
                 // HTML needs to go first so script will work if they have code outside functions
@@ -1682,7 +1682,7 @@ var sandboxIDE = {
         });
     },
     editApp: function (appname) {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.editApp");
             return;
         }
@@ -1722,7 +1722,7 @@ var sandboxIDE = {
         });
     },
     browseSamples: function () {
-        if (typeof (sandbox.events.clean) == typeof (Function)) {
+        if (typeof (sandbox.events.clean) === typeof (Function)) {
             try {
                 sandbox.events.clean();
                 sandbox.events.clean = null;
@@ -1734,7 +1734,7 @@ var sandboxIDE = {
         // Let Local Filesystem version use samples browser as an 'online' only feature for convenience.
         // If running local filesystem ask them if they want to AJAX to online web samples,
         // otherwise attempt to ajax to local filesystem which works on firefox (and possibly others?)
-        if (!sandbox.volatile.isHosted) {
+        if (!sandbox.volatile.isHosted && !sandbox.volatile.isWebkit) {
             alertify.confirm("Go online to access samples?", function (e) {
                 if (e) {
                     sandbox.volatile.onlineSamples = true;
@@ -1754,7 +1754,7 @@ var sandboxIDE = {
     browseSamplesAction: function () {
         var baseUrl = "";
 
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.browseSamplesAction");
             return;
         }
@@ -1818,14 +1818,14 @@ var sandboxIDE = {
         sandbox.volatile.autorunActive = false;
 
         sandbox.db.getAppKey("SandboxScriptUnits", "autorun", function (result) {
-            if (result == null || result.id == 0) return;
+            if (result == null || result.id === 0) return;
 
             sandbox.volatile.autorunActive = true;
             sandbox.units.appendScriptUnit(result.val);
         });
     },
     loadSlot: function (runAfterLoad) {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sb_load_run");
             return;
         }
@@ -1833,7 +1833,7 @@ var sandboxIDE = {
         var htmlHash = CryptoJS.SHA1(sandbox.volatile.editorMarkup.getValue()).toString();
         var scriptHash = CryptoJS.SHA1(sandbox.volatile.editorScript.getValue()).toString();
 
-        if (htmlHash != sandbox.volatile.markupHash || scriptHash != sandbox.volatile.scriptHash) {
+        if (htmlHash !== sandbox.volatile.markupHash || scriptHash !== sandbox.volatile.scriptHash) {
             alertify.confirm("You have pending changes, are you sure?", function (e) {
                 // user clicked "ok"
                 if (e) { sandbox.ide.loadSlotAction(runAfterLoad); }
@@ -1850,14 +1850,14 @@ var sandboxIDE = {
         sandbox.ide.loadSlotAction(runAfterLoad);
     },
     loadSlotAction: function (runAfterLoad) {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.loadSlotAction");
             return;
         }
 
         var selText = $("#sb_sel_trident_slot").find(":selected").text();
 
-        if (selText == "") return;
+        if (selText === "") return;
 
         sandbox.db.getAppKey("SandboxSaveSlots", selText, function (result) {
             var sandboxObject = JSON.parse(result.val);
@@ -1870,12 +1870,12 @@ var sandboxIDE = {
             sandbox.volatile.editorMarkup.setValue(sandboxObject.htmlText);
             sandbox.volatile.editorScript.setValue(sandboxObject.scriptText);
 
-            if (typeof (autorun) != "undefined" && autorun) sandbox.ide.run();
+            if (typeof (autorun) !== "undefined" && autorun) sandbox.ide.run();
 
         });
     },
     saveSlot: function (callback) {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.saveSlot");
             return;
         }
@@ -1893,7 +1893,7 @@ var sandboxIDE = {
 
         var json_text = JSON.stringify(sandboxObject, null, 2);
 
-        if (selText != progNameString) {
+        if (selText !== progNameString) {
             alertify.confirm("Are you sure you want to save into slot " + progNameString, function (e) {
                 if (e) {
                     try {
@@ -1903,11 +1903,11 @@ var sandboxIDE = {
                                 sandbox.ide.refreshSlots(function () {
                                     // todo: make SetAppKey (both trident and service) return id so i could select by that
                                     $("#sb_sel_trident_slot option").filter(function () {
-                                        return $(this).text() == progNameString;
+                                        return $(this).text() === progNameString;
                                     }).prop('selected', true);
                                 });
 
-                                if (typeof (callback) == "function") callback();
+                                if (typeof (callback) === "function") callback();
                             }
                             else {
                                 alertify.error("error calling SetKey()");
@@ -1924,7 +1924,7 @@ var sandboxIDE = {
             sandbox.db.setAppKey("SandboxSaveSlots", progNameString, json_text, function (result) {
                 if (result.success) {
                     alertify.success("saved");
-                    if (typeof (callback) == "function") callback();
+                    if (typeof (callback) === "function") callback();
                 }
                 else {
                     alertify.error("Error encountered during save");
@@ -1935,7 +1935,7 @@ var sandboxIDE = {
     deleteSlot: function () {
         var selText = $("#sb_sel_trident_slot").find(":selected").text();
 
-        if (selText == "") return;
+        if (selText === "") return;
 
         alertify.confirm("Are you sure you want to delete Trident Program Slot : " + selText, function (e) {
             if (e) {
@@ -1960,7 +1960,7 @@ var sandboxIDE = {
     toggleHeaderFont: function () {
         var fontName = $('#sb_header_caption').css("font-family");
 
-        if (fontName.indexOf('Heorot') != -1) {
+        if (fontName.indexOf('Heorot') !== -1) {
             $('#sb_header_caption').css("font-family", "Sans");
             $('#sb_header_caption2').css("font-family", "Sans");
         }
@@ -1970,7 +1970,7 @@ var sandboxIDE = {
         }
     },
     newProgram: function () {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.newProgram");
             return;
         }
@@ -1979,11 +1979,11 @@ var sandboxIDE = {
         var scriptHash = CryptoJS.SHA1(sandbox.volatile.editorScript.getValue()).toString();
 
         if (sandbox.settings.pend_changes_warn) {
-            if (htmlHash != sandbox.volatile.markupHash || scriptHash != sandbox.volatile.scriptHash) {
+            if (htmlHash !== sandbox.volatile.markupHash || scriptHash !== sandbox.volatile.scriptHash) {
                 alertify.confirm("You have pending changes, are you sure?", function (e) {
                     // user clicked "ok"
                     if (e) {
-                        if (sandbox.volatile.windowMode == 3) sandbox.ide.setWindowMode(2);
+                        if (sandbox.volatile.windowMode === 3) sandbox.ide.setWindowMode(2);
                         sandbox.ide.clean();
                         return;
                     }
@@ -1991,13 +1991,13 @@ var sandboxIDE = {
                 return;
             }
             else {
-                if (sandbox.volatile.windowMode == 3) sandbox.ide.setWindowMode(2);
+                if (sandbox.volatile.windowMode === 3) sandbox.ide.setWindowMode(2);
                 sandbox.ide.clean();
                 return;
             }
         }
 
-        if (sandbox.volatile.windowMode == 3) sandbox.ide.setWindowMode(2);
+        if (sandbox.volatile.windowMode === 3) sandbox.ide.setWindowMode(2);
         sandbox.ide.clean();
     },
     toggleMarkup: function () {
@@ -2029,8 +2029,8 @@ var sandboxIDE = {
         sandbox.volatile.editorScript.focus();
     },
     toggleSplit: function () {
-        if (sandbox.volatile.editorMode == sandbox.editorModeEnum.Split) {
-            sandbox.volatile.splitMode = (sandbox.volatile.splitMode == 0) ? 1 : 0;
+        if (sandbox.volatile.editorMode === sandbox.editorModeEnum.Split) {
+            sandbox.volatile.splitMode = (sandbox.volatile.splitMode === 0) ? 1 : 0;
         }
 
         sandbox.volatile.editorMode = sandbox.editorModeEnum.Split;
@@ -2077,7 +2077,7 @@ var sandboxIDE = {
             if (element) {
                 isCaptionVisible = false;
                 isLoaderVisible = false;
-                if (element.id == "divCode") isDevbarVisible = false;
+                if (element.id === "divCode") isDevbarVisible = false;
             }
         }
 
@@ -2089,14 +2089,14 @@ var sandboxIDE = {
             if (isLoaderVisible) used += ($("#sb_div_mainloader").height() + 4);
         }
 
-        if (sandbox.volatile.env == "IDE WJS") {
+        if (sandbox.volatile.env === "IDE WJS") {
             used += ($("#UI_TxtLogConsole").height() + 70); // 14 compensate for padding?
         }
 
         $("#UI_TxtLogText").height($(window).height() - used);
     },
     fitEditors: function () {
-        if (sandbox.volatile.env == "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.fitEditors");
             console.trace();
             return;
@@ -2126,7 +2126,7 @@ var sandboxIDE = {
             if (element) {
                 isCaptionVisible = false;
                 isLoaderVisible = false;
-                if (element.id == "divCode") isDevbarVisible = false;
+                if (element.id === "divCode") isDevbarVisible = false;
             }
         }
 
@@ -2156,7 +2156,7 @@ var sandboxIDE = {
 
                 var editorSize = ($(window).height() - used) / 2;
 
-                if (sandbox.volatile.splitMode == 0) {
+                if (sandbox.volatile.splitMode === 0) {
                     $("#ui_div_markup").css("width", "100%");
                     $("#ui_div_script").css("width", "100%");
                     sandbox.volatile.editorMarkup.setSize("100%", editorSize);
@@ -2229,14 +2229,14 @@ var sandboxIDE = {
         }
     },
     setActiveTab: function (tabId) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
         $("#UI_TabsOutput").tabs("option", "active", tabId);
     },
     toggleMaximize: function () {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -2253,7 +2253,7 @@ var sandboxIDE = {
         sandbox.ide.fitLog();
     },
     setToolbarMode: function (showCaption, showLoader) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -2275,12 +2275,12 @@ var sandboxIDE = {
         sandbox.ide.fitEditors();
     },
     setWindowMode: function (mode) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
         // Code Only
-        if (mode == 1) {
+        if (mode === 1) {
             sandbox.volatile.windowMode = mode;
             //showMarkup = true;
             //showScript = true;
@@ -2297,7 +2297,7 @@ var sandboxIDE = {
         }
 
         // Show Code and Output areas
-        if (mode == 2) {
+        if (mode === 2) {
             sandbox.volatile.windowMode = mode;
             //showMarkup = true;
             //showScript = true;
@@ -2315,7 +2315,7 @@ var sandboxIDE = {
         }
 
         // Show Output only
-        if (mode == 3) {
+        if (mode === 3) {
             sandbox.volatile.windowMode = mode;
             //showMarkup = true;
             //showScript = true;
@@ -2328,12 +2328,12 @@ var sandboxIDE = {
         }
     },
     setMobileMode: function (mode) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
         // Markup Only
-        if (mode == 1) {
+        if (mode === 1) {
             sandbox.volatile.windowMode = mode;
             $('#tdOutput').attr('width', '0%');
             $('#tdCode').attr('width', '100%');
@@ -2351,7 +2351,7 @@ var sandboxIDE = {
         }
 
         // Code Only
-        if (mode == 2) {
+        if (mode === 2) {
             sandbox.volatile.windowMode = mode;
             $('#tdOutput').attr('width', '0%');
             $('#tdCode').attr('width', '100%');
@@ -2369,7 +2369,7 @@ var sandboxIDE = {
         }
 
         // Show Output only
-        if (mode == 3) {
+        if (mode === 3) {
             sandbox.volatile.windowMode = mode;
             $('#tdCode').attr('width', '0%');
             $('#tdOutput').attr('width', '100%');
@@ -2380,7 +2380,7 @@ var sandboxIDE = {
         }
     },
     restoreLayout: function () {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -2389,7 +2389,7 @@ var sandboxIDE = {
         sandbox.ide.setWindowMode(2);
     },
     selectTheme: function () {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -2402,7 +2402,7 @@ var sandboxIDE = {
         sandbox.volatile.editorScript.setOption("theme", theme);
     },
     applyMobileMode: function (persist) {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -2417,7 +2417,7 @@ var sandboxIDE = {
         sandbox.ide.setMobileMode(1);
     },
     applyDesktopMode: function () {
-        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env == "SBL WJS") {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             return;
         }
 
@@ -2440,7 +2440,7 @@ var sandboxIDE = {
 //#region sandboxUtil
 
 var sandboxUtil = {
-    addDate : function (unixDate, offset, offsetType) {
+    addDate: function (unixDate, offset, offsetType) {
         var oldDate = new Date();
         oldDate.setTime(unixDate);
         var year = parseInt(oldDate.getFullYear());
@@ -2468,7 +2468,7 @@ var sandboxUtil = {
             case "weeks":
             case "W":
             case "w":
-                newDate = new Date(year, month, date + offset*7, hour);
+                newDate = new Date(year, month, date + offset * 7, hour);
                 break;
             case "hours":
             case "H":
@@ -2477,9 +2477,9 @@ var sandboxUtil = {
                 break;
         }
 
-        return newDate.getTime();            
-    } 
-}
+        return newDate.getTime();
+    }
+};
 
 //#endregion
 
@@ -2693,13 +2693,14 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.12",
+        version: "2.13",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,
         markupHash: null,
         scriptHash: null,
         isHosted: (document.URL.indexOf("file://") === -1),
+        isWebkit: (typeof(process) === "object" && typeof(require) === "function" && typeof(window) === "object"),
         markupHash: null,
         scriptHash: null,
         editorMarkup: null,
@@ -2757,9 +2758,9 @@ var sandbox = {
             // for each property defined in our settings object
             for (p in this) {
                 // if its not a function
-                if (typeof (this[p]) != "function") {
+                if (typeof (this[p]) !== "function") {
                     // see if local storage has a value for that setting defined
-                    if (typeof (localStorage[p]) != "undefined") {
+                    if (typeof (localStorage[p]) !== "undefined") {
                         // if so, override our default
                         this[p] = localStorage[p];
                     }
@@ -2791,10 +2792,10 @@ var sandbox = {
             // for each property defined in our settings object
             for (p in this) {
                 // if its not a function
-                if (typeof (this[p]) != "function") {
+                if (typeof (this[p]) !== "function") {
                     val = this.getParameter(p);
                     // see if hash param has a value for that setting defined
-                    if (typeof (val) != "undefined") {
+                    if (typeof (val) !== "undefined") {
                         // if so, override our default
                         this[p] = val;
                     }
@@ -2811,7 +2812,7 @@ var sandbox = {
             var sURLVariables = sPageURL.split('&');
             for (var i = 0; i < sURLVariables.length; i++) {
                 var sParameterName = sURLVariables[i].split('=');
-                if (sParameterName[0] == sParam) {
+                if (sParameterName[0] === sParam) {
                     return decodeURIComponent(sParameterName[1]);
                 }
             }
@@ -2841,7 +2842,7 @@ var sandbox = {
                     successCallback: function () {
                         sandbox.logger.log("Trident indexedDB adapter initialized successfully.");
 
-                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
+                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                             $("#sb_spn_indexeddb_status").text("IndexedDB");
 
                             // load slots now that db is initialized and then do post init
@@ -2866,7 +2867,7 @@ var sandbox = {
                     successCallback: function () {
                         sandbox.logger.log("Trident service adapter initialized successfully.");
 
-                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
+                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                             $("#sb_spn_indexeddb_status").html("Service");
 
                             // load slots now and do post init
@@ -2905,7 +2906,7 @@ var sandbox = {
                     successCallback: function () {
                         $("#sb_spn_indexeddb_status").text(sandbox.settings.databaseAdapter);
 
-                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env == "IDE WJS") {
+                        if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                             // load slots now that db is initialized and then do post init
                             sandbox.ide.refreshSlots(callback);
                             dbChanged();
@@ -2918,7 +2919,7 @@ var sandbox = {
         }
     },
     dbAdapterChanged: function () {
-        if (sandbox.db.adapter.name == "indexedDB") {
+        if (sandbox.db.adapter.name === "indexedDB") {
             $("#sb_spn_indexeddb_status").text("Yes");
         }
         else {
@@ -2952,7 +2953,7 @@ var sandbox = {
 
         // Fix for IE 10 and possibly IE 11 (on 8.1 update 0)
         // Needed for Crypto.JS to work properly with typearray lib
-        if (typeof Uint8ClampedArray == "undefined") {
+        if (typeof Uint8ClampedArray === "undefined") {
             Uint8ClampedArray = Uint8Array;
         }
 
@@ -2963,8 +2964,8 @@ var sandbox = {
         if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
             shortcut.add(sandbox.settings.keybindRun, function () { sandbox.ide.run(); });
             shortcut.add(sandbox.settings.keybindSave, function () { if (indexedDB) { sandbox.ide.saveSlot(); } else { sandbox.files.programSave(); } });
-            shortcut.add(sandbox.settings.keybindToggleMarkup, function () { if (sandbox.volatile.editorMode == sandbox.editorModeEnum.Markup) sandbox.ide.toggleSplit(); else sandbox.ide.toggleMarkup(); });
-            shortcut.add(sandbox.settings.keybindToggleScript, function () { if (sandbox.volatile.editorMode == sandbox.editorModeEnum.Script) sandbox.ide.toggleSplit(); else sandbox.ide.toggleScript(); });
+            shortcut.add(sandbox.settings.keybindToggleMarkup, function () { if (sandbox.volatile.editorMode === sandbox.editorModeEnum.Markup) sandbox.ide.toggleSplit(); else sandbox.ide.toggleMarkup(); });
+            shortcut.add(sandbox.settings.keybindToggleScript, function () { if (sandbox.volatile.editorMode === sandbox.editorModeEnum.Script) sandbox.ide.toggleSplit(); else sandbox.ide.toggleScript(); });
             shortcut.add(sandbox.settings.keybindInspect, function () { sandbox.ide.inspectSelection(); });
             shortcut.add(sandbox.settings.keybindWinMode1, function () { sandbox.ide.setWindowMode(1); });
             shortcut.add(sandbox.settings.keybindWinMode2, function () { sandbox.ide.setWindowMode(2); });
@@ -3029,10 +3030,10 @@ var sandbox = {
             // if served up from anywhere other than filesystem ... show
             // if served up from filesystem and localStorage is available... show
             // Mozilla supports ajax calls under filesystem
-            if (document.URL.indexOf("file://") == -1 || localStorage || indexedDB) {
+            if (document.URL.indexOf("file://") === -1 || localStorage || indexedDB) {
                 //$(".ui_show_dashboard").show();
                 $("#ui_btn_launch").show();
-                $("[id^='ui_gen_sa']").hide();	// no need to generate standalone if hosted/appcached
+                $("#ui_gen_sa").hide();	// no need to generate standalone if hosted/appcached
                 shortcut.add(sandbox.settings.keybindLaunch, function () { sandbox.ide.launch(); });
             }
 
@@ -3099,7 +3100,7 @@ var sandbox = {
 
             if (sandbox.settings.editorTheme && sandbox.settings.editorTheme !== "") {
                 $("#selTheme option").filter(function () {
-                    return $(this).text() == sandbox.settings.editorTheme;
+                    return $(this).text() === sandbox.settings.editorTheme;
                 }).prop('selected', true);
 
                 sandbox.volatile.editorMarkup.setOption("theme", sandbox.settings.editorTheme);
@@ -3111,7 +3112,7 @@ var sandbox = {
                 $('#sb_header_caption2').css("font-family", sandbox.settings.headerFont);
             }
 
-            if (sandbox.volatile.env == "IDE") {
+            if (sandbox.volatile.env === "IDE") {
                 if (sandbox.settings.headerText) {
                     $('#sb_header_caption').text(sandbox.settings.headerText);
                     $('#sb_header_caption2').text(sandbox.settings.headerText);
@@ -3131,7 +3132,7 @@ var sandbox = {
 
             if (localStorage) {
                 $("#sb_spn_localstorage_status").text("Yes");
-                $("[id^='ui_show_dashboard'").show();
+                $("#ui_show_dashboard").show();
             }
 
             // only had memstats in wjs version?
@@ -3159,7 +3160,7 @@ var sandbox = {
 
             // Allow User Programs to receive window resize events
             // by implementing this callback
-            if (typeof (sandbox.events.windowResize) == typeof (Function)) sandbox.events.windowResize();
+            if (typeof (sandbox.events.windowResize) === typeof (Function)) sandbox.events.windowResize();
         });
 
         if (sandbox.volatile.envTest(["SBL", "SBL WJS"])) {
@@ -3173,7 +3174,7 @@ var sandbox = {
             // Detect Hash Param changes for loadslot/runslot; (compare to txtProgramName or SaveSlotSelect?)
             window.onhashchange = function () {
                 var loadSlot = sandbox.hashparams.getParameter("LoadSlot");
-                if (loadSlot != null && loadSlot != $("#txtProgramName").val()) {
+                if (loadSlot != null && loadSlot !== $("#txtProgramName").val()) {
                     sandbox.ide.clean();
 
                     $("#sb_sel_trident_slot").val(loadSlot);
@@ -3185,7 +3186,7 @@ var sandbox = {
                 }
                 else {
                     var runSlot = sandbox.hashparams.getParameter("RunSlot");
-                    if (runSlot != null && runSlot != $("#txtProgramName").val()) {
+                    if (runSlot != null && runSlot !== $("#txtProgramName").val()) {
                         sandbox.ide.clean();
 
                         $("#sb_sel_trident_slot").val(runSlot);
@@ -3243,7 +3244,7 @@ var sandbox = {
 
         if (sandbox.volatile.envTest(["SBL", "SBL WJS"])) {
             // if loading from the web (not sa template), clear out the template placeholders
-            if (document.URL.indexOf("file://") == -1) $("#UI_MainPlaceholder").empty();
+            if (document.URL.indexOf("file://") === -1) $("#UI_MainPlaceholder").empty();
         }
 
         if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
@@ -3259,7 +3260,7 @@ var sandbox = {
                 var htmlHash = CryptoJS.SHA1(sandbox.volatile.editorMarkup.getValue()).toString();
                 var scriptHash = CryptoJS.SHA1(sandbox.volatile.editorScript.getValue()).toString();
 
-                if ((htmlHash != sandbox.volatile.markupHash || scriptHash != sandbox.volatile.scriptHash) && sandbox.settings.pendingChangesWarning == "true") {
+                if ((htmlHash !== sandbox.volatile.markupHash || scriptHash !== sandbox.volatile.scriptHash) && sandbox.settings.pendingChangesWarning === "true") {
                     return 'You have unsaved changes, are you sure you want to leave this page?';
                 }
             };
@@ -3284,7 +3285,7 @@ var sandbox = {
         }
 
         if (sandbox.hashparams.getParameter("RunSlot")) {
-            if (sandbox.volatile.env == "IDE" || sandbox.volatile.env == "IDE WJS") {
+            if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                 sandbox.ide.clean();
 
                 //if (localrun != null) $("#sb_sel_trident_slot").val(localrun);
@@ -3303,7 +3304,7 @@ var sandbox = {
         }
 
         if (sandbox.hashparams.getParameter("RunApp")) {
-            if (sandbox.volatile.env == "IDE" || sandbox.volatile.env == "IDE WJS") {
+            if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                 sandbox.ide.clean();
             }
 
@@ -3315,7 +3316,7 @@ var sandbox = {
         }
 
         if (sandbox.hashparams.getParameter("EditApp")) {
-            if (sandbox.volatile.env == "IDE" || sandbox.volatile.env == "IDE WJS") {
+            if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                 sandbox.ide.clean();
 
                 setTimeout(function () {

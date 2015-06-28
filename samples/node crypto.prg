@@ -1,0 +1,5 @@
+{
+  "progName": "node crypto",
+  "htmlText": "<h3>Node Crypto Sample</h3>\n",
+  "scriptText": "sandbox.ide.setWindowMode(2);\nsandbox.ide.setActiveTab(1);\n\nsandbox.logger.log(\"This sample just dumps to this Text Log\");\nsandbox.logger.log(\"\");\n\n// Most browsers (including webkit) already have a crypt object so we will call ours cryptoWebkit\nvar cryptoWebkit = require('crypto'),\n    algorithm = 'aes-256-ctr',\n    password = 'd6F3Efeq';\n\n\nfunction cw_encrypt(text){\n    var cipher = cryptoWebkit.createCipher(algorithm,password);\n    var crypted = cipher.update(text,'utf8','hex');\n\n    crypted += cipher.final('hex');\n\n    return crypted;\n}\n\nfunction cw_decrypt(text){\n    var decipher = cryptoWebkit.createDecipher(algorithm,password);\n    var dec = decipher.update(text,'hex','utf8');\n\n    dec += decipher.final('utf8');\n\n    return dec;\n}\n\nvar hw = cw_encrypt(\"hello world\");\n\n// outputs hello world\n\nsandbox.logger.log(cw_decrypt(hw));\n\n\n"
+}
