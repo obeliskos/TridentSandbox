@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--html-->
 <html manifest="appcache.mf">
 <head>
@@ -58,13 +58,13 @@
         $(document).ready(function () {
             if (location.href != top.location.href) {
                 // Only allow loader to run in IFRAME if served up from obeliskos
-                if (location.href.length < 25 || location.href.substring(0, 25) != "http://www.obeliskos.com/") {
+                if (!sandbox.volatile.isWebkit && (location.href.length < 25 || location.href.substring(0, 25) != "http://www.obeliskos.com/")) {
                     document.body.innerHTML = "Trident Sandbox does not run in an IFRAME from a foreign domain";
                     return;
                 }
 
                 // Only allow loader to run in IFRAME if that iframe is within a page also from obeliskos
-                if (top.location.href.length < 25 || top.location.href.substring(0, 25) != "http://www.obeliskos.com/") {
+                if (!sandbox.volatile.isWebkit && (top.location.href.length < 25 || top.location.href.substring(0, 25) != "http://www.obeliskos.com/")) {
                     document.body.innerHTML = "Trident Sandbox does not run in an IFRAME from a foreign domain";
                     return;
                 }
