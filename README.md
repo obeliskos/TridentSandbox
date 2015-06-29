@@ -8,13 +8,20 @@ This project is an offline browser-app development environment which itself runs
 
 You can use this environment by visiting http://www.obeliskos.com/TridentSandbox
 
-Visiting this page will automatically download the site (about 8 megs) into an 'application cache' (you may need to approve storage), so that the site continues to work when run offline.  Pay attention to the AppCache diagnostic messages (top left of page) to see the appcache status... is should say 'downloading' and then 'idle' when completely cached.  You can bookmark the page to avoid erasing the appcache when you clean internet files.
+Visiting this page will automatically download the site (about 8 megs) into a web browser 'application cache' (you may need to approve storage), so that the site continues to work when run offline.  Diagnostic messages should indicate 'downloading' and 'idle' when completely cached.  You can bookmark the page to avoid erasing the appcache when you clean internet files.
+
+Alternatively, Node Webkit support is provided so you may run the project directory as a node webkit application.  This method allows you to use all Trident Sandbox functionality in addition to allowing use of node libraries and permissions.
 
 This environment provides an IDE for creating and editing apps which run within your browser.  Those apps may utilize the TridentSandbox javascript API library and included third party javascript libraries and can be saved to the browser's indexed db storage (via the environment's TridentDatabase).  The environment provides Markup and Script editors... style tags should go in the HTML area.
 
 This project aims to utilize the newer HTML 5 interfaces such as File API, Fullscreen API, LocalStorage/IndexedDB as well as newer ECMA 5/6 constructs to fully explore and experiment with their integration into a sandboxed app ecosystem. 
 
-This project is a pure HTML5/Javascript project.  It's support of Visual Studio is optional, allowing for intellisense and web bundles.  It targets Visual Studio 2013 (Community) with Web Essentials.  If you do not wish to use Visual Studio and you wish to modify the bundles, you will need to examine the .bundle files and regenerate them yourself.  I will possibly add node/gulp alternatives in the future for this bundling.
+This project is a pure HTML5/Javascript project.  It's support of Visual Studio is optional, allowing for intellisense and web bundles.  On other environments, if you need to rebuild the web bundles, you may use the gulp bundling via :
+
+```
+npm install
+npm run rebundle
+```
 
 Trident Sandbox makes use of its own app/key/value indexeddb object store (when available) for storing programs, library units, and user data.  This 'Trident Database' now comes with indexedDB, web service, and in-memory adapters... if you want to use another means of storage, you are able to write your own custom adapter as long as it supports the expected adapter interface.
 
