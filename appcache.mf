@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 213
+#rev 214
 
 CACHE:
 TridentSandbox.htm
@@ -126,6 +126,7 @@ samples/Local%20Storage%20Usage.prg
 samples/LokiContinuum.prg
 samples/loki%20examples.prg
 samples/LokiJS%20QueryPerf.prg
+samples/LokiTransforms.prg
 samples/MetroJS%20Demo.prg
 samples/ObeliskJS%20Demo.prg
 samples/PixiJS%20Morph%20Demo.prg

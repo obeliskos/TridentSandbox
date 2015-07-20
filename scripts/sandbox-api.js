@@ -1623,7 +1623,7 @@ var sandboxIDE = {
 
                     // if editors dont reflect current source when we change back to a source visible window mode
                     // then we may need to setTimeout on the following two lines to give editors a chance to update display
-                    sandbox.ide.setWindowMode(3);
+                    //sandbox.ide.setWindowMode(3);
 
                     sandbox.ide.run();
                 }
@@ -1801,7 +1801,7 @@ var sandboxIDE = {
 
                     // if editors dont reflect current source when we change back to a source visible window mode
                     // then we may need to setTimeout on the following two lines to give editors a chance to update display
-                    sandbox.ide.setWindowMode(3);
+                    //sandbox.ide.setWindowMode(3);
 
                     sandbox.ide.run();
                 },
@@ -2693,7 +2693,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.13",
+        version: "2.14",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,

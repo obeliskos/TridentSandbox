@@ -1,11 +1,11 @@
 /**
- * TridentAdapter - Loki persistence adapter class for indexedDb.
+ * LokiTridentAdapter - Loki persistence adapter class for indexedDb.
  *     This class fulfills abstract adapter interface which can be applied to other storage methods
  *     Utilizes the included LokiCatalog app/key/value database for actual database persistence.
  *
  * @param {string} appname - Application name context can be used to distinguish subdomains or just 'loki'
  */
-function TridentAdapter(appname, db)
+function LokiTridentAdapter(appname, db)
 {
   this.app = 'loki';
   this.db = db;
@@ -25,7 +25,7 @@ function TridentAdapter(appname, db)
  * @param {string} dbname - the name of the database to retrieve.
  * @param {function} callback - callback should accept string param containing serialized db string.
  */
-TridentAdapter.prototype.loadDatabase = function(dbname, callback)
+LokiTridentAdapter.prototype.loadDatabase = function (dbname, callback)
 {
   var appName = this.app;
   
@@ -33,7 +33,7 @@ TridentAdapter.prototype.loadDatabase = function(dbname, callback)
   this.db.getAppKey(appName, dbname, function(result) {
     if (typeof (callback) === 'function') {
       if (result.id === 0) {
-        console.warn("trident adapter could not find database");
+        console.warn("loki trident adapter could not find database");
         callback(null);
         return;
       }
@@ -53,7 +53,7 @@ TridentAdapter.prototype.loadDatabase = function(dbname, callback)
  * @param {string} dbstring - the serialized db string to save.
  * @param {function} callback - (Optional) callback passed obj.success with true or false
  */
-TridentAdapter.prototype.saveDatabase = function(dbname, dbstring, callback)
+LokiTridentAdapter.prototype.saveDatabase = function (dbname, dbstring, callback)
 {
   var appName = this.app;
   
@@ -66,7 +66,7 @@ TridentAdapter.prototype.saveDatabase = function(dbname, dbstring, callback)
  *
  * @param {string} dbname - the name of the database to delete from the catalog.
  */
-TridentAdapter.prototype.deleteDatabase = function(dbname)
+LokiTridentAdapter.prototype.deleteDatabase = function (dbname)
 {
   var appName = this.app;
   
@@ -85,7 +85,7 @@ TridentAdapter.prototype.deleteDatabase = function(dbname)
  *
  * @param {function} callback - should accept array of database names in the catalog for current app.
  */
-TridentAdapter.prototype.getDatabaseList = function(callback)
+LokiTridentAdapter.prototype.getDatabaseList = function (callback)
 {
   var appName = this.app;
   
@@ -114,7 +114,7 @@ TridentAdapter.prototype.getDatabaseList = function(callback)
  *
  * @param {function} callback - (Optional) callback to accept result array.
  */
-TridentAdapter.prototype.getCatalogSummary = function(callback)
+LokiTridentAdapter.prototype.getCatalogSummary = function (callback)
 {
   var appName = this.app;
   

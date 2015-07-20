@@ -26,6 +26,49 @@
         for (prop in src) {
           dest[prop] = src[prop];
         }
+      },
+      // used to recursively scan hierarchical transform step object for param substitution
+      resolveTransformObject : function (subObj, params, depth) {
+        var prop,
+          pname;
+
+        if (typeof depth !== 'number') {
+          depth = 0;
+        }
+
+        if (++depth >= 10) return subObj;
+
+        for (prop in subObj) {
+          if (typeof subObj[prop] === 'string' && subObj[prop].indexOf("[%lktxp]") === 0) {
+            pname = subObj[prop].substring(8);
+            if (params.hasOwnProperty(pname)) {
+              subObj[prop] = params[pname];
+            }            
+          }
+          else if (typeof subObj[prop] === "object") {
+            subObj[prop] = Utils.resolveTransformObject(subObj[prop], params, depth);
+          }
+        }
+        
+        return subObj;
+      },
+      // top level utility to resolve an entire (single) transform (array of steps) for parameter substitution
+      resolveTransformParams: function (transform, params) {
+        var idx, 
+          prop,
+          clonedStep,
+          resolvedTransform = [];
+
+        if (typeof params === 'undefined') return transform;
+
+        // iterate all steps in the transform array
+        for (idx=0; idx < transform.length; idx++) {
+          // clone transform so our scan and replace can operate directly on cloned transform
+          clonedStep = JSON.parse(JSON.stringify(transform[idx]));
+          resolvedTransform.push(Utils.resolveTransformObject(clonedStep, params));
+        }
+
+        return resolvedTransform;
       }
     };
 
@@ -309,6 +352,21 @@
       this.autosaveInterval = 5000;
       this.autosaveHandle = null;
 
+      // experimental support for browserify's abstract syntax scan to pick up dependency of indexed adapter.
+      // Hopefully, once this hits npm a browserify require of lokijs should scan the main file and detect this indexed adapter reference.
+      // Only in that environment should you instantiate the indexed adapter via db.getters.indexedAdapter (where db is loki ref).
+      this.getters = {
+        get indexedAdapter() {
+          var adapter;
+
+          if (typeof require === 'function') {
+            adapter = require("./loki-indexed-adapter.js");
+          }
+
+          return adapter;
+        }
+      };
+      
       this.options = {};
 
       // currently keeping persistenceMethod and persistenceAdapter as loki level properties that
@@ -561,7 +619,7 @@
 
       var obj = JSON.parse(serializedDb),
         i = 0,
-        len = obj.collections.length,
+        len = obj.collections ? obj.collections.length : 0,
         coll,
         copyColl,
         clen,
@@ -608,16 +666,23 @@
 
         copyColl.maxId = (coll.data.length === 0) ? 0 : coll.maxId;
         copyColl.idIndex = coll.idIndex;
-        // if saved in previous format recover id index out of it
-        if (typeof (coll.indices) !== 'undefined') {
-          copyColl.idIndex = coll.indices.id;
-        }
         if (typeof (coll.binaryIndices) !== 'undefined') {
           copyColl.binaryIndices = coll.binaryIndices;
         }
-
+        if (typeof coll.transforms !== 'undefined') {
+          copyColl.transforms = coll.transforms;
+        }
 
         copyColl.ensureId();
+
+        // regenerate unique indexes
+        copyColl.uniqueNames = [];
+        if (coll.hasOwnProperty("uniqueNames")) {
+          copyColl.uniqueNames = coll.uniqueNames;
+          for (j=0; j < copyColl.uniqueNames.length; j++) {
+            copyColl.ensureUniqueIndex(copyColl.uniqueNames[j]);
+          }
+        }
 
         // in case they are loading a database created before we added dynamic views, handle undefined
         if (typeof (coll.DynamicViews) === 'undefined') continue;
@@ -1997,6 +2062,7 @@
     function DynamicView(collection, name, options) {
       this.collection = collection;
       this.name = name;
+      this.rebuildPending = false;
       this.options = options || {};
 
       if (!this.options.hasOwnProperty('persistent')) {
@@ -2297,7 +2363,28 @@
     };
 
     /**
-     *
+     * queueRebuildEvent() - When the view is not sorted we may still wish to be notified of rebuild events.
+     *     This event will throttle and queue a single rebuild event when batches of updates affect the view.
+     */
+    DynamicView.prototype.queueRebuildEvent = function() {
+      var self = this;
+
+      if (this.rebuildPending) {
+        return;
+      }
+
+      this.rebuildPending = true;
+
+      setTimeout(function() {
+        self.rebuildPending = false;
+        self.emit('rebuild', this);
+      }, 1);
+    };
+    
+    /**
+     * queueSortPhase : If the view is sorted we will throttle sorting to either :
+     *    (1) passive - when the user calls data(), or
+     *    (2) active - once they stop updating and yield js thread control
      */
     DynamicView.prototype.queueSortPhase = function () {
       var self = this;
@@ -2310,10 +2397,15 @@
       this.sortDirty = true;
 
       if (this.options.sortPriority === "active") {
-        // queue async call to performSortPhase()
+        // active sorting... once they are done and yield js thread, run async performSortPhase()
         setTimeout(function () {
           self.performSortPhase();
         }, 1);
+      }
+      else {
+        // must be passive sorting... since not calling performSortPhase (until data call), lets use queueRebuildEvent to 
+        // potentially notify user that data has changed.
+        this.queueRebuildEvent();
       }
     };
 
@@ -2393,6 +2485,9 @@
         if (this.sortFunction || this.sortCriteria) {
           this.queueSortPhase();
         }
+        else {
+          this.queueRebuildEvent();
+        }
 
         return;
       }
@@ -2420,6 +2515,9 @@
         if (this.sortFunction || this.sortCriteria) {
           this.queueSortPhase();
         }
+        else {
+          this.queueRebuildEvent();
+        }
 
         return;
       }
@@ -2433,7 +2531,10 @@
 
         // in case changes to data altered a sort column
         if (this.sortFunction || this.sortCriteria) {
-          this.sortDirty = true;
+          this.queueSortPhase();
+        }
+        else {
+          this.queueRebuildEvent();
         }
 
         return;
@@ -2522,6 +2623,14 @@
         exact: {}
       };
 
+      // unique contraints contain duplicate object references, so they are not persisted.
+      // we will keep track of properties which have unique contraint applied here, and regenerate on load
+      this.uniqueNames = [];
+      
+      // transforms will be used to store frequently used query chains as a series of steps 
+      // which itself can be stored along with the database.
+      this.transforms = {};
+
       // the object type of the collection
       this.objType = name;
 
@@ -2545,6 +2654,7 @@
           options.unique = [options.unique];
         }
         options.unique.forEach(function (prop) {
+          self.uniqueNames.push(prop);  // used to regenerate on subsequent database loads
           self.constraints.unique[prop] = new UniqueIndex(prop);
         });
       }
@@ -2711,6 +2821,18 @@
 
     Collection.prototype = new LokiEventEmitter();
 
+    Collection.prototype.addTransform = function (name, transform) {
+      if (this.transforms.hasOwnProperty(name)) {
+        throw new Error("a transform by that name already exists");
+      }
+
+      this.transforms[name] = transform;
+    };
+
+    Collection.prototype.removeTransform = function(name) {
+      delete transforms[name];
+    };
+
     Collection.prototype.byExample = function(template) {
       var k, obj, query;
       query = [];
@@ -2788,6 +2910,10 @@
 
       var index = this.constraints.unique[field];
       if (!index) {
+        // keep track of new unique index for regenerate after database (re)load.
+        if (this.uniqueNames.indexOf(field) == -1) {
+          this.uniqueNames.push(field);
+        }
         this.constraints.unique[field] = index = new UniqueIndex(field);
       }
       var self = this;
@@ -3047,13 +3173,14 @@
         obj.$loki = this.maxId;
         obj.meta.version = 0;
 
-        // add the object
-        this.data.push(obj);
-
         var self = this;
         Object.keys(this.constraints.unique).forEach(function (key) {
+          // Function set will throw error when unique constraint is not honoured
           self.constraints.unique[key].set(obj);
         });
+
+        // add the object
+        this.data.push(obj);
 
         // now that we can efficiently determine the data[] position of newly added document,
         // submit it for all registered DynamicViews to evaluate for inclusion/exclusion
@@ -3133,7 +3260,9 @@
           position = arr[1];
         var self = this;
         Object.keys(this.constraints.unique).forEach(function (key) {
-          self.constraints.unique[key].remove(doc);
+          if( doc[key] !== null && typeof doc[key] !== 'undefined' ) {
+            self.constraints.unique[key].remove(doc[key]);
+          }
         });
         // now that we can efficiently determine the data[] position of newly added document,
         // submit it for all registered DynamicViews to remove
@@ -3231,9 +3360,60 @@
     /**
      * Chain method, used for beginning a series of chained find() and/or view() operations
      * on a collection.
+     *
+     * @param {array} transform : Ordered array of transform step objects similar to chain
+     * @param {object} parameters: Object containing properties representing parameters to substitute
+     * @returns {Resultset} : (or data array if any map or join functions where called)
      */
-    Collection.prototype.chain = function () {
-      return new Resultset(this, null, null);
+    Collection.prototype.chain = function (transform, parameters) {
+      var idx, 
+        step,
+        rs = new Resultset(this, null, null);
+
+      if (typeof transform === 'undefined') {
+        return rs;
+      }
+
+      // if transform is name, then do lookup first
+      if (typeof transform === 'string') {
+        if (this.transforms.hasOwnProperty(transform)) {
+          transform = this.transforms[transform];
+        }
+      }
+
+      // either they passed in raw transform array or we looked it up, so process
+      if (typeof transform === 'object' && Array.isArray(transform)) {
+        // if parameters were passed, apply them
+        if (typeof parameters !== 'undefined') {
+          transform = Utils.resolveTransformParams(transform, parameters);
+        }
+
+        for(idx = 0; idx < transform.length; idx++) {
+          step = transform[idx];
+
+          switch (step.type) {
+            case "find" : rs.find(step.value); break;
+            case "where" : rs.where(step.value); break;
+            case "simplesort" : rs.simplesort(step.property, step.desc); break;
+            case "compoundsort" : rs.compoundsort(step.value); break;
+            case "sort" : rs.sort(step.value); break;
+            case "limit" : rs = rs.limit(step.value); break;  // limit makes copy so update reference
+            case "offset" : rs = rs.offset(step.value); break; // offset makes copy so update reference
+            case "map" : rs = rs.map(step.value); break;
+            case "eqJoin" : rs = rs.eqJoin (step.joinData, step.leftJoinKey, step.rightJoinKey, step.mapFun); break;
+            // following cases break chain by returning array data so make any of these last in transform steps
+            case "mapReduce" : rs = rs.mapReduce(step.mapFunction, step.reduceFunction); break;
+            // following cases update documents in current filtered resultset (use carefully)
+            case "update" : rs.update(step.value); break;
+            case "remove" : rs.remove(); break;
+            default : break;
+          }
+        }
+
+        return rs;
+      }
+
+      return null;
     };
 
     /**
@@ -3655,11 +3835,13 @@
     UniqueIndex.prototype.keyMap = {};
     UniqueIndex.prototype.lokiMap = {};
     UniqueIndex.prototype.set = function (obj) {
-      if (this.keyMap[obj[this.field]]) {
-        throw new Error('Duplicate key for property ' + this.field + ': ' + obj[this.field]);
-      } else {
-        this.keyMap[obj[this.field]] = obj;
-        this.lokiMap[obj.$loki] = obj[this.field];
+      if (obj[this.field] !== null && typeof(obj[this.field]) !== 'undefined') {
+        if (this.keyMap[obj[this.field]]) {
+          throw new Error('Duplicate key for property ' + this.field + ': ' + obj[this.field]);
+        } else {
+          this.keyMap[obj[this.field]] = obj;
+          this.lokiMap[obj.$loki] = obj[this.field];
+        }
       }
     };
     UniqueIndex.prototype.get = function (key) {
@@ -3681,8 +3863,12 @@
     };
     UniqueIndex.prototype.remove = function (key) {
       var obj = this.keyMap[key];
-      this.keyMap[key] = undefined;
-      this.lokiMap[obj.$loki] = undefined;
+      if( obj !== null && typeof obj !== 'undefined') {
+        this.keyMap[key] = undefined;
+        this.lokiMap[obj.$loki] = undefined;
+      } else {
+        throw new Error('Key is not in unique index: ' + this.field);
+      }
     };
     UniqueIndex.prototype.clear = function () {
       this.keyMap = {};
