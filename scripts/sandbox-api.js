@@ -1155,11 +1155,11 @@ var sandboxAppCache = {
 
         // hardcoding total # files
         switch (sandbox.volatile.env) {
-            case "IDE": $("#sb_spn_appcache_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 147) + "%)"); break;
-            case "IDE WJS": $("#sb_spn_appcache_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 147) + "%)"); break;
-            case "SBL": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 147) + "%)"); break;
-            case "SBL WJS": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 147) + "%)"); break;
-            case "SA": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 147) + "%)"); break;
+            case "IDE": $("#sb_spn_appcache_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
+            case "IDE WJS": $("#sb_spn_appcache_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
+            case "SBL": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
+            case "SBL WJS": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
+            case "SA": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
         }
     },
     logACEvent: function (e) {
@@ -2693,7 +2693,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.14",
+        version: "2.15",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,

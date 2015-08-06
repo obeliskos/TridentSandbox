@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 214
+#rev 215
 
 CACHE:
 TridentSandbox.htm
@@ -9,6 +9,7 @@ SandboxLoaderWJS.htm
 libraries/jquery/jquery-2.1.0.min.js
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js
 css/sandbox.css
+css/style-bundle.min.css
 libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js
 libraries/jqGrid-4.5.4/js/i18n/grid.locale-en.js
 libraries/codemirror.min.js
