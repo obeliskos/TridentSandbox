@@ -145,7 +145,7 @@
         return function (curr) {
           return a.indexOf(curr) !== -1;
         };
-      } else if (typeof a === 'string') {
+      } else if (a && typeof a === 'string') {
         return function (curr) {
           return a.indexOf(curr) !== -1;
         };
@@ -158,6 +158,8 @@
 
     var LokiOps = {
       // comparison operators
+      // a is the value in the collection
+      // b is the query value
       $eq: function (a, b) {
         return a === b;
       },
@@ -217,8 +219,9 @@
           b = [b];
         }
 
+        // return false on check if no check fn is found
         checkFn = containsCheckFn(a, b) || function () {
-          return true;
+          return false;
         };
 
         return b.reduce(function (prev, curr) {
@@ -243,6 +246,9 @@
       '$contains': LokiOps.$contains,
       '$containsAny': LokiOps.$containsAny
     };
+
+    // making indexing opt-in... our range function knows how to deal with these ops :
+    var indexedOpsList = ['$eq', '$gt', '$gte', '$lt', '$lte'];
 
     function clone(data, method) {
       var cloneMethod = method || 'parse-stringify',
@@ -497,7 +503,12 @@
         if (this.options.hasOwnProperty('autosave') && this.options.autosave) {
           this.autosaveDisable();
           this.autosave = true;
-          this.autosaveEnable();
+          
+          if(this.options.hasOwnProperty('autosaveCallback')){
+              this.autosaveEnable(options, options.autosaveCallback);
+          }else{
+              this.autosaveEnable();
+          }
         }
       } // end of options processing
 
@@ -617,6 +628,7 @@
      */
     Loki.prototype.loadJSON = function (serializedDb, options) {
 
+      if(serializedDb.length===0) serializedDb=JSON.stringify({});
       var obj = JSON.parse(serializedDb),
         i = 0,
         len = obj.collections ? obj.collections.length : 0,
@@ -964,8 +976,10 @@
     /**
      * autosaveEnable - begin a javascript interval to periodically save the database.
      *
+     * @param {object} options - not currently used (remove or allow overrides?)
+     * @param {function} callback - (Optional) user supplied async callback
      */
-    Loki.prototype.autosaveEnable = function () {
+    Loki.prototype.autosaveEnable = function (options, callback) {
       this.autosave = true;
 
       var delay = 5000,
@@ -981,7 +995,7 @@
         // along with loki level isdirty() function which iterates all collections to see if any are dirty
 
         if (self.autosaveDirty()) {
-          self.saveDatabase();
+          self.saveDatabase(callback);
         }
       }, delay);
     };
@@ -1641,7 +1655,7 @@
       // for now only enabling for non-chained query (who's set of docs matches index)
       // or chained queries where it is the first filter applied and prop is indexed
       if ((!this.searchIsChained || (this.searchIsChained && !this.filterInitialized)) &&
-        operator !== '$ne' && operator !== '$regex' && operator !== '$contains' && operator !== '$containsAny' && operator !== '$in' && this.collection.binaryIndices.hasOwnProperty(property)) {
+        indexedOpsList.indexOf(operator) !== -1 && this.collection.binaryIndices.hasOwnProperty(property)) {
         // this is where our lazy index rebuilding will take place
         // basically we will leave all indexes dirty until we need them
         // so here we will rebuild only the index tied to this property
@@ -2829,6 +2843,10 @@
       this.transforms[name] = transform;
     };
 
+    Collection.prototype.setTransform = function (name, transform) {
+      this.transforms[name] = transform;
+    };
+
     Collection.prototype.removeTransform = function(name) {
       delete transforms[name];
     };
@@ -3991,7 +4009,7 @@
         }
       },
       // clear will zap the index
-      clear: function (key) {
+      clear: function () {
         this.keys = [];
         this.values = [];
       }
