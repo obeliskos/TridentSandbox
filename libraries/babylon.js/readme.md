@@ -3,6 +3,26 @@ Babylon.js
 
 Getting started? Play directly with the Babylon.js API via our [playground](http://www.babylonjs.com/playground). It contains also lot of simple samples to learn how to use it. 
 
+## CDN
+- http://cdn.babylonjs.com/2-1/babylon.js 
+- http://cdn.babylonjs.com/2-1/babylon.max.js 
+- http://cdn.babylonjs.com/2-1/babylon.noworker.js 
+
+## Preview release
+You can help by testing or contributing to the next version.
+- **2.2-alpha** can be found [here](https://github.com/BabylonJS/Babylon.js/tree/master/dist/preview%20release%20-%20alpha)
+- We are not complicate people, but we still have some [coding guidelines](http://doc.babylonjs.com/page.php?p=22671)
+- Before submitting your PR, just check that everything goes well by [creating the minified version](http://doc.babylonjs.com/page.php?p=22641)
+
+## Documentation
+- [Documentation](http://doc.babylonjs.com)
+- [Roadmap](http://doc.babylonjs.com/page.php?p=22681)
+- [Samples](https://github.com/BabylonJS/Samples)
+- [Video overview (1 hour) of BabylonJS features](http://www.youtube.com/watch?v=z80TYMqsdEM)
+- [Complete course (8 hours)](http://www.microsoftvirtualacademy.com/training-courses/introduction-to-webgl-3d-with-html5-and-babylon-js)
+
+## Useful links
+
 Official web site: [www.babylonjs.com](http://www.babylonjs.com/) 
 
 Official [forum](http://www.html5gamedevs.com/forum/16-babylonjs/) on www.html5gamedevs.com
@@ -15,14 +35,7 @@ Online [shader creation tool](http://www.babylonjs.com/cyos/) where you can lear
 
 Blender [exporter](https://github.com/BabylonJS/Babylon.js/tree/master/Exporters/Blender) can be used to generate a .babylon file from Blender 3d
 
-Online [asset converter](http://www.babylonjs.com/converter.html) where you can generate .babylon file from .OBJ, .FBX, .DAE
-
-## Documentation
-- [Wiki](https://github.com/babylonjs/babylon.js/wiki)
-- [Creating the minified version](https://github.com/BabylonJS/Babylon.js/wiki/Creating-the-minified-version)
-- [Roadmap](https://github.com/BabylonJS/Babylon.js/wiki/Roadmap)
-- [Samples](https://github.com/BabylonJS/Samples)
-- [Video overview (1 hour) of BabylonJS features](http://www.youtube.com/watch?v=z80TYMqsdEM)
+Unity 5 [exporter](https://github.com/BabylonJS/Babylon.js/tree/master/Exporters/Unity%205) can be used to export your geometries from Unity 5 scene editor
 
 ## Features
 - Complete scene graph with lights, cameras, materials and meshes
@@ -31,6 +44,7 @@ Online [asset converter](http://www.babylonjs.com/converter.html) where you can 
 - Scene picking
 - Antialiasing
 - Animations engine
+- Audio engine
 - Particles Systems
 - Sprites and 2D layers
 -  Optimizations engines: 
@@ -42,6 +56,11 @@ Online [asset converter](http://www.babylonjs.com/converter.html) where you can 
  - Incremental loading 
  - Binary compressed format
  - Hardware accelerated instances
+ - Level of details (LOD)
+ - Automatic scene optimizer
+ - Debug layer to help you optimize and debug scenes
+ - SIMD.js support
+ - Collisions can be offloaded on webworkers
 - Standard material is a per pixel material that supports:
  - Diffuse lightning and texture
  - Ambient lightning and texture
@@ -59,16 +78,19 @@ Online [asset converter](http://www.babylonjs.com/converter.html) where you can 
  - Skybox
  - Vertex color
  - Bones (Animations and shadows are supported)
- - Fresnel term for diffuse, opacity, emissive and reflection
+ - Procedural textures
 -  Special FX
  - Fog
  - Alpha blending
  - Alpha testing
  - Billboarding
  - Fullscreen mode
- - Shadow Maps and Variance Shadow Maps
+ - Shadow Maps and Variance Shadow Maps (with support for blurred shadows)
  - Rendering layers
  - Post-processes (blur, refraction, black'n'white, fxaa, customs...)
+ - SSAO
+ - Volumetric Light Scattering 
+ - Depth of field and lens effects
  - Lens flares
  - Multi-views
 -  Textures:
@@ -83,7 +105,7 @@ Online [asset converter](http://www.babylonjs.com/converter.html) where you can 
  - Touch camera
  - Anaglyph camera
  - Virtual Joysticks camera
- - Oculus Rift camera
+ - Stereoscopic camera
  - Gamepad camera
  - VR Device Oriention camera
  - WebVR camera
@@ -93,12 +115,18 @@ Online [asset converter](http://www.babylonjs.com/converter.html) where you can 
  - Dynamic meshes
  - Height maps
  - Constructive solid geometries
+ - Parametric shapes (Ribbon, tube, etc.)
+ - Hardware instances
 -  Import: 
  - Babylon scene file can be converted from .OBJ, .FBX
  - Exporter for Blender
  - Exporter for Cheetah3d
  - Exporter for 3ds Max
+ - Exporter for Unity 5
+ - STL importer
  - Assets manager
+
+[![Build Status](https://travis-ci.org/BabylonJS/Babylon.js.svg)](https://travis-ci.org/BabylonJS/Babylon.js)
 
 ## Apache License 2.0 (Apache)
 

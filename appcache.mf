@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 215
+#rev 216
 
 CACHE:
 TridentSandbox.htm
@@ -98,7 +98,7 @@ sounds/ElectricalSweep.mp3
 samples/Alertify%20Demo.prg
 samples/Antikythera.prg
 samples/Antikythera-WJS.prg
-samples/Babylon.JS%20Sample%20(WebGL).prg
+samples/BabylonJS%20Sample%20WebGL.prg
 samples/Codemirror%20demo.prg
 samples/CryptoJS.prg
 samples/CryptoJS%20File%20Hasher.prg
