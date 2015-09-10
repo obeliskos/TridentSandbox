@@ -2693,7 +2693,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.16",
+        version: "2.17",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,
