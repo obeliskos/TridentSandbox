@@ -1128,6 +1128,18 @@ var sandboxUnits = {
             self.appendScriptUnit(result.val, callback);
         });
     },
+    importScriptFile: function (tridentFilename, callback) {
+        var self = this;
+
+        sandbox.db.getAppKey("TridentFiles", unitName, function (result) {
+            if (result == null || result.id === 0) {
+                alertify.error("No TridentFile by that name");
+                return false;
+            }
+
+            self.appendScriptUnit(result.val, callback);
+        });
+    },
     appendScriptUnit: function (scriptText, callback) {
         var s = document.createElement("script");
         s.innerHTML = scriptText;
@@ -1153,13 +1165,15 @@ var sandboxAppCache = {
     progressAC: function (e) {
         sandbox.volatile.appCacheProgress++;
 
+        var progressPCT = "(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 151) + "%)";
+
         // hardcoding total # files
         switch (sandbox.volatile.env) {
-            case "IDE": $("#sb_spn_appcache_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
-            case "IDE WJS": $("#sb_spn_appcache_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
-            case "SBL": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
-            case "SBL WJS": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
-            case "SA": $("#sb_spn_ac_progress").text("(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 149) + "%)"); break;
+            case "IDE": $("#sb_spn_appcache_progress").text(progressPCT); break;
+            case "IDE WJS": $("#sb_spn_appcache_progress").text(progressPCT); break;
+            case "SBL": $("#sb_spn_ac_progress").text(progressPCT); break;
+            case "SBL WJS": $("#sb_spn_ac_progress").text(progressPCT); break;
+            case "SA": $("#sb_spn_ac_progress").text(progressPCT); break;
         }
     },
     logACEvent: function (e) {

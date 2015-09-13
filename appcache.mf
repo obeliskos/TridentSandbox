@@ -10,6 +10,7 @@ libraries/jquery/jquery-2.1.0.min.js
 libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.min.js
 css/sandbox.css
 css/style-bundle.min.css
+libraries/loki-js/lokijs.js
 libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js
 libraries/jqGrid-4.5.4/js/i18n/grid.locale-en.js
 libraries/codemirror.min.js
@@ -69,11 +70,11 @@ libraries/tinymce/plugins/emoticons/img/smiley-tongue-out.gif
 libraries/tinymce/plugins/emoticons/img/smiley-undecided.gif
 libraries/tinymce/plugins/emoticons/img/smiley-wink.gif
 libraries/tinymce/plugins/emoticons/img/smiley-yell.gif
-libraries/font-awesome/fonts/fontawesome-webfont.eot?
-libraries/font-awesome/fonts/FontAwesome.otf?v=4.0.3
-libraries/font-awesome/fonts/fontawesome-webfont.svg?v=4.0.3
-libraries/font-awesome/fonts/fontawesome-webfont.ttf?v=4.0.3
-libraries/font-awesome/fonts/fontawesome-webfont.woff?v=4.0.3
+libraries/font-awesome/fonts/fontawesome-webfont.eot
+libraries/font-awesome/fonts/FontAwesome.otf
+libraries/font-awesome/fonts/fontawesome-webfont.svg
+libraries/font-awesome/fonts/fontawesome-webfont.ttf
+libraries/font-awesome/fonts/fontawesome-webfont.woff
 libraries/pixi.js/pixel.png
 libraries/pixi.js/photonstorm.png
 libraries/pixi.js/pixi.png
@@ -148,6 +149,7 @@ samples/Trident%20Sandbox%20Radio.prg
 samples/Trident%20UI%20Demo.prg
 samples/WebGL%20Spinning%20Box.prg
 samples/WebGL%20Spinning%20Crate.prg
+samples/WinJS%20SplitView%20Template.prg
 samples/WinJS%20Promises.prg
 samples/WinJS%20Scheduler.prg
 libraries/web_worker_demo.js
@@ -155,3 +157,10 @@ libraries/web_worker_demo.js
 NETWORK:
 *
 http://*
+
+FALLBACK:
+/libraries/font-awesome/fonts/fontawesome-webfont.eot libraries/font-awesome/fonts/fontawesome-webfont.eot
+/libraries/font-awesome/fonts/FontAwesome.otf libraries/font-awesome/fonts/FontAwesome.otf
+/libraries/font-awesome/fonts/fontawesome-webfont.svg libraries/font-awesome/fonts/fontawesome-webfont.svg
+/libraries/font-awesome/fonts/fontawesome-webfont.ttf libraries/font-awesome/fonts/fontawesome-webfont.ttf
+/libraries/font-awesome/fonts/fontawesome-webfont.woff libraries/font-awesome/fonts/fontawesome-webfont.woff
