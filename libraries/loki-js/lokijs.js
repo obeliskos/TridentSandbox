@@ -28,7 +28,7 @@
         }
       },
       // used to recursively scan hierarchical transform step object for param substitution
-      resolveTransformObject : function (subObj, params, depth) {
+      resolveTransformObject: function (subObj, params, depth) {
         var prop,
           pname;
 
@@ -43,18 +43,17 @@
             pname = subObj[prop].substring(8);
             if (params.hasOwnProperty(pname)) {
               subObj[prop] = params[pname];
-            }            
-          }
-          else if (typeof subObj[prop] === "object") {
+            }
+          } else if (typeof subObj[prop] === "object") {
             subObj[prop] = Utils.resolveTransformObject(subObj[prop], params, depth);
           }
         }
-        
+
         return subObj;
       },
       // top level utility to resolve an entire (single) transform (array of steps) for parameter substitution
       resolveTransformParams: function (transform, params) {
-        var idx, 
+        var idx,
           prop,
           clonedStep,
           resolvedTransform = [];
@@ -62,7 +61,7 @@
         if (typeof params === 'undefined') return transform;
 
         // iterate all steps in the transform array
-        for (idx=0; idx < transform.length; idx++) {
+        for (idx = 0; idx < transform.length; idx++) {
           // clone transform so our scan and replace can operate directly on cloned transform
           clonedStep = JSON.parse(JSON.stringify(transform[idx]));
           resolvedTransform.push(Utils.resolveTransformObject(clonedStep, params));
@@ -74,14 +73,6 @@
 
     // Sort helper that support null and undefined
     function ltHelper(prop1, prop2, equal) {
-      if (prop1 === prop2) {
-        if (equal) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
       if (prop1 === undefined) {
         return true;
       }
@@ -94,18 +85,25 @@
       if (prop2 === null) {
         return false;
       }
-      return prop1 < prop2;
+
+      if (prop1 < prop2) {
+        return true;
+      }
+
+      if (prop1 > prop2) {
+        return false;
+      }
+
+      // not lt and and not gt so equality assumed-- this ordering of tests is date compatible
+      if (equal) {
+        return true;
+      } else {
+        return false;
+      }
+
     }
 
     function gtHelper(prop1, prop2, equal) {
-      if (prop1 === prop2) {
-        if (equal) {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
       if (prop1 === undefined) {
         return false;
       }
@@ -118,26 +116,45 @@
       if (prop2 === null) {
         return true;
       }
-      return prop1 > prop2;
+
+      if (prop1 > prop2) {
+        return true;
+      }
+
+      if (prop1 < prop2) {
+        return false;
+      }
+
+      // not lt and and not gt so equality assumed-- this ordering of tests is date compatible
+      if (equal) {
+        return true;
+      } else {
+        return false;
+      }
+
     }
 
     function sortHelper(prop1, prop2, desc) {
-      if (prop1 === prop2) {
-        return 0;
-      }
-      if (desc) {
-        if (ltHelper(prop1, prop2)) {
+      if (ltHelper(prop1, prop2)) {
+        if (desc) {
           return 1;
-        } else {
-          return -1;
         }
-      } else {
-        if (gtHelper(prop1, prop2)) {
-          return 1;
-        } else {
+        else {
           return -1;
         }
       }
+
+      if (gtHelper(prop1, prop2)) {
+        if (desc) {
+          return -1;
+        }
+        else {
+          return 1;
+        }
+      }
+
+      // not lt, not gt so implied equality-- date compatible
+      return 0;
     }
 
     function containsCheckFn(a, b) {
@@ -162,6 +179,18 @@
       // b is the query value
       $eq: function (a, b) {
         return a === b;
+      },
+
+      $dteq: function(a, b) {
+        if (ltHelper(a, b)) {
+          return false;
+        }
+
+        if (gtHelper(a,b)) {
+          return false;
+        }
+
+        return true;
       },
 
       $gt: function (a, b) {
@@ -236,6 +265,7 @@
 
     var operators = {
       '$eq': LokiOps.$eq,
+      '$dteq': LokiOps.$dteq,
       '$gt': LokiOps.$gt,
       '$gte': LokiOps.$gte,
       '$lt': LokiOps.$lt,
@@ -248,7 +278,7 @@
     };
 
     // making indexing opt-in... our range function knows how to deal with these ops :
-    var indexedOpsList = ['$eq', '$gt', '$gte', '$lt', '$lte'];
+    var indexedOpsList = ['$eq', '$dteq', '$gt', '$gte', '$lt', '$lte'];
 
     function clone(data, method) {
       var cloneMethod = method || 'parse-stringify',
@@ -376,6 +406,7 @@
 
       this.events = {
         'init': [],
+        'loaded': [],
         'flushChanges': [],
         'close': [],
         'changes': [],
@@ -428,7 +459,7 @@
 
     // experimental support for browserify's abstract syntax scan to pick up dependency of indexed adapter.
     // Hopefully, once this hits npm a browserify require of lokijs should scan the main file and detect this indexed adapter reference.
-    Loki.prototype.getIndexedAdapter = function() {
+    Loki.prototype.getIndexedAdapter = function () {
       var adapter;
 
       if (typeof require === 'function') {
@@ -501,11 +532,11 @@
         if (this.options.hasOwnProperty('autosave') && this.options.autosave) {
           this.autosaveDisable();
           this.autosave = true;
-          
-          if(this.options.hasOwnProperty('autosaveCallback')){
-              this.autosaveEnable(options, options.autosaveCallback);
-          }else{
-              this.autosaveEnable();
+
+          if (this.options.hasOwnProperty('autosaveCallback')) {
+            this.autosaveEnable(options, options.autosaveCallback);
+          } else {
+            this.autosaveEnable();
           }
         }
       } // end of options processing
@@ -626,7 +657,7 @@
      */
     Loki.prototype.loadJSON = function (serializedDb, options) {
 
-      if(serializedDb.length===0) serializedDb=JSON.stringify({});
+      if (serializedDb.length === 0) serializedDb = JSON.stringify({});
       var obj = JSON.parse(serializedDb),
         i = 0,
         len = obj.collections ? obj.collections.length : 0,
@@ -689,7 +720,7 @@
         copyColl.uniqueNames = [];
         if (coll.hasOwnProperty("uniqueNames")) {
           copyColl.uniqueNames = coll.uniqueNames;
-          for (j=0; j < copyColl.uniqueNames.length; j++) {
+          for (j = 0; j < copyColl.uniqueNames.length; j++) {
             copyColl.ensureUniqueIndex(copyColl.uniqueNames[j]);
           }
         }
@@ -731,7 +762,8 @@
       if (this.autosave) {
         this.autosaveDisable();
         if (this.autosaveDirty()) {
-          this.saveDatabase();
+          this.saveDatabase(callback);
+          callback = undefined;
         }
       }
 
@@ -896,6 +928,7 @@
           if (typeof (dbString) === 'string') {
             self.loadJSON(dbString, options || {});
             cFun(null);
+            self.emit('loaded', 'database ' + self.filename + ' loaded');
           } else {
             console.warn('lokijs loadDatabase : Database not found');
             if (typeof (dbString) === "object") {
@@ -1067,7 +1100,7 @@
     Resultset.prototype.limit = function (qty) {
       // if this is chained resultset with no filters applied, we need to populate filteredrows first
       if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
-        this.filteredrows = Object.keys(this.collection.data);
+        this.filteredrows = Object.keys(this.collection.data).map(Number);
       }
 
       var rscopy = this.copy();
@@ -1086,7 +1119,7 @@
     Resultset.prototype.offset = function (pos) {
       // if this is chained resultset with no filters applied, we need to populate filteredrows first
       if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
-        this.filteredrows = Object.keys(this.collection.data);
+        this.filteredrows = Object.keys(this.collection.data).map(Number);
       }
 
       var rscopy = this.copy();
@@ -1120,7 +1153,7 @@
      * @param {object} : (Optional) object property hash of parameters, if the transform requires them.
      * @returns {Resultset} : either (this) resultset or a clone of of this resultset (depending on steps)
      */
-    Resultset.prototype.transform = function(transform, parameters) {
+    Resultset.prototype.transform = function (transform, parameters) {
       var idx,
         step,
         rs = this;
@@ -1129,25 +1162,50 @@
         transform = Utils.resolveTransformParams(transform, parameters);
       }
 
-      for(idx = 0; idx < transform.length; idx++) {
+      for (idx = 0; idx < transform.length; idx++) {
         step = transform[idx];
 
         switch (step.type) {
-          case "find" : rs.find(step.value); break;
-          case "where" : rs.where(step.value); break;
-          case "simplesort" : rs.simplesort(step.property, step.desc); break;
-          case "compoundsort" : rs.compoundsort(step.value); break;
-          case "sort" : rs.sort(step.value); break;
-          case "limit" : rs = rs.limit(step.value); break;  // limit makes copy so update reference
-          case "offset" : rs = rs.offset(step.value); break; // offset makes copy so update reference
-          case "map" : rs = rs.map(step.value); break;
-          case "eqJoin" : rs = rs.eqJoin (step.joinData, step.leftJoinKey, step.rightJoinKey, step.mapFun); break;
+        case "find":
+          rs.find(step.value);
+          break;
+        case "where":
+          rs.where(step.value);
+          break;
+        case "simplesort":
+          rs.simplesort(step.property, step.desc);
+          break;
+        case "compoundsort":
+          rs.compoundsort(step.value);
+          break;
+        case "sort":
+          rs.sort(step.value);
+          break;
+        case "limit":
+          rs = rs.limit(step.value);
+          break; // limit makes copy so update reference
+        case "offset":
+          rs = rs.offset(step.value);
+          break; // offset makes copy so update reference
+        case "map":
+          rs = rs.map(step.value);
+          break;
+        case "eqJoin":
+          rs = rs.eqJoin(step.joinData, step.leftJoinKey, step.rightJoinKey, step.mapFun);
+          break;
           // following cases break chain by returning array data so make any of these last in transform steps
-          case "mapReduce" : rs = rs.mapReduce(step.mapFunction, step.reduceFunction); break;
+        case "mapReduce":
+          rs = rs.mapReduce(step.mapFunction, step.reduceFunction);
+          break;
           // following cases update documents in current filtered resultset (use carefully)
-          case "update" : rs.update(step.value); break;
-          case "remove" : rs.remove(); break;
-          default : break;
+        case "update":
+          rs.update(step.value);
+          break;
+        case "remove":
+          rs.remove();
+          break;
+        default:
+          break;
         }
       }
 
@@ -1169,7 +1227,7 @@
     Resultset.prototype.sort = function (comparefun) {
       // if this is chained resultset with no filters applied, just we need to populate filteredrows first
       if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
-        this.filteredrows = Object.keys(this.collection.data);
+        this.filteredrows = Object.keys(this.collection.data).map(Number);
       }
 
       var wrappedComparer =
@@ -1197,7 +1255,7 @@
     Resultset.prototype.simplesort = function (propname, isdesc) {
       // if this is chained resultset with no filters applied, just we need to populate filteredrows first
       if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
-        this.filteredrows = Object.keys(this.collection.data);
+        this.filteredrows = Object.keys(this.collection.data).map(Number);
       }
 
       if (typeof (isdesc) === 'undefined') {
@@ -1268,7 +1326,7 @@
 
       // if this is chained resultset with no filters applied, just we need to populate filteredrows first
       if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
-        this.filteredrows = Object.keys(this.collection.data);
+        this.filteredrows = Object.keys(this.collection.data).map(Number);
       }
 
       var wrappedComparer =
@@ -1320,6 +1378,11 @@
           return [0, -1];
         }
         break;
+      case '$dteq':
+        if (ltHelper(val, minVal) || gtHelper(val, maxVal)) {
+          return [0, -1];
+        }
+        break;
       case '$gt':
         if (gtHelper(val, maxVal, true)) {
           return [0, -1];
@@ -1335,7 +1398,7 @@
           return [0, -1];
         }
         if (ltHelper(maxVal, val)) {
-          return [0, rcd.length-1];
+          return [0, rcd.length - 1];
         }
         break;
       case '$lte':
@@ -1343,7 +1406,7 @@
           return [0, -1];
         }
         if (ltHelper(maxVal, val, true)) {
-          return [0, rcd.length-1];
+          return [0, rcd.length - 1];
         }
         break;
       }
@@ -1390,6 +1453,16 @@
         }
 
         return [lbound, ubound];
+      case '$dteq':
+        if (lval > val || lval < val) {
+          return [0, -1];
+        }
+        if (uval > val || uval < val) {
+          ubound--;
+        }
+
+        return [lbound, ubound];
+
 
       case '$gt':
         if (ltHelper(uval, val, true)) {
@@ -1528,6 +1601,10 @@
         }
         // else not yet determined if subarray scan is involved
         else {
+          // if the dot notation is invalid for the current document, then ignore this document
+          if (typeof root === 'undefined' || root === null || !root.hasOwnProperty(path)) {
+            return false;
+          }
           root = root[path];
           if (Array.isArray(root)) {
             arrayRef = root;
@@ -1592,7 +1669,7 @@
         // chained queries can just do coll.chain().data() but let's
         // be versatile and allow this also coll.chain().find().data()
         if (this.searchIsChained) {
-          this.filteredrows = Object.keys(this.collection.data);
+          this.filteredrows = Object.keys(this.collection.data).map(Number);
           return this;
         }
         // not chained, so return collection data array
@@ -1666,7 +1743,7 @@
           }
 
           // see if query object is in shorthand mode (assuming eq operator)
-          if (queryObject[p] === null || typeof queryObject[p] !== 'object') {
+          if (queryObject[p] === null || (typeof queryObject[p] !== 'object' || queryObject[p] instanceof Date)) {
             operator = '$eq';
             value = queryObject[p];
           } else if (typeof queryObject[p] === 'object') {
@@ -1723,13 +1800,12 @@
 
           if (firstOnly) {
             if (usingDotNotation) {
-              while(i--) {
+              while (i--) {
                 if (this.dotSubScan(t[i], property, fun, value)) {
-                  return(t[i]);
+                  return (t[i]);
                 }
               }
-            }
-            else {
+            } else {
               while (i--) {
                 if (fun(t[i][property], value)) {
                   return (t[i]);
@@ -1972,7 +2048,7 @@
 
       // if this is chained resultset with no filters applied, we need to populate filteredrows first
       if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
-        this.filteredrows = Object.keys(this.collection.data);
+        this.filteredrows = Object.keys(this.collection.data).map(Number);
       }
 
       var len = this.filteredrows.length,
@@ -1998,14 +2074,10 @@
 
       // if this is chained resultset with no filters applied, we need to populate filteredrows first
       if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
-        this.filteredrows = Object.keys(this.collection.data);
+        this.filteredrows = Object.keys(this.collection.data).map(Number);
       }
 
-      var len = this.filteredrows.length;
-
-      for (var idx = 0; idx < len; idx++) {
-        this.collection.remove(this.filteredrows[idx]);
-      }
+      this.collection.remove(this.data());
 
       this.filteredrows = [];
 
@@ -2131,7 +2203,7 @@
         this.options.persistent = false;
       }
 
-      // 'persistentSortPriority': 
+      // 'persistentSortPriority':
       // 'passive' will defer the sort phase until they call data(). (most efficient overall)
       // 'active' will sort async whenever next idle. (prioritizes read speeds)
       if (!this.options.hasOwnProperty('sortPriority')) {
@@ -2449,7 +2521,7 @@
      * queueRebuildEvent() - When the view is not sorted we may still wish to be notified of rebuild events.
      *     This event will throttle and queue a single rebuild event when batches of updates affect the view.
      */
-    DynamicView.prototype.queueRebuildEvent = function() {
+    DynamicView.prototype.queueRebuildEvent = function () {
       var self = this;
 
       if (this.rebuildPending) {
@@ -2458,12 +2530,12 @@
 
       this.rebuildPending = true;
 
-      setTimeout(function() {
+      setTimeout(function () {
         self.rebuildPending = false;
         self.emit('rebuild', this);
       }, 1);
     };
-    
+
     /**
      * queueSortPhase : If the view is sorted we will throttle sorting to either :
      *    (1) passive - when the user calls data(), or
@@ -2484,9 +2556,8 @@
         setTimeout(function () {
           self.performSortPhase();
         }, 1);
-      }
-      else {
-        // must be passive sorting... since not calling performSortPhase (until data call), lets use queueRebuildEvent to 
+      } else {
+        // must be passive sorting... since not calling performSortPhase (until data call), lets use queueRebuildEvent to
         // potentially notify user that data has changed.
         this.queueRebuildEvent();
       }
@@ -2531,7 +2602,7 @@
      */
     DynamicView.prototype.evaluateDocument = function (objIndex) {
       var ofr = this.resultset.filteredrows;
-      var oldPos = ofr.indexOf(objIndex);
+      var oldPos = ofr.indexOf(+objIndex);
       var oldlen = ofr.length;
 
       // creating a 1-element resultset to run filter chain ops on to see if that doc passes filters;
@@ -2567,8 +2638,7 @@
         // need to re-sort to sort new document
         if (this.sortFunction || this.sortCriteria) {
           this.queueSortPhase();
-        }
-        else {
+        } else {
           this.queueRebuildEvent();
         }
 
@@ -2597,8 +2667,7 @@
         // in case changes to data altered a sort column
         if (this.sortFunction || this.sortCriteria) {
           this.queueSortPhase();
-        }
-        else {
+        } else {
           this.queueRebuildEvent();
         }
 
@@ -2615,8 +2684,7 @@
         // in case changes to data altered a sort column
         if (this.sortFunction || this.sortCriteria) {
           this.queueSortPhase();
-        }
-        else {
+        } else {
           this.queueRebuildEvent();
         }
 
@@ -2629,7 +2697,7 @@
      */
     DynamicView.prototype.removeDocument = function (objIndex) {
       var ofr = this.resultset.filteredrows;
-      var oldPos = ofr.indexOf(objIndex);
+      var oldPos = ofr.indexOf(+objIndex);
       var oldlen = ofr.length;
       var idx;
 
@@ -2665,7 +2733,7 @@
       oldlen = ofr.length;
       for (idx = 0; idx < oldlen; idx++) {
         if (ofr[idx] > objIndex) {
-          ofr[idx] --;
+          ofr[idx]--;
         }
       }
     };
@@ -2709,8 +2777,8 @@
       // unique contraints contain duplicate object references, so they are not persisted.
       // we will keep track of properties which have unique contraint applied here, and regenerate on load
       this.uniqueNames = [];
-      
-      // transforms will be used to store frequently used query chains as a series of steps 
+
+      // transforms will be used to store frequently used query chains as a series of steps
       // which itself can be stored along with the database.
       this.transforms = {};
 
@@ -2737,7 +2805,7 @@
           options.unique = [options.unique];
         }
         options.unique.forEach(function (prop) {
-          self.uniqueNames.push(prop);  // used to regenerate on subsequent database loads
+          self.uniqueNames.push(prop); // used to regenerate on subsequent database loads
           self.constraints.unique[prop] = new UniqueIndex(prop);
         });
       }
@@ -2916,11 +2984,11 @@
       this.transforms[name] = transform;
     };
 
-    Collection.prototype.removeTransform = function(name) {
+    Collection.prototype.removeTransform = function (name) {
       delete transforms[name];
     };
 
-    Collection.prototype.byExample = function(template) {
+    Collection.prototype.byExample = function (template) {
       var k, obj, query;
       query = [];
       for (k in template) {
@@ -2931,12 +2999,18 @@
           obj
         ));
       }
-      return { '$and': query };
+      return {
+        '$and': query
+      };
     };
 
-    Collection.prototype.findObject = function(template) { return this.findOne(this.byExample(template)); };
+    Collection.prototype.findObject = function (template) {
+      return this.findOne(this.byExample(template));
+    };
 
-    Collection.prototype.findObjects = function(template) { return this.find(this.byExample(template)); };
+    Collection.prototype.findObjects = function (template) {
+      return this.find(this.byExample(template));
+    };
 
     /*----------------------------+
     | INDEXING                    |
@@ -3215,7 +3289,7 @@
         this.commit();
         this.dirty = true; // for autosave scenarios
         this.emit('update', doc);
-
+        return doc;
       } catch (err) {
         this.rollback();
         console.error(err.message);
@@ -3347,7 +3421,7 @@
           position = arr[1];
         var self = this;
         Object.keys(this.constraints.unique).forEach(function (key) {
-          if( doc[key] !== null && typeof doc[key] !== 'undefined' ) {
+          if (doc[key] !== null && typeof doc[key] !== 'undefined') {
             self.constraints.unique[key].remove(doc[key]);
           }
         });
@@ -3894,7 +3968,7 @@
     UniqueIndex.prototype.keyMap = {};
     UniqueIndex.prototype.lokiMap = {};
     UniqueIndex.prototype.set = function (obj) {
-      if (obj[this.field] !== null && typeof(obj[this.field]) !== 'undefined') {
+      if (obj[this.field] !== null && typeof (obj[this.field]) !== 'undefined') {
         if (this.keyMap[obj[this.field]]) {
           throw new Error('Duplicate key for property ' + this.field + ': ' + obj[this.field]);
         } else {
@@ -3922,7 +3996,7 @@
     };
     UniqueIndex.prototype.remove = function (key) {
       var obj = this.keyMap[key];
-      if( obj !== null && typeof obj !== 'undefined') {
+      if (obj !== null && typeof obj !== 'undefined') {
         this.keyMap[key] = undefined;
         this.lokiMap[obj.$loki] = undefined;
       } else {
@@ -3939,7 +4013,7 @@
       this.field = exactField;
     }
 
-    // add the value you want returned to the key in the index 
+    // add the value you want returned to the key in the index
     ExactIndex.prototype = {
       set: function add(key, val) {
         if (this.index[key]) {
@@ -3991,7 +4065,7 @@
       setSort: function (fun) {
         this.bs = new BSonSort(fun);
       },
-      // add the value you want returned  to the key in the index  
+      // add the value you want returned  to the key in the index
       set: function (key, value) {
         var pos = binarySearch(this.keys, key, this.sort);
         if (pos.found) {

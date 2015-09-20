@@ -1735,6 +1735,46 @@ var sandboxIDE = {
             }
         });
     },
+    loadRawGist: function(rawGistUrl) {
+        if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
+            console.log("ignoring call to sandbox.ide.loadRawGist");
+            return;
+        }
+
+        if (rawGistUrl.indexOf("https://gist.githubusercontent.com") !== 0) {
+            console.log("expecting an https://gist.githubusercontent.com url");
+            return;
+        }
+
+        jQuery.ajax({
+            type: "GET",
+            url: rawGistUrl,
+            cache: true,
+            dataType: "json",
+
+            success: function (response) {
+                var sandboxObject = response;
+
+                $("#sb_txt_ProgramName").val(sandboxObject.progName);
+
+                sandbox.volatile.editorMarkup.setValue(sandboxObject.htmlText);
+                sandbox.volatile.editorScript.setValue(sandboxObject.scriptText);
+
+                sandbox.volatile.markupHash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
+                sandbox.volatile.scriptHash = CryptoJS.SHA1(sandboxObject.scriptText).toString();
+
+                var control = $("#sb_file");
+                control.replaceWith(control = control.clone(true));
+
+                sandbox.ide.setWindowMode(2);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                sandbox.logger.log(xhr.status + " : " + xhr.statusText);
+                alertify.log(xhr.status + " : " + xhr.statusText);
+                alertify.log("See user log for more info");
+            }
+        });
+    },
     browseSamples: function () {
         if (typeof (sandbox.events.clean) === typeof (Function)) {
             try {
@@ -2793,6 +2833,7 @@ var sandbox = {
         }
     },
     hashparams: {
+        rawgist: "",
         Theme: "",
         memstats: "",
         LoadSlot: "",
@@ -3229,6 +3270,17 @@ var sandbox = {
                                     sandbox.ide.editApp(runProgram);
                                 }, 200);
                             }
+                            else {
+                                var gistUrl = sandbox.hashparams.getParameter("rawgist");
+
+                                if (gistUrl != null) {
+                                    sandbox.ide.clean();
+
+                                    setTimeout(function () {
+                                        sandbox.ide.loadRawGist(gistUrl);
+                                    }, 200);
+                                }
+                            }
                         }
                     }
 
@@ -3335,6 +3387,18 @@ var sandbox = {
 
                 setTimeout(function () {
                     sandbox.ide.editApp(sandbox.hashparams.getParameter("EditApp"));
+                }, 200);
+            }
+
+            return;
+        }
+
+        if (sandbox.hashparams.getParameter("rawgist")) {
+            if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
+                sandbox.ide.clean();
+
+                setTimeout(function () {
+                    sandbox.ide.loadRawGist(sandbox.hashparams.getParameter("rawgist"));
                 }, 200);
             }
 
