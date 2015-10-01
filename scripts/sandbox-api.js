@@ -3310,7 +3310,7 @@ var sandbox = {
 
         if (sandbox.volatile.envTest(["SBL", "SBL WJS"])) {
             // if loading from the web (not sa template), clear out the template placeholders
-            if (document.URL.indexOf("file://") === -1) $("#UI_MainPlaceholder").empty();
+            if (sandbox.volatile.isHosted) $("#UI_MainPlaceholder").empty();
         }
 
         if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
@@ -3412,8 +3412,15 @@ var sandbox = {
 
         // Sandbox Loaders : if no runslot/runapp then load SandboxLoader prog
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
-            if (!sandbox.hashparams.getParameter("RunSlot") && !sandbox.hashparams.getParameter("RunApp")) {
-                sandbox.ide.runApp("SandboxLanding");
+            if (sandbox.volatile.isHosted) {
+                if (!sandbox.hashparams.getParameter("RunSlot") && !sandbox.hashparams.getParameter("RunApp")) {
+                    sandbox.ide.runApp("SandboxLanding");
+                }
+            }
+            else {
+                if (sandbox.volatile.env === "SBL WJS") {
+                    sandbox.ui.setDarkTheme();
+                }
             }
         }
     }
