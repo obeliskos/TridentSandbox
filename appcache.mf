@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 217
+#rev 218
 
 CACHE:
 TridentSandbox.htm
@@ -71,10 +71,11 @@ libraries/tinymce/plugins/emoticons/img/smiley-undecided.gif
 libraries/tinymce/plugins/emoticons/img/smiley-wink.gif
 libraries/tinymce/plugins/emoticons/img/smiley-yell.gif
 libraries/font-awesome/fonts/fontawesome-webfont.eot
-libraries/font-awesome/fonts/FontAwesome.otf
-libraries/font-awesome/fonts/fontawesome-webfont.svg
-libraries/font-awesome/fonts/fontawesome-webfont.ttf
+libraries/font-awesome/fonts/fontawesome-webfont.woff2
 libraries/font-awesome/fonts/fontawesome-webfont.woff
+libraries/font-awesome/fonts/fontawesome-webfont.ttf
+libraries/font-awesome/fonts/fontawesome-webfont.svg
+libraries/font-awesome/fonts/FontAwesome.otf
 libraries/pixi.js/pixel.png
 libraries/pixi.js/photonstorm.png
 libraries/pixi.js/pixi.png
