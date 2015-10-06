@@ -107,11 +107,16 @@ object inspector programmatically to display the contents of your own variable, 
                     { title: "launch()", key: "launch", hideCheckbox: true, tooltip: "Identical to pressing the 'launch' toolbar button.  Runs the program in a new window without an ide." },
                     { title: "clean()", key: "clean", hideCheckbox: true, tooltip: "Identical to pressing 'new' toolbar button.  Clears editors and output and defaults to new program template." },
                     { title: "clearOutput()", key: "clearOutput", hideCheckbox: true, tooltip: "Identical to pressing 'clear output' toolbar button.  Clears output and runs clean event but leaves editor text intact for subsequent runs." },
-                    { title: "runApp(progname)", key: "runApp", hideCheckbox: true, tooltip: "Will issue an ajax call to load a sample program.  Used by samples browsers." },
-                    { title: "runSlot(appName)", key: "runSlot", hideCheckbox: true, tooltip: "Will load a program from a save slot in the trident database.  Used by the program save dropdown list." },
-                    { title: "runAutorun()", key: "runAutorun", hideCheckbox: true, tooltip: "Will manually re-run the autorun save slot.  Might be useful if autorun is available but disabled, this would manually run it." },
+                    { title: "toggleLint()", key: "toggleLint", hideCheckbox: true, tooltip: "Toggles Codemirror linting functionality.  Might be used from text log console for immediate action." },
+                    { title: "runApp(progname)", key: "runApp", hideCheckbox: true, tooltip: "Will issue an ajax call to load and run a sample program.  Used by samples browsers." },
+                    { title: "editApp(appName)", key: "editApp", hideCheckbox: true, tooltip: "Will load (via ajax) any program from the samples subfolder, given the appname (without .prg extension).  If it is not in appcache it will load it from host web site." },
+                    { title: "runSlot(progName)", key: "runSlot", hideCheckbox: true, tooltip: "(Different than the RunSlot url param)... This utility method only executes the program indicated.  The editors are not loaded." },
+                    { title: "loadSlot(progName, runAfterLoad)", key: "loadSlot", hideCheckbox: true, tooltip: "Checks for pending unsaved changes to editors and then calls loadSlotAction." },
+                    { title: "loadSlotAction(progName, runAfterLoad)", key: "loadSlot", hideCheckbox: true, tooltip: "Will load the indicated program from a save slot in the trident database.  Parameter is boolean indicating whether to run after loading." },
+                    { title: "runAutorun()", key: "runAutorun", hideCheckbox: true, tooltip: "Will manually run the autorun save slot.  Might be useful if autorun is available but disabled, this would manually run it." },
                     { title: "setActiveTab(tabId)", key: "setActiveTab", hideCheckbox: true, tooltip: "Switch the active tab to main output (0) or text log (1) " },
-                    { title: "setWindowMode(mode)", key: "setWindowMode", hideCheckbox: true, tooltip: "Switch between window modes : code only (1) code and output (2) or output only (3)" }
+                    { title: "setWindowMode(mode)", key: "setWindowMode", hideCheckbox: true, tooltip: "Switch between window modes : code only (1) code and output (2) or output only (3)" },
+                    { title: "loadRawGist(rawGistUrl)", key: "loadRawGist", hideCheckbox: true, tooltip: "If your environment is one of the IDEs, this will load a program from a raw gist url." }
                 ]
             },
             {
@@ -172,6 +177,7 @@ object inspector programmatically to display the contents of your own variable, 
                     { title: "saveScriptUnit(unitName)", key: "saveScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will save the contents of the Script editor as a script unit within the trident database." },
                     { title: "loadScriptUnit(unitName)", key: "loadScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will load the script unit from the trident database into the Script editor of the IDE." },
                     { title: "importScriptUnit(unitName, callback)", key: "importScriptUnit", hideCheckbox: true, tooltip: "This command will load your script unit from the trident database and automatically add it to the page for use.  Pass in a callback to be notified when this is done." },
+                    { title: "importScriptFile(tridentFilename, callback)", key: "importScriptFile", hideCheckbox: true, tooltip: "If you import a script file into 'TridentFiles' using TridentFiles utility, this will import it from that app in the AKV db." },
                     { title: "appendScriptUnit(scriptText, callback)", key: "appendScriptUnit", hideCheckbox: true, tooltip: "If you already have the script text and do not need to load it from the trident database, this will just append it for use.  Pass in a callback to be notified when this is done." },
                     { title: "clearScriptUnits()", key: "clearScriptUnits", hideCheckbox: true, tooltip: "Can be used to clear out old scripts but scripts often get attached to the DOM via the window object and will remain until page is reloaded, so do not depend too much on this." }
                 ]

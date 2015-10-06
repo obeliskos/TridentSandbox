@@ -1562,7 +1562,7 @@ var sandboxIDE = {
         sandbox.db.getAppKeys("SandboxSaveSlots", function (result) {
             if (result != null) {
                 for (var idx = 0; idx < result.length; idx++) {
-                    $("#sb_sel_trident_slot").append($("<option></option>").attr("value", result[idx].id).text(result[idx].key));
+                    $("#sb_sel_trident_slot").append($("<option></option>").attr("value", result[idx].key).text(result[idx].key));
                 }
 
                 var my_options = $("#sb_sel_trident_slot option");
@@ -1878,7 +1878,7 @@ var sandboxIDE = {
             sandbox.units.appendScriptUnit(result.val);
         });
     },
-    loadSlot: function (runAfterLoad) {
+    loadSlot: function (progName, runAfterLoad) {
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sb_load_run");
             return;
@@ -1890,7 +1890,7 @@ var sandboxIDE = {
         if (htmlHash !== sandbox.volatile.markupHash || scriptHash !== sandbox.volatile.scriptHash) {
             alertify.confirm("You have pending changes, are you sure?", function (e) {
                 // user clicked "ok"
-                if (e) { sandbox.ide.loadSlotAction(runAfterLoad); }
+                if (e) { sandbox.ide.loadSlotAction(progName, runAfterLoad); }
                 else {
                     // The chose to abort load of selected slot, attempt to re-select the program
                     // by the name they have entered in the Program Name slot if it exists
@@ -1901,19 +1901,26 @@ var sandboxIDE = {
             return;
         }
 
-        sandbox.ide.loadSlotAction(runAfterLoad);
+        sandbox.ide.loadSlotAction(progName, runAfterLoad);
     },
-    loadSlotAction: function (runAfterLoad) {
+    loadSlotAction: function (progName, runAfterLoad) {
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             console.log("ignoring call to sandbox.ide.loadSlotAction");
             return;
         }
 
-        var selText = $("#sb_sel_trident_slot").find(":selected").text();
+        if (!progName) {
+            progName = $("#sb_sel_trident_slot").find(":selected").text();
+        }
 
-        if (selText === "") return;
+        if (!progName) return;
 
-        sandbox.db.getAppKey("SandboxSaveSlots", selText, function (result) {
+        sandbox.db.getAppKey("SandboxSaveSlots", progName, function (result) {
+            if (result.id === 0) {
+                alertify.error("Program Slot " + progName + " does not exist in database.");
+                return;
+            }
+
             var sandboxObject = JSON.parse(result.val);
 
             sandbox.volatile.markupHash = CryptoJS.SHA1(sandboxObject.htmlText).toString();
@@ -1924,7 +1931,7 @@ var sandboxIDE = {
             sandbox.volatile.editorMarkup.setValue(sandboxObject.htmlText);
             sandbox.volatile.editorScript.setValue(sandboxObject.scriptText);
 
-            if (typeof (autorun) !== "undefined" && autorun) sandbox.ide.run();
+            if (typeof (runAfterLoad) !== "undefined" && runAfterLoad) sandbox.ide.run();
 
         });
     },
@@ -2605,11 +2612,16 @@ var sandboxProtos = [
                     { title: "launch()", key: "launch", hideCheckbox: true, tooltip: "Identical to pressing the 'launch' toolbar button.  Runs the program in a new window without an ide." },
                     { title: "clean()", key: "clean", hideCheckbox: true, tooltip: "Identical to pressing 'new' toolbar button.  Clears editors and output and defaults to new program template." },
                     { title: "clearOutput()", key: "clearOutput", hideCheckbox: true, tooltip: "Identical to pressing 'clear output' toolbar button.  Clears output and runs clean event but leaves editor text intact for subsequent runs." },
-                    { title: "runApp(progname)", key: "runApp", hideCheckbox: true, tooltip: "Will issue an ajax call to load a sample program.  Used by samples browsers." },
-                    { title: "runSlot(appName)", key: "runSlot", hideCheckbox: true, tooltip: "Will load a program from a save slot in the trident database.  Used by the program save dropdown list." },
-                    { title: "runAutorun()", key: "runAutorun", hideCheckbox: true, tooltip: "Will manually re-run the autorun save slot.  Might be useful if autorun is available but disabled, this would manually run it." },
+                    { title: "toggleLint()", key: "toggleLint", hideCheckbox: true, tooltip: "Toggles Codemirror linting functionality.  Might be used from text log console for immediate action." },
+                    { title: "runApp(progname)", key: "runApp", hideCheckbox: true, tooltip: "Will issue an ajax call to load and run a sample program.  Used by samples browsers." },
+                    { title: "editApp(appName)", key: "editApp", hideCheckbox: true, tooltip: "Will load (via ajax) any program from the samples subfolder, given the appname (without .prg extension).  If it is not in appcache it will load it from host web site." },
+                    { title: "runSlot(progName)", key: "runSlot", hideCheckbox: true, tooltip: "(Different than the RunSlot url param)... This utility method only executes the program indicated.  The editors are not loaded." },
+                    { title: "loadSlot(progName, runAfterLoad)", key: "loadSlot", hideCheckbox: true, tooltip: "Checks for pending unsaved changes to editors and then calls loadSlotAction." },
+                    { title: "loadSlotAction(progName, runAfterLoad)", key: "loadSlot", hideCheckbox: true, tooltip: "Will load the indicated program from a save slot in the trident database.  Parameter is boolean indicating whether to run after loading." },
+                    { title: "runAutorun()", key: "runAutorun", hideCheckbox: true, tooltip: "Will manually run the autorun save slot.  Might be useful if autorun is available but disabled, this would manually run it." },
                     { title: "setActiveTab(tabId)", key: "setActiveTab", hideCheckbox: true, tooltip: "Switch the active tab to main output (0) or text log (1) " },
-                    { title: "setWindowMode(mode)", key: "setWindowMode", hideCheckbox: true, tooltip: "Switch between window modes : code only (1) code and output (2) or output only (3)" }
+                    { title: "setWindowMode(mode)", key: "setWindowMode", hideCheckbox: true, tooltip: "Switch between window modes : code only (1) code and output (2) or output only (3)" },
+                    { title: "loadRawGist(rawGistUrl)", key: "loadRawGist", hideCheckbox: true, tooltip: "If your environment is one of the IDEs, this will load a program from a raw gist url." }
                 ]
             },
             {
@@ -2670,6 +2682,7 @@ var sandboxProtos = [
                     { title: "saveScriptUnit(unitName)", key: "saveScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will save the contents of the Script editor as a script unit within the trident database." },
                     { title: "loadScriptUnit(unitName)", key: "loadScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will load the script unit from the trident database into the Script editor of the IDE." },
                     { title: "importScriptUnit(unitName, callback)", key: "importScriptUnit", hideCheckbox: true, tooltip: "This command will load your script unit from the trident database and automatically add it to the page for use.  Pass in a callback to be notified when this is done." },
+                    { title: "importScriptFile(tridentFilename, callback)", key: "importScriptFile", hideCheckbox: true, tooltip: "If you import a script file into 'TridentFiles' using TridentFiles utility, this will import it from that app in the AKV db." },
                     { title: "appendScriptUnit(scriptText, callback)", key: "appendScriptUnit", hideCheckbox: true, tooltip: "If you already have the script text and do not need to load it from the trident database, this will just append it for use.  Pass in a callback to be notified when this is done." },
                     { title: "clearScriptUnits()", key: "clearScriptUnits", hideCheckbox: true, tooltip: "Can be used to clear out old scripts but scripts often get attached to the DOM via the window object and will remain until page is reloaded, so do not depend too much on this." }
                 ]
@@ -3228,27 +3241,30 @@ var sandbox = {
         else {
             // Detect Hash Param changes for loadslot/runslot; (compare to txtProgramName or SaveSlotSelect?)
             window.onhashchange = function () {
+                var selectedProgram = $("#sb_sel_trident_slot").find(":selected").text();
+
                 var loadSlot = sandbox.hashparams.getParameter("LoadSlot");
-                if (loadSlot != null && loadSlot !== $("#txtProgramName").val()) {
+                if (loadSlot != null) {
                     sandbox.ide.clean();
 
                     $("#sb_sel_trident_slot").val(loadSlot);
 
                     // let sandbox finish cleaning then load
                     setTimeout(function () {
-                        sandbox.ide.loadSlot();
+                        sandbox.ide.loadSlot(loadSlot);
                     }, 250);
                 }
                 else {
                     var runSlot = sandbox.hashparams.getParameter("RunSlot");
-                    if (runSlot != null && runSlot !== $("#txtProgramName").val()) {
+                    if (runSlot != null) {
                         sandbox.ide.clean();
 
                         $("#sb_sel_trident_slot").val(runSlot);
 
                         // let sandbox finish cleaning then run
                         setTimeout(function () {
-                            sandbox.ide.loadSlot(true);
+                            // loader pages dont get here so we need to call loadslot so editors are populated as well
+                            sandbox.ide.loadSlot(runSlot, true);
                         }, 250);
                     }
                     else {
@@ -3335,22 +3351,24 @@ var sandbox = {
 
     },
     postInit: function () {
-        if (sandbox.hashparams.getParameter("LoadSlot")) {
+        var loadSlot = sandbox.hashparams.getParameter("LoadSlot");
+        if (loadSlot) {
             if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
                 sandbox.ide.clean();
 
-                $("#sb_sel_trident_slot").val(sandbox.hashparams.getParameter("LoadSlot"));
+                $("#sb_sel_trident_slot").val(loadSlot);
 
                 // let sandbox finish cleaning then load
                 setTimeout(function () {
-                    sandbox.ide.loadSlot();
+                    sandbox.ide.loadSlot(loadSlot);
                 }, 200);
             }
 
             return;
         }
 
-        if (sandbox.hashparams.getParameter("RunSlot")) {
+        var runSlot = sandbox.hashparams.getParameter("RunSlot");
+        if (runSlot) {
             if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
                 sandbox.ide.clean();
 
@@ -3359,11 +3377,11 @@ var sandbox = {
 
                 // let sandbox finish cleaning then run
                 setTimeout(function () {
-                    sandbox.ide.loadSlot(true);
+                    sandbox.ide.loadSlot(runSlot, true);
                 }, 200);
             }
             else {
-                sandbox.ide.runSlot(sandbox.hashparams.getParameter("RunSlot"));
+                sandbox.ide.runSlot(runSlot);
             }
 
             return;

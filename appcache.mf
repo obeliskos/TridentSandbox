@@ -103,6 +103,7 @@ samples/Antikythera-WJS.prg
 samples/BabylonJS%20Sample%20WebGL.prg
 samples/Codemirror%20demo.prg
 samples/CryptoJS.prg
+samples/CryptoAlbum%20WinJS.prg
 samples/CryptoJS%20File%20Hasher.prg
 samples/CryptoWorker%20Demo.prg
 samples/D3%20sample.prg
