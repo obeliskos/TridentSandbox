@@ -1165,7 +1165,7 @@ var sandboxAppCache = {
     progressAC: function (e) {
         sandbox.volatile.appCacheProgress++;
 
-        var progressPCT = "(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 151) + "%)";
+        var progressPCT = "(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 154) + "%)";
 
         // hardcoding total # files
         switch (sandbox.volatile.env) {
@@ -2760,7 +2760,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.18",
+        version: "2.19",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,

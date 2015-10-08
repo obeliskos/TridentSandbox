@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 218
+#rev 219
 
 CACHE:
 TridentSandbox.htm
@@ -17,6 +17,7 @@ libraries/codemirror.min.js
 libraries/cryptojs.min.js
 libraries/jqplot.min.js
 libraries/sbx-bundle.min.js
+scripts/sandbox-api.js
 libraries/dynatree/jquery.dynatree.min.js
 libraries/tinymce/tinymce.min.js
 libraries/three.min.js
