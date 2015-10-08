@@ -53,6 +53,8 @@
     <file>/libraries/codemirror/theme/xq-dark.css</file>
     <file>/libraries/codemirror/theme/xq-light.css</file>
     <file>/libraries/codemirror/theme/zenburn.css</file>
+    <file>/libraries/codemirror/theme/abcdef.css</file>
+    <file>/libraries/codemirror/theme/material.css</file>
 
     <file>/libraries/tinymce/skins/lightgray/skin.min.css</file>
     <file>/libraries/textillate/animate.css</file>
