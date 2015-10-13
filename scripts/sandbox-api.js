@@ -1131,18 +1131,30 @@ var sandboxUnits = {
     importScriptFile: function (tridentFilename, callback) {
         var self = this;
 
-        sandbox.db.getAppKey("TridentFiles", unitName, function (result) {
+        sandbox.db.getAppKey("TridentFiles", tridentFilename, function (result) {
             if (result == null || result.id === 0) {
                 alertify.error("No TridentFile by that name");
                 return false;
             }
 
-            self.appendScriptUnit(result.val, callback);
+            self.appendScriptDataUri(result.val, callback);
         });
     },
     appendScriptUnit: function (scriptText, callback) {
         var s = document.createElement("script");
         s.innerHTML = scriptText;
+
+        document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
+
+        if (typeof (callback) === "function") {
+            setTimeout(function () {
+                callback();
+            }, 200);
+        }
+    },
+    appendScriptDataUri: function (scriptDataUri, callback) {
+        var s = document.createElement("script");
+        s.src = scriptDataUri;
 
         document.getElementById("UI_LibUnitPlaceholder").appendChild(s);
 
@@ -3351,6 +3363,10 @@ var sandbox = {
 
     },
     postInit: function () {
+        if (sandbox.settings.skipAutorun !== "true" && sandbox.hashparams.getParameter("SkipAutorun") !== 'true') {
+            sandbox.ide.runAutorun();
+        }
+
         var loadSlot = sandbox.hashparams.getParameter("LoadSlot");
         if (loadSlot) {
             if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
@@ -3423,10 +3439,6 @@ var sandbox = {
             return;
         }
 
-
-        if (sandbox.settings.skipAutorun !== "true" && sandbox.hashparams.getParameter("SkipAutorun") !== 'true') {
-            sandbox.ide.runAutorun();
-        }
 
         // Sandbox Loaders : if no runslot/runapp then load SandboxLoader prog
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
