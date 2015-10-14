@@ -1116,7 +1116,7 @@ var sandboxUnits = {
             callback(result.val);
         });
     },
-    importScriptUnit: function (unitName, callback) {
+    importScriptUnit: function (unitName, callback, delayOverride) {
         var self = this;
 
         sandbox.db.getAppKey("SandboxScriptUnits", unitName, function (result) {
@@ -1125,10 +1125,10 @@ var sandboxUnits = {
                 return false;
             }
 
-            self.appendScriptUnit(result.val, callback);
+            self.appendScriptUnit(result.val, callback, delayOverride);
         });
     },
-    importScriptFile: function (tridentFilename, callback) {
+    importScriptFile: function (tridentFilename, callback, delayOverride) {
         var self = this;
 
         sandbox.db.getAppKey("TridentFiles", tridentFilename, function (result) {
@@ -1137,10 +1137,14 @@ var sandboxUnits = {
                 return false;
             }
 
-            self.appendScriptDataUri(result.val, callback);
+            self.appendScriptDataUri(result.val, callback, delayOverride);
         });
     },
-    appendScriptUnit: function (scriptText, callback) {
+    appendScriptUnit: function (scriptText, callback, delayOverride) {
+        if (!delayOverride) {
+            delayOverride = 200;
+        }
+
         var s = document.createElement("script");
         s.innerHTML = scriptText;
 
@@ -1149,10 +1153,10 @@ var sandboxUnits = {
         if (typeof (callback) === "function") {
             setTimeout(function () {
                 callback();
-            }, 200);
+            }, delayOverride);
         }
     },
-    appendScriptDataUri: function (scriptDataUri, callback) {
+    appendScriptDataUri: function (scriptDataUri, callback, delayOverride) {
         var s = document.createElement("script");
         s.src = scriptDataUri;
 
@@ -1161,7 +1165,7 @@ var sandboxUnits = {
         if (typeof (callback) === "function") {
             setTimeout(function () {
                 callback();
-            }, 200);
+            }, delayOverride);
         }
     },
     clearScriptUnits: function () {
@@ -1726,7 +1730,7 @@ var sandboxIDE = {
             success: function (response) {
                 var sandboxObject = response;
 
-                $("#sb_txt_ProgramName").val(sandboxObject.progName + " Copy");
+                $("#sb_txt_ProgramName").val(sandboxObject.progName);
 
                 sandbox.volatile.editorMarkup.setValue(sandboxObject.htmlText);
                 sandbox.volatile.editorScript.setValue(sandboxObject.scriptText);
@@ -2693,9 +2697,9 @@ var sandboxProtos = [
                     { title: "logScriptUnits()", key: "logScriptUnits", hideCheckbox: true, tooltip: "Mostly for console use.  This will dump a list of script units in the trident database to the text log." },
                     { title: "saveScriptUnit(unitName)", key: "saveScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will save the contents of the Script editor as a script unit within the trident database." },
                     { title: "loadScriptUnit(unitName)", key: "loadScriptUnit", hideCheckbox: true, tooltip: "Mostly for console use.  This will load the script unit from the trident database into the Script editor of the IDE." },
-                    { title: "importScriptUnit(unitName, callback)", key: "importScriptUnit", hideCheckbox: true, tooltip: "This command will load your script unit from the trident database and automatically add it to the page for use.  Pass in a callback to be notified when this is done." },
-                    { title: "importScriptFile(tridentFilename, callback)", key: "importScriptFile", hideCheckbox: true, tooltip: "If you import a script file into 'TridentFiles' using TridentFiles utility, this will import it from that app in the AKV db." },
-                    { title: "appendScriptUnit(scriptText, callback)", key: "appendScriptUnit", hideCheckbox: true, tooltip: "If you already have the script text and do not need to load it from the trident database, this will just append it for use.  Pass in a callback to be notified when this is done." },
+                    { title: "importScriptUnit(unitName, callback, delayOverride)", key: "importScriptUnit", hideCheckbox: true, tooltip: "This command will load your script unit from the trident database and automatically add it to the page for use.  Pass in a callback to be notified when this is done and optional delayOverride (in ms) before calling callback." },
+                    { title: "importScriptFile(tridentFilename, callback, delayOverride)", key: "importScriptFile", hideCheckbox: true, tooltip: "If you import a script file into 'TridentFiles' using TridentFiles utility, this will import it from that app in the AKV db and run your optional callback. delayOverride (in ms) can be optionally provided." },
+                    { title: "appendScriptUnit(scriptText, callback, delayOverride)", key: "appendScriptUnit", hideCheckbox: true, tooltip: "If you already have the script text and do not need to load it from the trident database, this will just append it for use.  Pass in a callback to be notified when this is done and optional delayOverride (in ms) before calling callback." },
                     { title: "clearScriptUnits()", key: "clearScriptUnits", hideCheckbox: true, tooltip: "Can be used to clear out old scripts but scripts often get attached to the DOM via the window object and will remain until page is reloaded, so do not depend too much on this." }
                 ]
             },
@@ -2772,7 +2776,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.19",
+        version: "2.20",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,
