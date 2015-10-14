@@ -1469,7 +1469,7 @@ var sandboxIDE = {
         if (sandbox.volatile.env === "IDE WJS") {
             markupText = "<h3>My Sandbox WinJS Program</h3>\r\n";
         }
-        var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n\tmyVar : null,\r\n\tmyVar2 : 2\r\n};\r\n\r\nsandbox.events.clean = function()\r\n{\r\n\tdelete sbv.myVar;\r\n\tdelete sbv.myVar2;\r\n};\r\n";
+        var scriptText = "// Recommended practice is to place variables in this object and then delete in cleanup\r\nvar sbv = {\r\n    myVar : null,\r\n    myVar2 : 2\r\n};\r\n\r\nsandbox.events.clean = function()\r\n{\r\n    delete sbv.myVar;\r\n    delete sbv.myVar2;\r\n};\r\n";
 
         sandbox.volatile.editorMarkup.setValue(markupText);
         sandbox.volatile.editorScript.setValue(scriptText);
@@ -3097,7 +3097,7 @@ var sandbox = {
                 $("#sb_txt_Markup").val(markupInitText);
             }
 
-            $("#sb_txt_Script").val("// script editor tips : \r\n// autoindenting is turned on\r\n// the horizontal slashes indicate forced tabs (instead of smart indenting)\r\n// use shift-tab to use auto-indention for a line instead (cleans up tab slashes)\r\n// use ctrl-a or select multiple lines and then press shift-tab to smart indent them\r\n// the javascript linter may notify you of issues with your code, such as : \r\n\r\nfunction badCode() {\r\n\tvar test=[]\r\n\r\n\tvar test = 'a';\r\n}");
+            $("#sb_txt_Script").val("// script editor tips : \r\n// autoindenting is turned on\r\n// the horizontal slashes indicate forced tabs (instead of smart indenting)\r\n// use shift-tab to use auto-indention for a line instead (cleans up tab slashes)\r\n// use ctrl-a or select multiple lines and then press shift-tab to smart indent them\r\n// the javascript linter may notify you of issues with your code, such as : \r\n\r\nfunction sample() {\r\n\tvar test=[]\r\n\r\n\tvar test = 'a';\r\n}");
 
             $('#UI_TabsDashboard').on('tabsactivate', function (event, ui) {
                 var newIndex = ui.newTab.index();
