@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 220
+#rev 221
 
 CACHE:
 TridentSandbox.htm
@@ -121,7 +121,7 @@ samples/Hosted%20Files%20Database.prg
 samples/Hosted%20Samples%20Browser.prg
 samples/HTML%205%20Starfield%20Fullscreen.prg
 samples/jqPlot%20Demo.prg
-samples/jQuery%20UI%20Demo.prg
+samples/jQueryUI%20Demo.prg
 samples/JSON%20Databank.prg
 samples/JSONDatabank-WJS.prg
 samples/JsonEditor%20Forms%20Sample.prg
@@ -131,11 +131,9 @@ samples/Local%20Storage%20Usage.prg
 samples/LokiContinuum.prg
 samples/loki%20examples.prg
 samples/LokiJS%20QueryPerf.prg
-samples/LokiTransforms.prg
 samples/MetroJS%20Demo.prg
 samples/ObeliskJS%20Demo.prg
 samples/PixiJS%20Morph%20Demo.prg
-samples/ProgramClipboard.prg
 samples/Proper%20Cleanup%20Method.prg
 samples/React%20Sample.prg
 samples/Samples%20Browser%20WJS.prg
@@ -145,7 +143,6 @@ samples/Sandbox%20Radio%20WJS.prg
 samples/SpeechSynthesisAPI%20Safari.prg
 samples/Springy%20Demo.prg
 samples/TinyMCE%20Demo.prg
-samples/Trident%20API%20Demo.prg
 samples/Trident%20Binary%20Encryptor.prg
 samples/Trident%20DB%20Usage.prg
 samples/Trident%20Sandbox%20Radio.prg

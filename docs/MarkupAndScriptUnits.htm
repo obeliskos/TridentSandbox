@@ -18,24 +18,31 @@
         easily swap in and out of the HTML Log Tab dynamically.
     </p>
 
-    <h3>Balancing capability and portability</h3>
+    <h3>Capability and Portability</h3>
     <p>
-        This entire Unit library mechanism (as well as all of the Trident Sandbox API calls) are intended to maximize the capability of a Trident Sandbox scripting environment.&nbsp;&nbsp;The more Trident
-        Sandbox specific functionality you utilize, the less portable your program becomes to any environment other than Trident Sandbox.&nbsp;&nbsp;Unit libraries also make it more difficult to move your program from
-        one machine to another since you need to move each of the units as well (see Backup and Restore below for options).&nbsp;&nbsp;If you are using Trident Sandbox as a 'test bed'
-        for web development you might want to limit your API use and specifically unit libraries as they would be very difficult to translate into other web environments.&nbsp;&nbsp;However, if you want to utilize the
-        Trident Sandbox to create real applications that have value in and of themselves then unit libraries might one of those 'custom' API functionalities that allow your program
-        significant more capabilities for growth and code structuring.&nbsp;&nbsp;You might want to build and test your code within a real Trident Sandbox program before saving portions as units since they
-        might be more complicated to debug.
+        This entire Unit library mechanism are intended to maximize the capability of a Trident Sandbox scripting environment.&nbsp;&nbsp;
+        The use of Unit libraries add requirements to the programs you write which use them.  If you attempt to run your program on a different Trident Sandbox
+        installation, you need to make sure those units are carried over as well.  For now, you might use the Backup and Restore functionality in the Storage Dashboard
+        to create backup 'packages' to import on another machine.  Otherwise you can manually create the dependent script unit with the Library Unit Management utility.
     </p>
 
     <h3>Library Unit Management Utility</h3>
     <p>
-        For now, I decided not wish to clutter up the user interface with this added complexity, and i placed this in Samples/Utilities/Library Unit Management.&nbsp; From here you can create all of your script and html units.&nbsp;You can
-        create a script unit with the name <b>autorun</b> and it will execute immediately upon Trident Sandbox page load (unless a <b>SkipAutorun</b> hash param is added.&nbsp; From an autorun script
-        you can initialize the environment by loading other script units via <b>sandbox.units.importScriptUnit("script name")</b>, or perhaps add your own api functions or change the main page layout, etc.&nbsp;
-        SandboxLoader.htm will also run your autorun script unit (unless you add the SkipAutorun hash param).&nbsp; If your autorun script and/or its imports take over 600ms you might need to add your own delay if your page
-        initialization logic depends on those library imports.
+        For now, I decided not wish to clutter up the user interface with this added complexity, and i placed this in Samples/Utilities/Library Unit Management.&nbsp; From here you can create all of your script and html units.&nbsp;
+        After importing your script and/or markup units, you can use the <b>sandbox.units.importScriptUnit("script name")</b> to import them in your program startup.
+        You can also create a script unit with the name <b>autorun</b> and it will execute immediately upon Trident Sandbox page load (unless a <b>SkipAutorun</b> hash param is added.&nbsp; From an autorun script
+        you can initialize the environment by loading other script units via the sandbox.units.importScriptUnit("script name") method, or perhaps add your own api functions or change the main page layout, etc.&nbsp;
+        SandboxLoader.htm will also run your autorun script unit (unless you add the SkipAutorun hash param).&nbsp; If you rely on autorun script to load your script dependencies, you may want to delay your program initialization to allow 
+        the script time to register when run in a sandbox loader page.  Depending on script unit size, you might delay 500ms or even 1000 or 2000 for large scripts.
+    </p>
+
+    <h3>Trident Files</h3>
+    <p>
+        When dealing with third party libraries, you might prefer to just import the whole file as a complete file which you pick from your hard drive.  Many libraries which 
+        are just a single javascript file would work well with this approach.  Using this approach, you can utilize the sample utility 'Trident Files Database' to pick a file from 
+        your hard drive to import into the Trident Database as a data uri.  Within your program startup, you can then utilize the sandbox.units.importScriptFile(tridentFilename) method to 
+        register the script source to that datauri, forcing the browser to load it.  You can use the Trident Files Database sample to manage or update it in the future or you can use 
+        the Storage Summary dashboard to delete, backup, or restore it since it is just another key in the trident database.
     </p>
 
     <h3>Console Command Interface</h3>
@@ -61,6 +68,7 @@
         <li>(Console) sandbox.units.saveScriptUnit(unitName)</li>
         <li>(Console) sandbox.units.loadScriptUnit(unitName)</li>
         <li>(Program) sandbox.units.importScriptUnit(unitName)</li>
+        <li>(Program) sandbox.units.importScriptFile(tridentFilename)</li>
     </ul>
 
     <h3>Backing up and Restoring the Trident Database</h3>

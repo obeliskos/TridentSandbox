@@ -1181,7 +1181,7 @@ var sandboxAppCache = {
     progressAC: function (e) {
         sandbox.volatile.appCacheProgress++;
 
-        var progressPCT = "(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 154) + "%)";
+        var progressPCT = "(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 151) + "%)";
 
         // hardcoding total # files
         switch (sandbox.volatile.env) {
@@ -2700,6 +2700,7 @@ var sandboxProtos = [
                     { title: "importScriptUnit(unitName, callback, delayOverride)", key: "importScriptUnit", hideCheckbox: true, tooltip: "This command will load your script unit from the trident database and automatically add it to the page for use.  Pass in a callback to be notified when this is done and optional delayOverride (in ms) before calling callback." },
                     { title: "importScriptFile(tridentFilename, callback, delayOverride)", key: "importScriptFile", hideCheckbox: true, tooltip: "If you import a script file into 'TridentFiles' using TridentFiles utility, this will import it from that app in the AKV db and run your optional callback. delayOverride (in ms) can be optionally provided." },
                     { title: "appendScriptUnit(scriptText, callback, delayOverride)", key: "appendScriptUnit", hideCheckbox: true, tooltip: "If you already have the script text and do not need to load it from the trident database, this will just append it for use.  Pass in a callback to be notified when this is done and optional delayOverride (in ms) before calling callback." },
+                    { title: "appendScriptDataUri(scriptDataUri, callback, delayOverride)", key: "appendScriptDataUri", hideCheckbox: true, tooltip: "If you already have the data uri string and do not need to load it from the trident database, this will just appeend a script tag with this source, for use. Pass in a callback to be notified when this is done. Delay overide (in milliseconds) is optional."},
                     { title: "clearScriptUnits()", key: "clearScriptUnits", hideCheckbox: true, tooltip: "Can be used to clear out old scripts but scripts often get attached to the DOM via the window object and will remain until page is reloaded, so do not depend too much on this." }
                 ]
             },
@@ -2736,7 +2737,7 @@ var sandbox = {
     showProtos: function() {
         $("#div-sbx-api").dialog({
             title: 'Sandbox Library Reference',
-            width: 500,
+            width: 600,
             height: 600,
             open: function () {
                 $("#sandboxTree").dynatree({
@@ -2776,7 +2777,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.20",
+        version: "2.21",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,
