@@ -1,12 +1,12 @@
 /*
   Loki IndexedDb Adapter (need to include this script to use it)
-  
+
   Indexeddb is highly async, but this adapter has been made 'console-friendly' as well.
   Anywhere a callback is omitted, it should return results (if applicable) to console.
 
   IndexedDb storage is provided per-domain, so we implement app/key/value database to allow separate contexts
   for separate apps within a domain.
-  
+
   Examples :
 
   // SAVE : will save App/Key/Val as 'finance'/'test'/{serializedDb}
@@ -30,10 +30,10 @@
       console.log(str);
     });
   });
-  
+
   // DELETE DATABASE
   idbAdapter.deleteDatabase('test'); // delete 'finance'/'test' value from catalog
-  
+
   // CONSOLE USAGE : if using from console for management/diagnostic, here are a few examples :
   adapter.getDatabaseList(); // with no callback passed, this method will log results to console
   adapter.saveDatabase('UserDatabase', JSON.stringify(myDb));
@@ -65,17 +65,17 @@
     function IndexedAdapter(appname)
     {
       this.app = 'loki';
-      
-      if (typeof (appname) !== 'undefined') 
+
+      if (typeof (appname) !== 'undefined')
       {
         this.app = appname;
       }
 
       // keep reference to catalog class for base AKV operations
       this.catalog = null;
-      
+
       if (!this.checkAvailability()) {
-        console.error('indexedDB does not seem to be supported for your environment');
+        throw new Error('indexedDB does not seem to be supported for your environment');
       }
     }
 
@@ -87,7 +87,7 @@
     IndexedAdapter.prototype.checkAvailability = function()
     {
       if (window && window.indexedDB) return true;
-      
+
       return false;
     };
 
@@ -101,23 +101,22 @@
     {
       var appName = this.app;
       var adapter = this;
-      
+
       // lazy open/create db reference so dont -need- callback in constructor
-      if (this.catalog === null) {
+      if (this.catalog === null || this.catalog.db === null) {
         this.catalog = new LokiCatalog(function(cat) {
           adapter.catalog = cat;
-        
+
           adapter.loadDatabase(dbname, callback);
         });
-        
+
         return;
       }
-      
+
       // lookup up db string in AKV db
       this.catalog.getAppKey(appName, dbname, function(result) {
         if (typeof (callback) === 'function') {
           if (result.id === 0) {
-            console.warn("loki indexeddb adapter could not find database");
             callback(null);
             return;
           }
@@ -144,21 +143,30 @@
     {
       var appName = this.app;
       var adapter = this;
-      
+
+      function saveCallback(result) {
+        if (result && result.success === true) {
+          callback(null);
+        }
+        else {
+          callback(new Error("Error saving database"));
+        }
+      }
+
       // lazy open/create db reference so dont -need- callback in constructor
-      if (this.catalog === null) {
+      if (this.catalog === null || this.catalog.db === null) {
         this.catalog = new LokiCatalog(function(cat) {
           adapter.catalog = cat;
-          
+
           // now that catalog has been initialized, set (add/update) the AKV entry
-          cat.setAppKey(appName, dbname, dbstring, callback);
+          cat.setAppKey(appName, dbname, dbstring, saveCallback);
         });
-        
+
         return;
       }
-      
+
       // set (add/update) entry to AKV database
-      this.catalog.setAppKey(appName, dbname, dbstring, callback);
+      this.catalog.setAppKey(appName, dbname, dbstring, saveCallback);
     };
 
     // alias
@@ -173,22 +181,22 @@
     {
       var appName = this.app;
       var adapter = this;
-      
+
       // lazy open/create db reference so dont -need- callback in constructor
-      if (this.catalog === null) {
+      if (this.catalog === null || this.catalog.db === null) {
         this.catalog = new LokiCatalog(function(cat) {
           adapter.catalog = cat;
-          
+
           adapter.deleteDatabase(dbname);
         });
-        
+
         return;
       }
-      
+
       // catalog was already initialized, so just lookup object and delete by id
       this.catalog.getAppKey(appName, dbname, function(result) {
         var id = result.id;
-        
+
         if (id !== 0) {
           adapter.catalog.deleteAppKey(id);
         }
@@ -207,27 +215,27 @@
     {
       var appName = this.app;
       var adapter = this;
-      
+
       // lazy open/create db reference so dont -need- callback in constructor
-      if (this.catalog === null) {
+      if (this.catalog === null || this.catalog.db === null) {
         this.catalog = new LokiCatalog(function(cat) {
           adapter.catalog = cat;
-          
+
           adapter.getDatabaseList(callback);
         });
-        
+
         return;
       }
-      
+
       // catalog already initialized
       // get all keys for current appName, and transpose results so just string array
       this.catalog.getAppKeys(appName, function(results) {
         var names = [];
-        
+
         for(var idx = 0; idx < results.length; idx++) {
           names.push(results[idx].key);
         }
-        
+
         if (typeof (callback) === 'function') {
           callback(names);
         }
@@ -251,18 +259,18 @@
     {
       var appName = this.app;
       var adapter = this;
-      
+
       // lazy open/create db reference
-      if (this.catalog === null) {
+      if (this.catalog === null || this.catalog.db === null) {
         this.catalog = new LokiCatalog(function(cat) {
           adapter.catalog = cat;
-          
+
           adapter.getCatalogSummary(callback);
         });
-        
+
         return;
       }
-      
+
       // catalog already initialized
       // get all keys for current appName, and transpose results so just string array
       this.catalog.getAllKeys(function(results) {
@@ -272,19 +280,19 @@
           oapp,
           okey,
           oval;
-        
+
         for(var idx = 0; idx < results.length; idx++) {
           obj = results[idx];
           oapp = obj.app || '';
           okey = obj.key || '';
           oval = obj.val || '';
-          
+
           // app and key are composited into an appkey column so we will mult by 2
           size = oapp.length * 2 + okey.length * 2 + oval.length + 1;
-          
+
           entries.push({ "app": obj.app, "key": obj.key, "size": size });
         }
-        
+
         if (typeof (callback) === 'function') {
           callback(entries);
         }
@@ -295,24 +303,22 @@
         }
       });
     };
-    
+
     /**
      * LokiCatalog - underlying App/Key/Value catalog persistence
      *    This non-interface class implements the actual persistence.
      *    Used by the IndexedAdapter class.
      */
-    function LokiCatalog(callback) 
+    function LokiCatalog(callback)
     {
       this.db = null;
-
       this.initializeLokiCatalog(callback);
     }
 
-    LokiCatalog.prototype.initializeLokiCatalog = function(callback)
-    {
+    LokiCatalog.prototype.initializeLokiCatalog = function(callback) {
       var openRequest = indexedDB.open('LokiCatalog', 1);
       var cat = this;
-      
+
       // If database doesn't exist yet or its version is lower than our version specified above (2nd param in line above)
       openRequest.onupgradeneeded = function(e) {
         var thisDB = e.target.result;
@@ -326,7 +332,7 @@
           objectStore.createIndex('key', 'key', {unique:false});
           // hack to simulate composite key since overhead is low (main size should be in val field)
           // user (me) required to duplicate the app and key into comma delimited appkey field off object
-          // This will allow retrieving single record with that composite key as well as 
+          // This will allow retrieving single record with that composite key as well as
           // still supporting opening cursors on app or key alone
           objectStore.createIndex('appkey', 'appkey', {unique:true});
         }
@@ -355,9 +361,9 @@
           var lres = e.target.result;
 
           if (lres === null || typeof(lres) === 'undefined') {
-            lres = { 
-              id: 0, 
-              success: false 
+            lres = {
+              id: 0,
+              success: false
             };
           }
 
@@ -369,7 +375,7 @@
           }
         };
       })(callback);
-      
+
       request.onerror = (function(usercallback) {
         return function(e) {
           if (typeof(usercallback) === 'function') {
@@ -388,7 +394,7 @@
       var request = store.get(id);
 
       request.onsuccess = (function(data, usercallback){
-        return function(e) { 
+        return function(e) {
           if (typeof(usercallback) === 'function') {
             usercallback(e.target.result, data);
           }
@@ -396,7 +402,7 @@
             console.log(e.target.result);
           }
         };
-      })(data, callback);   
+      })(data, callback);
     };
 
     LokiCatalog.prototype.setAppKey = function (app, key, val, callback) {
@@ -422,7 +428,7 @@
         else {
           res.val = val;
         }
-        
+
         var requestPut = store.put(res);
 
         requestPut.onerror = (function(usercallback) {
@@ -460,7 +466,7 @@
       })(callback);
     };
 
-    LokiCatalog.prototype.deleteAppKey = function (id, callback) {	
+    LokiCatalog.prototype.deleteAppKey = function (id, callback) {
       var transaction = this.db.transaction(['LokiAKV'], 'readwrite');
       var store = transaction.objectStore('LokiAKV');
       var request = store.delete(id);
@@ -495,7 +501,7 @@
       // To use one of the key ranges, pass it in as the first argument of openCursor()/openKeyCursor()
       var cursor = index.openCursor(singleKeyRange);
 
-      // cursor internally, pushing results into this.data[] and return 
+      // cursor internally, pushing results into this.data[] and return
       // this.data[] when done (similar to service)
       var localdata = [];
 
@@ -531,7 +537,7 @@
           }
         };
       })(callback);
-      
+
     };
 
     // Hide 'cursoring' and return array of { id: id, key: key }
@@ -572,5 +578,6 @@
     };
 
     return IndexedAdapter;
+
   }());
 }));
