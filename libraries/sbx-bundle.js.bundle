@@ -10,7 +10,7 @@
   </settings>
   <!--The order of the <file> elements determines the order of the files in the bundle.-->
   <files>
-    <file>babylon.js/babylon.2.1.js</file>
+    <file>babylon.js/babylon.2.2.js</file>
     <file>knockout-3.3.0.js</file>
     <file>react/react-with-addons.js</file>
     <file>react/JSXTransformer.js</file>
