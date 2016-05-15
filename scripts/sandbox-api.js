@@ -9,9 +9,10 @@
 //#region logger
 
 var sbxLogger = {
+    console : null,
     log: function (msg) {
         if (sandbox.volatile.env === "IDE" || sandbox.volatile.env === "IDE WJS") {
-            $("#UI_TxtLogText").val($("#UI_TxtLogText").val() + msg + "\r\n");
+            this.console.report(msg);
 
             // Using flag variable to prevent multiple consecutive logmessage calls from overloading the flash effect
             // Will only flash once every 4 seconds
@@ -45,7 +46,7 @@ var sbxLogger = {
             return;
         }
 
-        $("#UI_TxtLogText").val("");
+        this.console.reset();
     },
     trace: function () {
         var stack;
@@ -1142,7 +1143,7 @@ var sandboxUnits = {
     },
     appendScriptUnit: function (scriptText, callback, delayOverride) {
         if (!delayOverride) {
-            delayOverride = 200;
+            delayOverride = 50;
         }
 
         var s = document.createElement("script");
@@ -1181,7 +1182,7 @@ var sandboxAppCache = {
     progressAC: function (e) {
         sandbox.volatile.appCacheProgress++;
 
-        var progressPCT = "(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 151) + "%)";
+        var progressPCT = "(" + Math.floor(sandbox.volatile.appCacheProgress * 100 / 152) + "%)";
 
         // hardcoding total # files
         switch (sandbox.volatile.env) {
@@ -1530,11 +1531,9 @@ var sandboxIDE = {
             case "IDE WJS": sandbox.ui.setDarkTheme(); break;
         }
 
-        // No longer clearing unit scripts, they are likely already attached to window
-        // and i am establishing an autorun script which could affect ui or load other scripts to be used
-        // for the duration of the page load.
-
-        //API_ClearUnitScripts();
+        // No longer clearing unit scripts
+        // User can do as much isolation or cleanup as they need but clearing script tag 
+        // wont remove from window object.
 
         // main includes div with script so hopefully sandbox.events.clean has completed
         setTimeout(function () {
@@ -1884,7 +1883,7 @@ var sandboxIDE = {
             });
         }, 250);
     },
-    runAutorun: function () {
+    runAutorun: function (callback) {
         sandbox.volatile.autorunActive = false;
 
         sandbox.db.getAppKey("SandboxScriptUnits", "autorun", function (result) {
@@ -1892,6 +1891,10 @@ var sandboxIDE = {
 
             sandbox.volatile.autorunActive = true;
             sandbox.units.appendScriptUnit(result.val);
+
+            if (callback && typeof (callback) === "function") {
+                callback();
+            }
         });
     },
     loadSlot: function (progName, runAfterLoad) {
@@ -2166,11 +2169,11 @@ var sandboxIDE = {
             if (isLoaderVisible) used += ($("#sb_div_mainloader").height() + 4);
         }
 
-        if (sandbox.volatile.env === "IDE WJS") {
-            used += ($("#UI_TxtLogConsole").height() + 70); // 14 compensate for padding?
-        }
-
-        $("#UI_TxtLogText").height($(window).height() - used);
+        //if (sandbox.volatile.env === "IDE WJS") {
+            used += 14; // compensate for padding?
+        //}
+        $("#logConsole").height($(window).height() - used);
+        $("div.jquery-console-inner").css("height", $(window).height() - used);
     },
     fitEditors: function () {
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
@@ -2263,25 +2266,6 @@ var sandboxIDE = {
                 $("#sb_btn_script_fs").prop('disabled', '');
                 break;
         }
-    },
-    consoleEval: function () {
-        sandbox.volatile.lastConsoleCommand = $("#UI_TxtLogConsole").val();
-        sandbox.logger.log("=> " + sandbox.volatile.lastConsoleCommand);
-
-        // For some reason API_Inspect calls were not invoking the jquery dialog
-        // Not really sure why but adding small delay allows this to work
-        setTimeout(function () {
-            try {
-                var res = eval(sandbox.volatile.lastConsoleCommand);
-
-                if (res != null) sandbox.logger.log("result: " + res);
-            }
-            catch (err) {
-                sandbox.logger.log("Error : " + err.message);
-            }
-        }, 100);
-
-        $("#UI_TxtLogConsole").val("");
     },
     fullscreenDevArea: function () {
         var inFullScreenMode = document.fullscreenElement ||
@@ -2777,7 +2761,7 @@ var sandbox = {
     dashboard: sandboxDashboard,
     editorModeEnum: Object.freeze({ "Markup": 1, "Split": 2, "Script": 3 }),
     volatile: {
-        version: "2.2.2",
+        version: "2.2.4",
         env: '',    // page should set this in document.ready to 'WJS IDE', 'IDE', 'SBL', 'SBL WJS', or 'SA'
         online: function () { return navigator.onLine; },
         vars: null,
@@ -3024,6 +3008,38 @@ var sandbox = {
             this.volatile.env = options.env;
         }
 
+        sandbox.logger.console = $('#logConsole').console({
+            welcomeMessage:'Welcome to Trident Sandbox ' + sandbox.volatile.version + " console. \r\nType 'help' or enter a javascript expression to evaluate.",
+            promptLabel: '=> ',
+            commandValidate: function (line) {
+                if (line === "") return false;
+                else return true;
+            },
+            commandHandle: function (line, report) {
+                switch (line) {
+                    case "help": report("Commands currently supported : ['help', 'cls', 'env']"); return;
+                    case "env": report("version: " + sandbox.volatile.version + "\r\nenv : " + sandbox.volatile.env
+                        + "\r\ndb adapter : " + ((sandbox.db && sandbox.db.hasOwnProperty('name'))?sandbox.db.name:"unknown")
+                        + "\r\nscreen width : " + $(window).width() + "\r\nscreen height : " + $(window).height()
+                        ); return;
+                    case "cls": sandbox.logger.console.clearScreen(); return;
+                    default: break;
+                }
+                try {
+                    var ret = eval(line);
+                    if (typeof ret != 'undefined') {
+                        report(ret.toString());
+                        return;
+                    }
+                    else return true;
+                }
+                catch (e) { return e.toString(); }
+            },
+            autofocus: true,
+            animateScroll: true,
+            promptHistory: true
+        });
+
         // Help user quickly identify errors in their code by displaying alert with msg, line and col
         window.onerror = function (msg, url, line, col, error) {
             if (!sandbox.settings.errorPopups) return;
@@ -3069,10 +3085,15 @@ var sandbox = {
             // so now scripts are enabled un-hide the code elements and clear our warning/notice log message.
             $("#divCode").css("display", "block");
             $("#UI_TabsOutput").tabs();
+            $("#UI_TabsOutput").on('tabsactivate', function (event, ui) {
+                if (ui.newTab.index() == 1) {
+                    sandbox.logger.console.focus();
+                };
+            });
             $("#UI_TabsDashboard").tabs();
             $("#sb_radioset").buttonset();
 
-            sandbox.logger.clearLog();
+            //sandbox.logger.clearLog();
 
             if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
                 document.title = "Trident Sandbox " + ((sandbox.volatile.env === "IDE WJS")?"WJS":"") + " v" + sandbox.volatile.version;
@@ -3352,7 +3373,7 @@ var sandbox = {
                 // API_ClearOuput will call sandbox.events.clean() is the user has one defined.
                 // will allow synchronous shutdown activities to complete, async activities may not complete (tridentdb)
                 // local storage should be ok.
-                sandbox.logger.clearLog();
+                //sandbox.logger.clearLog();
 
                 // Get Hash of current editor contents to compare with last 'load' or 'new
                 // If they are different (user made changes) then warm them when they are leaving the page.
@@ -3367,11 +3388,7 @@ var sandbox = {
         }
 
     },
-    postInit: function () {
-        if (sandbox.settings.skipAutorun !== "true" && sandbox.hashparams.getParameter("SkipAutorun") !== 'true') {
-            sandbox.ide.runAutorun();
-        }
-
+    postInitParams: function() {
         var loadSlot = sandbox.hashparams.getParameter("LoadSlot");
         if (loadSlot) {
             if (sandbox.volatile.envTest(["IDE", "IDE WJS"])) {
@@ -3444,7 +3461,6 @@ var sandbox = {
             return;
         }
 
-
         // Sandbox Loaders : if no runslot/runapp then load SandboxLoader prog
         if (sandbox.volatile.env === "SBL" || sandbox.volatile.env === "SBL WJS") {
             if (sandbox.volatile.isHosted) {
@@ -3457,6 +3473,16 @@ var sandbox = {
                     sandbox.ui.setDarkTheme();
                 }
             }
+        }
+    },
+    postInit: function () {
+        if (sandbox.settings.skipAutorun !== "true" && sandbox.hashparams.getParameter("SkipAutorun") !== 'true') {
+            sandbox.ide.runAutorun(function () {
+                sandbox.postInitParams();
+            });
+        }
+        else {
+            sandbox.postInitParams();
         }
     }
 };

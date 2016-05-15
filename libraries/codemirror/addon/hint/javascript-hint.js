@@ -141,6 +141,6 @@
         gatherCompletions(global);
       forEach(keywords, maybeAdd);
     }
-    return found;
+    return found.sort();
   }
 });

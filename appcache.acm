@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 222
+#rev 224
 
 CACHE:
 TridentSandbox.htm
@@ -108,6 +108,7 @@ samples/CryptoAlbum%20WinJS.prg
 samples/CryptoJS%20File%20Hasher.prg
 samples/CryptoWorker%20Demo.prg
 samples/D3%20sample.prg
+samples/DaylightGraph.prg
 samples/Dynatree%20Demo.prg
 samples/EaselJS%20Demo.prg
 samples/Font%20Awesome.prg

@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <!--html -->
-<html manifest="appcache.mf">
+<html manifest="appcache.acm">
 <head>
     <title>Trident Sandbox</title>
     <meta charset="utf-8">
@@ -120,12 +120,11 @@
         </table>
     </div>
 
-    <div id="sb_div_mainloader" style="background-color:#999; border:0; padding:2px">
+    <div id="sb_div_mainloader" style="background-color:#667; border:0; padding:2px">
         <table width="100%" style="font-family:Tahoma">
             <tr>
-
                 <td>
-                    Prog Name :
+                    <span style="color:white">Prog Name :</span>
                     <input style='height:24px; width:160px; ' id='sb_txt_ProgramName' type='text' placeholder="Enter program name here" value='' />
                     <input style='height:30px; width:90px; color:transparent;' id='sb_file' type="file" name="fileloader" onchange="sandbox.files.programPicked()" />
                 </td>
@@ -170,8 +169,6 @@
                         <option>xq-light</option>
                         <option>zenburn</option>
                     </select>
-
-
                 </td>
                 <td style="vertical-align:middle">
                     <div style="display:none" id="sb_div_compile_standalone">
@@ -185,13 +182,13 @@
                 </td>
                 <td>
                     <div style="display:inline">
-                        <button style='height:40px; float:right' title='Toggle Maximize' onclick="sandbox.ide.toggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
-                        <button style='height:40px; float:right' title="New Program" onclick="sandbox.ide.newProgram()"><i class="fa fa-plus-circle fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_browse_samples" onclick="sandbox.ide.browseSamples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_show_dashboard" onclick='sandbox.dashboard.show()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_gen_sa" onclick='sandbox.files.templatePrompt()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
-                        <button style='height:40px; float:right' id="ui_mode_desktop" title='Desktop Mode' onclick="sandbox.ide.applyDesktopMode()"><i class="fa fa-desktop fa-2x"></i></button>
-                        <button style='height:40px; width:40px; float:right' id="ui_mode_mobile" title='Mobile Mode' onclick="sandbox.ide.applyMobileMode(true)"><i class="fa fa-mobile fa-2x"></i></button>
+                        <button class="TridentAppButton" title='Toggle Maximize' onclick="sandbox.ide.toggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
+                        <button class="TridentAppButton" style="color:#1FD07D" title="New Program" onclick="sandbox.ide.newProgram()"><i class="fa fa-plus-circle fa-2x"></i></button>
+                        <button class="TridentAppButton" id="ui_browse_samples" onclick="sandbox.ide.browseSamples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
+                        <button class="TridentAppButton" id="ui_show_dashboard" onclick='sandbox.dashboard.show()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
+                        <button class="TridentAppButton" id="ui_gen_sa" onclick='sandbox.files.templatePrompt()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
+                        <button class="TridentAppButton" id="ui_mode_desktop" title='Desktop Mode' onclick="sandbox.ide.applyDesktopMode()"><i class="fa fa-desktop fa-2x"></i></button>
+                        <button class="TridentAppButton" style='width:40px;' id="ui_mode_mobile" title='Mobile Mode' onclick="sandbox.ide.applyMobileMode(true)"><i class="fa fa-mobile fa-2x"></i></button>
                     </div>
                 </td>
             </tr>
@@ -228,7 +225,7 @@
                         <button class="TridentCodeButton" id="sb_btn_fscode" onclick="sandbox.ide.fullscreenDevArea()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i></button>
                         <button class="TridentCodeButton" title='Clear Output Tabs' onclick="sandbox.ide.clearOutput()"><i class="fa fa-eraser"></i></button>
                         &nbsp;&nbsp;
-                        <button class="TridentCodeButton" id="ui_btn_run" style='width:80px;' onclick="sandbox.ide.run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
+                        <button class="TridentCodeButton" id="ui_btn_run" style='width:80px;' onclick="sandbox.ide.run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#1FD07D"></i> RUN</b></button>
                         &nbsp;&nbsp;
                     </div>
                     <div id='divDesktopWindowMode' style="display:inline">
@@ -276,8 +273,7 @@
                     </div>
                     <div id="UI_Tab_Text" style="background-color:#555">
                         <div id='sb_div_LogPlaceholder' style='background-color:#555;'>
-                            <textarea id="UI_TxtLogText" spellcheck='false' rows='30' style="font-family: Lucida Console; height:100; width:100%; background-color:#333; color:#ccc">You need to allow blocked content for Trident Sandbox to initialize.</textarea><br />
-                            <input type='text' id='UI_TxtLogConsole' style="width:100%;height:30px; background-color:#333; color:#ccc" onkeydown="{ if (event.keyCode==38) $('#UI_TxtLogConsole').val(sandbox.volatile.lastConsoleCommand) }" onkeypress="{ if (event.keyCode==13) sandbox.ide.consoleEval() }" />
+                            <div id="logConsole" class="logConsole"></div><br />
                         </div>
                     </div>
                 </div>

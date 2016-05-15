@@ -1,6 +1,6 @@
 ﻿<!DOCTYPE html>
 <!--html -->
-<html manifest="appcache.mf">
+<html manifest="appcache.acm">
 <head>
     <title>Trident Sandbox</title>
     <meta charset="utf-8">
@@ -26,11 +26,6 @@
             Visual Studio and Web Essentials plugin.  I may provide a parallel gulp-based minifier/bundle in the future,
             but for now if you wish to remove or update libraries already bundled you will need those tools.  You can
             add your own libraries outside of those bundles.
-
-            Html Files :
-            TridentSandbox.htm : this is the main page which supports AppCache autoupdate
-            SilentSandbox.htm : Same as the main TridentSandbox.htm page except it doesn't check for updates
-            SandboxLoader.htm : For hosted/appcached, this works with Trident Save Slots as a Standalone Launcher of programs
     -->
 
     <script src="libraries/jquery/jquery-2.1.0.min.js"></script>
@@ -124,12 +119,11 @@
         </table>
     </div>
 
-    <div id="sb_div_mainloader" style="background-color:#999; border:0; padding:2px">
+    <div id="sb_div_mainloader" style="background-color:#667; border:0; padding:2px">
         <table width="100%" style="font-family:Tahoma">
             <tr>
-
                 <td>
-                    Prog Name :
+                    <span style="color:white">Prog Name :</span>
                     <input style='height:24px; width:160px; ' id='sb_txt_ProgramName' type='text' placeholder="Enter program name here" value='' />
                     <input style='height:30px; width:110px; color:transparent;' id='sb_file' type="file" name="fileloader" onchange="sandbox.files.programPicked()" />
                 </td>
@@ -190,7 +184,7 @@
                 <td>
                     <div style="display:inline">
                         <button class="TridentAppButton" title='Toggle Maximize' onclick="sandbox.ide.toggleMaximize()"><i class="fa fa-angle-double-up"></i></button>
-                        <button class="TridentAppButton" title="New Program" onclick="sandbox.ide.newProgram()"><i class="fa fa-plus-circle fa-2x"></i></button>
+                        <button class="TridentAppButton" style="color:#1FD07D" title="New Program" onclick="sandbox.ide.newProgram()"><i class="fa fa-plus-circle fa-2x"></i></button>
                         <button class="TridentAppButton" id="ui_browse_samples" onclick="sandbox.ide.browseSamples()" title='Samples Browser'><i class="fa fa-flask fa-2x"></i></button>
                         <button class="TridentAppButton" id="ui_show_dashboard" onclick='sandbox.dashboard.show()' title='Show Dashboard'><i class="fa fa-dashboard fa-2x"></i></button>
                         <button class="TridentAppButton" id="ui_gen_sa" onclick='sandbox.files.templatePrompt()' title='Generate Standalone HTML app'><i class="fa fa-cog fa-2x"></i></button>
@@ -232,7 +226,7 @@
                         <button class="TridentCodeButton" id="sb_btn_fscode" onclick="sandbox.ide.fullscreenDevArea()" title='Zoom the dev area fullscreen'><i class="fa fa-arrows-alt"></i></button>
                         <button class="TridentCodeButton" title='Clear Output Tabs' onclick="sandbox.ide.clearOutput()"><i class="fa fa-eraser"></i></button>
                         &nbsp;&nbsp;
-                        <button class="TridentCodeButton" id="ui_btn_run" style='width:80px;' onclick="sandbox.ide.run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#4b4"></i> RUN</b></button>
+                        <button class="TridentCodeButton" id="ui_btn_run" style='width:80px;' onclick="sandbox.ide.run()" title="Run your Program (Alt+R)"><b><i class="fa fa-play" style="color:#1FD07D"></i> RUN</b></button>
                         &nbsp;&nbsp;
                     </div>
                     <div id='divDesktopWindowMode' style="display:inline">
@@ -267,7 +261,7 @@
                         <li><a href="#UI_Tab_Text">Log</a></li>
                     </ul>
                     <div id="UI_Tab_Main" style="overflow: auto;">
-                        <div id='sb_div_userfile' style="display:none">
+                        <div id='sb_div_userfile' style="display:none; overflow-x:scroll; overflow-y:scroll">
                             <input style='height:30px;width:400px;' id='sb_user_file' type="file" name="userfileloader" onchange="sandbox.files.userfilePicked()" />
                             <button id="sb_btn_user_file_cancel" onclick="$('#sb_div_userfile').hide()">Cancel</button>&nbsp;&nbsp;[Text]
                         </div>
@@ -280,8 +274,7 @@
                     </div>
                     <div id="UI_Tab_Text" style="background-color:#555">
                         <div id='sb_div_LogPlaceholder' style='background-color:#555;'>
-                            <textarea id="UI_TxtLogText" spellcheck='false' rows='30' style="font-family: Lucida Console; height:100; width:100%; background-color:#333; color:#ccc">You need to allow blocked content for Trident Sandbox to initialize.</textarea><br />
-                            <input type='text' id='UI_TxtLogConsole' style="width:100%;height:30px; background-color:#333; color:#ccc" onkeydown="{ if (event.keyCode == 38) $('#UI_TxtLogConsole').val(sandbox.volatile.lastConsoleCommand) }" onkeypress="{ if (event.keyCode == 13) sandbox.ide.consoleEval() }" />
+                            <div id="logConsole" class="logConsole"></div><br/>
                         </div>
                     </div>
                 </div>

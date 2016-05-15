@@ -33,11 +33,13 @@
     <file>filesaver/FileSaver.js</file>
     <file>indexed.js</file>
     <file>moment.min.js</file>
+    <file>jquery-console/jquery.console.js</file>
+    <file>Chart.js-2.1.1/Chart.bundle.js</file>
+    <file>suncalc/suncalc.js</file>
     <file>json-editor/jsoneditor.js</file>
     <file>d3/d3.min.js</file>
     <file>memory-stats.js</file>
-
-	<file>/scripts/tridentdb.js</file>    
+	  <file>/scripts/tridentdb.js</file>    
     <file>../scripts/tridentlist.js</file>
     <file>../scripts/workerpool.js</file>
   </files>
