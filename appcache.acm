@@ -1,5 +1,5 @@
 CACHE MANIFEST
-#rev 225
+#rev 227
 
 CACHE:
 TridentSandbox.htm
@@ -11,6 +11,7 @@ libraries/jquery-ui/jquery-ui-1.10.3.redmond/jquery-ui-1.10.3.custom/js/jquery-u
 css/sandbox.css
 css/style-bundle.min.css
 libraries/loki-js/lokijs.js
+libraries/loki-js/loki-indexed-adapter.js
 libraries/jqGrid-4.5.4/js/jquery.jqGrid.min.js
 libraries/jqGrid-4.5.4/js/i18n/grid.locale-en.js
 libraries/codemirror.min.js
