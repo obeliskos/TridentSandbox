@@ -443,6 +443,10 @@
     var indexedOpsList = ['$eq', '$aeq', '$dteq', '$gt', '$gte', '$lt', '$lte', '$in', '$between'];
 
     function clone(data, method) {
+      if (data === null || data === undefined) {
+        return null;
+      }
+
       var cloneMethod = method || 'parse-stringify',
         cloned;
 
@@ -612,6 +616,8 @@
      * @param {adapter} options.adapter - an instance of a loki persistence adapter
      * @param {string} options.serializationMethod - ['normal', 'pretty', 'destructured']
      * @param {string} options.destructureDelimiter - string delimiter used for destructured serialization
+     * @param {boolean} options.throttledSaves - if true, it batches multiple calls to to saveDatabase reducing number of disk I/O operations
+                                                and guaranteeing proper serialization of the calls. Default value is true.
      */
     function Loki(filename, options) {
       this.filename = filename || 'loki.db';
@@ -627,6 +633,7 @@
       this.autosave = false;
       this.autosaveInterval = 5000;
       this.autosaveHandle = null;
+      this.throttledSaves = true;
 
       this.options = {};
 
@@ -641,6 +648,10 @@
 
       // retain reference to optional (non-serializable) persistenceAdapter 'instance'
       this.persistenceAdapter = null;
+
+      // flags used to throttle saves
+      this.throttledSavePending = false;
+      this.throttledCallbacks = [];
 
       // enable console output if verbose flag is set (disabled by default)
       this.verbose = options && options.hasOwnProperty('verbose') ? options.verbose : false;
@@ -799,6 +810,10 @@
           } else {
             this.autosaveEnable();
           }
+        }
+
+        if (this.options.hasOwnProperty('throttledSaves')) {
+          this.throttledSaves = this.options.throttledSaves;
         }
       } // end of options processing
 
@@ -983,6 +998,9 @@
       case 'constraints':
       case 'ttl':
         return null;
+      case 'throttledSavePending':
+      case 'throttledCallbacks':
+        return undefined;        
       default:
         return value;
       }
@@ -1402,6 +1420,11 @@
         this.databaseVersion = dbObject.databaseVersion;
       }
 
+      // restore save throttled boolean only if not defined in options
+      if (dbObject.hasOwnProperty('throttledSaves') && options && !options.hasOwnProperty('throttledSaves')) {
+        this.throttledSaves = dbObject.throttledSaves;
+      }
+
       this.collections = [];
 
       function makeLoader(coll) {
@@ -1600,10 +1623,22 @@
      * In in-memory persistence adapter for an in-memory database.  
      * This simple 'key/value' adapter is intended for unit testing and diagnostics.
      *
+     * @param {object=} options - memory adapter options
+     * @param {boolean} options.asyncResponses - whether callbacks are invoked asynchronously (default: false)
+     * @param {int} options.asyncTimeout - timeout in ms to queue callbacks (default: 50)
      * @constructor LokiMemoryAdapter
      */
-    function LokiMemoryAdapter() {
+    function LokiMemoryAdapter(options) {
       this.hashStore = {};
+      this.options = options || {};
+
+      if (!this.options.hasOwnProperty('asyncResponses')) {
+        this.options.asyncResponses = false;
+      }
+
+      if (!this.options.hasOwnProperty('asyncTimeout')) {
+        this.options.asyncTimeout = 50; // 50 ms default
+      }
     }
 
     /**
@@ -1615,11 +1650,25 @@
      * @memberof LokiMemoryAdapter
      */
     LokiMemoryAdapter.prototype.loadDatabase = function (dbname, callback) {
-      if (this.hashStore.hasOwnProperty(dbname)) {
-        callback(this.hashStore[dbname].value);
+      var self=this;
+
+      if (this.options.asyncResponses) {
+        setTimeout(function() {
+          if (self.hashStore.hasOwnProperty(dbname)) {
+            callback(self.hashStore[dbname].value);
+          }
+          else {
+            callback (new Error("unable to load database, " + dbname + " was not found in memory adapter"));
+          }
+        }, this.options.asyncTimeout);
       }
       else {
-        callback (new Error("unable to load database, " + dbname + " was not found in memory adapter"));
+        if (this.hashStore.hasOwnProperty(dbname)) {
+          callback(this.hashStore[dbname].value);
+        }
+        else {
+          callback (new Error("unable to load database, " + dbname + " was not found in memory adapter"));
+        }
       }
     };
 
@@ -1632,15 +1681,50 @@
      * @memberof LokiMemoryAdapter
      */
     LokiMemoryAdapter.prototype.saveDatabase = function (dbname, dbstring, callback) {
-      var saveCount = (this.hashStore.hasOwnProperty(dbname)?this.hashStore[dbname].savecount:0);
+      var self=this;
+      var saveCount;
 
-      this.hashStore[dbname] = {
-        savecount: saveCount+1,
-        lastsave: new Date(),
-        value: dbstring 
-      };
+      if (this.options.asyncResponses) {
+        setTimeout(function() {
+          saveCount = (self.hashStore.hasOwnProperty(dbname)?self.hashStore[dbname].savecount:0);
 
-      callback();
+          self.hashStore[dbname] = {
+            savecount: saveCount+1,
+            lastsave: new Date(),
+            value: dbstring 
+          };
+
+          callback();
+        }, this.options.asyncTimeout);
+      }
+      else {
+        saveCount = (this.hashStore.hasOwnProperty(dbname)?this.hashStore[dbname].savecount:0);
+
+        this.hashStore[dbname] = {
+          savecount: saveCount+1,
+          lastsave: new Date(),
+          value: dbstring 
+        };
+
+        callback();
+      }
+    };
+
+    /**
+     * Deletes a database from its in-memory store.
+     *
+     * @param {string} dbname - name of the database (filename/keyname)
+     * @param {function} callback - function to call when done
+     * @memberof LokiMemoryAdapter
+     */
+    LokiMemoryAdapter.prototype.deleteDatabase = function(dbname, callback) {
+      if (this.hashStore.hasOwnProperty(dbname)) {
+        delete this.hashStore[dbname];
+      }
+      
+      if (typeof callback === "function") {
+        callback();
+      }
     };
 
     /**
@@ -2094,15 +2178,80 @@
     };
 
     /**
-     * Handles loading from file system, local storage, or adapter (indexeddb)
-     *    This method utilizes loki configuration options (if provided) to determine which
-     *    persistence method to use, or environment detection (if configuration was not provided).
+     * Wait for throttledSaves to complete and invoke your callback when drained or duration is met.
+     *
+     * @param {function} callback - callback to fire when save queue is drained, it is passed a sucess parameter value
+     * @param {object=} options - configuration options
+     * @param {boolean} options.recursiveWait - (default: true) if after queue is drained, another save was kicked off, wait for it
+     * @param {bool} options.recursiveWaitLimit - (default: false) limit our recursive waiting to a duration
+     * @param {int} options.recursiveWaitLimitDelay - (default: 2000) cutoff in ms to stop recursively re-draining
+     * @memberof Loki
+     */
+    Loki.prototype.throttledSaveDrain = function(callback, options) {
+      var self = this;
+      var now = (new Date()).getTime();
+
+      if (!this.throttledSaves) {
+        callback(true);
+      }
+
+      options = options || {};
+      if (!options.hasOwnProperty('recursiveWait')) {
+        options.recursiveWait = true;
+      }
+      if (!options.hasOwnProperty('recursiveWaitLimit')) {
+        options.recursiveWaitLimit = false;
+      }
+      if (!options.hasOwnProperty('recursiveWaitLimitDuration')) {
+        options.recursiveWaitLimitDuration = 2000;
+      }
+      if (!options.hasOwnProperty('started')) {
+        options.started = (new Date()).getTime();
+      }
+
+      // if save is pending
+      if (this.throttledSaves && this.throttledSavePending) {
+        // if we want to wait until we are in a state where there are no pending saves at all
+        if (options.recursiveWait) {
+          // queue the following meta callback for when it completes
+          this.throttledCallbacks.push(function() {
+            // if there is now another save pending...
+            if (self.throttledSavePending) {
+              // if we wish to wait only so long and we have exceeded limit of our waiting, callback with false success value
+              if (options.recursiveWaitLimit && (now - options.started > options.recursiveWaitLimitDuration)) {
+                callback(false);
+                return;
+              }
+              // it must be ok to wait on next queue drain
+              self.throttledSaveDrain(callback, options);
+              return;
+            }
+            // no pending saves so callback with true success
+            else {
+              callback(true);
+              return;
+            }
+          });
+        }
+        // just notify when current queue is depleted
+        else {
+          this.throttledCallbacks.push(callback);
+          return;
+        }
+      }
+      // no save pending, just callback
+      else {
+        callback(true);
+      }
+    };
+
+    /**
+     * Internal load logic, decoupled from throttling/contention logic
      *
      * @param {object} options - not currently used (remove or allow overrides?)
      * @param {function=} callback - (Optional) user supplied async callback / error handler
-     * @memberof Loki
      */
-    Loki.prototype.loadDatabase = function (options, callback) {
+    Loki.prototype.loadDatabaseInternal = function (options, callback) {
       var cFun = callback || function (err, data) {
           if (err) {
             throw err;
@@ -2145,14 +2294,61 @@
     };
 
     /**
-     * Handles saving to file system, local storage, or adapter (indexeddb)
+     * Handles loading from file system, local storage, or adapter (indexeddb)
      *    This method utilizes loki configuration options (if provided) to determine which
      *    persistence method to use, or environment detection (if configuration was not provided).
+     *    To avoid contention with any throttledSaves, we will drain the save queue first.
      *
+     * @param {object} options - if throttling saves and loads, this controls how we drain save queue before loading
+     * @param {boolean} options.recursiveWait - (default: true) wait recursively until no saves are queued 
+     * @param {bool} options.recursiveWaitLimit - (default: false) limit our recursive waiting to a duration
+     * @param {int} options.recursiveWaitLimitDelay - (default: 2000) cutoff in ms to stop recursively re-draining
      * @param {function=} callback - (Optional) user supplied async callback / error handler
      * @memberof Loki
      */
-    Loki.prototype.saveDatabase = function (callback) {
+    Loki.prototype.loadDatabase = function (options, callback) {
+      var self=this;
+
+      // if throttling disabled, just call internal
+      if (!this.throttledSaves) {
+        this.loadDatabaseInternal(options, callback);
+        return;
+      }
+
+      // try to drain any pending saves in the queue to lock it for loading
+      this.throttledSaveDrain(function(success) {
+        if (success) {
+          // pause/throttle saving until loading is done
+          self.throttledSavePending = true;
+
+          self.loadDatabaseInternal(options, function(err) {
+            // now that we are finished loading, if no saves were throttled, disable flag
+            if (self.throttledCallbacks.length === 0) {
+              self.throttledSavePending = false;
+            }
+            // if saves requests came in while loading, kick off new save to kick off resume saves
+            else {
+              self.saveDatabase();
+            }
+
+            if (typeof callback === 'function') {
+              callback(err);
+            }
+          });
+          return;
+        }
+        else {
+          if (typeof callback === 'function') {
+            callback(new Error("Unable to pause save throttling long enough to read database"));
+          }
+        }
+      }, options);
+    };
+
+    /**
+     * Internal save logic, decoupled from save throttling logic
+     */
+    Loki.prototype.saveDatabaseInternal = function (callback) {
       var cFun = callback || function (err) {
           if (err) {
             throw err;
@@ -2181,6 +2377,49 @@
       } else {
         cFun(new Error('persistenceAdapter not configured'));
       }
+    };
+
+    /**
+     * Handles saving to file system, local storage, or adapter (indexeddb)
+     *    This method utilizes loki configuration options (if provided) to determine which
+     *    persistence method to use, or environment detection (if configuration was not provided).
+     *
+     * @param {function=} callback - (Optional) user supplied async callback / error handler
+     * @memberof Loki
+     */
+    Loki.prototype.saveDatabase = function (callback) {
+      if (!this.throttledSaves) {
+        this.saveDatabaseInternal(callback);
+        return;
+      }
+
+      if (this.throttledSavePending) {
+        this.throttledCallbacks.push(callback);
+        return;
+      }
+
+      var localCallbacks = this.throttledCallbacks;
+      this.throttledCallbacks = [];
+      localCallbacks.unshift(callback);
+      this.throttledSavePending = true;
+
+      var self = this;
+      this.saveDatabaseInternal(function(err) {
+        self.throttledSavePending = false;
+        localCallbacks.forEach(function(pcb) {
+          if (typeof pcb === 'function') {
+            // Queue the callbacks so we first finish this method execution
+            setTimeout(function() {
+              pcb(err);
+            }, 1);
+          }
+        });
+
+        // since this is called async, future requests may have come in, if so.. kick off next save
+        if (self.throttledCallbacks.length > 0) {
+          self.saveDatabase();
+        }
+      });
     };
 
     // alias
@@ -2487,6 +2726,39 @@
     };
 
     /**
+     * Instances a new anonymous collection with the documents contained in the current resultset.
+     *
+     * @param {object} collectionOptions - Options to pass to new anonymous collection construction.
+     * @returns {Collection} A reference to an anonymous collection initialized with resultset data().
+     * @memberof Resultset
+     */
+    Resultset.prototype.instance = function(collectionOptions) {
+      var docs = this.data();
+      var idx,
+        doc;
+
+      collectionOptions = collectionOptions || {};
+
+      var instanceCollection = new Collection(collectionOptions);
+
+      for(idx=0; idx<docs.length; idx++) {
+        if (this.collection.cloneObjects) {
+          doc = docs[idx];
+        }
+        else {
+          doc = clone(docs[idx], this.collection.cloneMethod);
+        }
+
+        delete doc.$loki;
+        delete doc.meta;
+
+        instanceCollection.insert(doc);
+      }
+
+      return instanceCollection;
+    };
+
+    /**
      * User supplied compare function is provided two documents to compare. (chainable)
      * @example
      *    rslt.sort(function(obj1, obj2) {
@@ -2529,7 +2801,19 @@
     Resultset.prototype.simplesort = function (propname, isdesc) {
       // if this is chained resultset with no filters applied, just we need to populate filteredrows first
       if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
-        this.filteredrows = this.collection.prepareFullDocIndex();
+        // if we have a binary index and no other filters applied, we can use that instead of sorting (again)
+        if (this.collection.binaryIndices.hasOwnProperty(propname)) {
+          // make sure index is up-to-date
+          this.collection.ensureIndex(propname);
+          // copy index values into filteredrows
+          this.filteredrows = this.collection.binaryIndices[propname].values.slice(0);
+          // we are done, return this (resultset) for further chain ops
+          return this;
+        }
+        // otherwise initialize array for sort below
+        else {
+          this.filteredrows = this.collection.prepareFullDocIndex();
+        }
       }
 
       if (typeof (isdesc) === 'undefined') {
@@ -2881,25 +3165,26 @@
 
 
       // Otherwise this is a chained query
+      // Chained queries now preserve results ordering at expense on slightly reduced unindexed performance
 
       var filter, rowIdx = 0;
 
       // If the filteredrows[] is already initialized, use it
       if (this.filterInitialized) {
         filter = this.filteredrows;
-        i = filter.length;
+        len = filter.length;
 
         // currently supporting dot notation for non-indexed conditions only
         if (usingDotNotation) {
           property = property.split('.');
-          while (i--) {
+          for(i=0; i<len; i++) {
             rowIdx = filter[i];
             if (dotSubScan(t[rowIdx], property, fun, value)) {
               result.push(rowIdx);
             }
           }
         } else {
-          while (i--) {
+          for(i=0; i<len; i++) {
             rowIdx = filter[i];
             if (fun(t[rowIdx][property], value)) {
               result.push(rowIdx);
@@ -2911,17 +3196,17 @@
       else {
         // if not searching by index
         if (!searchByIndex) {
-          i = t.length;
+          len = t.length;
 
           if (usingDotNotation) {
             property = property.split('.');
-            while (i--) {
+            for(i=0; i<len; i++) {
               if (dotSubScan(t[i], property, fun, value)) {
                 result.push(i);
               }
             }
           } else {
-            while (i--) {
+            for(i=0; i<len; i++) {
               if (fun(t[i][property], value)) {
                 result.push(i);
               }
@@ -3409,13 +3694,17 @@
     /**
      * removeFilters() - Used to clear pipeline and reset dynamic view to initial state.
      *     Existing options should be retained.
+     * @param {object=} options - configure removeFilter behavior
+     * @param {boolean=} options.queueSortPhase - (default: false) if true we will async rebuild view (maybe set default to true in future?)
      * @memberof DynamicView
      */
-    DynamicView.prototype.removeFilters = function () {
+    DynamicView.prototype.removeFilters = function (options) {
+      options = options || {};
+
       this.rebuildPending = false;
       this.resultset.reset();
       this.resultdata = [];
-      this.resultsdirty = false;
+      this.resultsdirty = true;
 
       this.cachedresultset = null;
 
@@ -3427,6 +3716,10 @@
       this.sortFunction = null;
       this.sortCriteria = null;
       this.sortDirty = false;
+
+      if (options.queueSortPhase === true) {
+        this.queueSortPhase();
+      }
     };
 
     /**
@@ -3687,9 +3980,13 @@
      * @memberof DynamicView
      */
     DynamicView.prototype.count = function () {
-      if (this.options.persistent) {
-        return this.resultdata.length;
+      // in order to be accurate we will pay the minimum cost (and not alter dv state management)
+      // recurring resultset data resolutions should know internally its already up to date.
+      // for persistent data this will not update resultdata nor fire rebuild event.
+      if (this.resultsdirty) {
+        this.resultdata = this.resultset.data();
       }
+
       return this.resultset.count();
     };
 
@@ -4401,6 +4698,11 @@
         if (!this.binaryIndices[property].dirty) return;
       }
 
+      // if the index is already defined and we are using adaptiveBinaryIndices and we are not forcing a rebuild, return.
+      if (this.adaptiveBinaryIndices === true && this.binaryIndices.hasOwnProperty(property) && !force) {
+        return;
+      }
+
       var index = {
         'name': property,
         'dirty': true,
@@ -4650,9 +4952,6 @@
         };
       }
 
-      // if cloning, give user back clone of 'cloned' object with $loki and meta
-      returnObj = this.cloneObjects ? clone(obj, this.cloneMethod) : obj;
-
       // allow pre-insert to modify actual collection reference even if cloning
       if (!bulkInsert) {
         this.emit('pre-insert', obj);
@@ -4660,6 +4959,9 @@
       if (!this.add(obj)) {
         return undefined;
       }
+
+      // if cloning, give user back clone of 'cloned' object with $loki and meta
+      returnObj = this.cloneObjects ? clone(obj, this.cloneMethod) : obj;
 
       this.addAutoUpdateObserver(returnObj);
       if (!bulkInsert) {
@@ -4670,18 +4972,54 @@
 
     /**
      * Empties the collection.
+     * @param {object=} options - configure clear behavior
+     * @param {bool=} options.removeIndices - (default: false)
      * @memberof Collection
      */
-    Collection.prototype.clear = function () {
+    Collection.prototype.clear = function (options) {
+      var self = this;
+
+      options = options || {};
+
       this.data = [];
       this.idIndex = [];
-      this.binaryIndices = {};
       this.cachedIndex = null;
       this.cachedBinaryIndex = null;
       this.cachedData = null;
       this.maxId = 0;
       this.DynamicViews = [];
       this.dirty = true;
+
+      // if removing indices entirely
+      if (options.removeIndices === true) {
+        this.binaryIndices = {};
+
+        this.constraints = {
+          unique: {},
+          exact: {}
+        };
+        this.uniqueNames = [];
+      }
+      // clear indices but leave definitions in place
+      else {
+        // clear binary indices
+        var keys = Object.keys(this.binaryIndices);
+        keys.forEach(function(biname) {
+          self.binaryIndices[biname].dirty = false;
+          self.binaryIndices[biname].values = [];
+        });
+
+        // clear entire unique indices definition
+        this.constraints = {
+          unique: {},
+          exact: {}
+        };
+
+        // add definitions back
+        this.uniqueNames.forEach(function(uiname) {
+          self.ensureUniqueIndex(uiname);
+        });
+      }
     };
 
     /**
