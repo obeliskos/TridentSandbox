@@ -72,119 +72,205 @@
       }
     };
 
+    /** Helper function for determining 'loki' abstract equality which is a little more abstract than ==
+     *     aeqHelper(5, '5') === true
+     *     aeqHelper(5.0, '5') === true
+     *     aeqHelper(new Date("1/1/2011"), new Date("1/1/2011")) === true
+     *     aeqHelper({a:1}, {z:4}) === true (all objects sorted equally)
+     *     aeqHelper([1, 2, 3], [1, 3]) === false
+     *     aeqHelper([1, 2, 3], [1, 2, 3]) === true
+     *     aeqHelper(undefined, null) === true
+     */
+    function aeqHelper(prop1, prop2) {
+      var cv1, cv2, t1, t2;
+
+      if (prop1 === prop2) return true;
+
+      // 'falsy' and Boolean handling
+      if (!prop1 || !prop2 || prop1 === true || prop2 === true || prop1 !== prop1 || prop2 !== prop2) {
+        // dates and NaN conditions (typed dates before serialization)
+        switch (prop1) {
+          case undefined: t1 = 1; break;
+          case null: t1 = 1; break;
+          case false: t1 = 3; break;
+          case true: t1 = 4; break;
+          case "": t1 = 5; break;
+          default: t1 = (prop1 === prop1)?9:0; break;
+        }
+
+        switch (prop2) {
+          case undefined: t2 = 1; break;
+          case null: t2 = 1; break;
+          case false: t2 = 3; break;
+          case true: t2 = 4; break;
+          case "": t2 = 5; break;
+          default: t2 = (prop2 === prop2)?9:0; break;
+        }
+
+        // one or both is edge case
+        if (t1 !== 9 || t2 !== 9) {
+          return (t1===t2);
+        }
+      }
+
+      // Handle 'Number-like' comparisons
+      cv1 = Number(prop1);
+      cv2 = Number(prop2);
+
+      // if one or both are 'number-like'...
+      if (cv1 === cv1 || cv2 === cv2) {
+        return (cv1 === cv2);
+      }
+
+      // not strict equal nor less than nor gt so must be mixed types, convert to string and use that to compare
+      cv1 = prop1.toString();
+      cv2 = prop2.toString();
+
+      return (cv1 == cv2);
+    }
+
     /** Helper function for determining 'less-than' conditions for ops, sorting, and binary indices.
      *     In the future we might want $lt and $gt ops to use their own functionality/helper.
      *     Since binary indices on a property might need to index [12, NaN, new Date(), Infinity], we
      *     need this function (as well as gtHelper) to always ensure one value is LT, GT, or EQ to another.
      */
     function ltHelper(prop1, prop2, equal) {
-      var cv1, cv2;
+      var cv1, cv2, t1, t2;
 
-      // 'falsy' and Boolean handling
-      if (!prop1 || !prop2 || prop1 === true || prop2 === true) {
-        if ((prop1 === true || prop1 === false) && (prop2 === true || prop2 === false)) {
-          if (equal) {
-            return prop1 === prop2;
-          } else {
-            if (prop1) {
-              return false;
-            } else {
-              return prop2;
-            }
-          }
+      // if one of the params is falsy or strictly true or not equal to itself
+      // 0, 0.0, "", NaN, null, undefined, not defined, false, true
+      if (!prop1 || !prop2 || prop1 === true || prop2 === true || prop1 !== prop1 || prop2 !== prop2) {
+        switch (prop1) {
+          case undefined: t1 = 1; break;
+          case null: t1 = 1; break;
+          case false: t1 = 3; break;
+          case true: t1 = 4; break;
+          case "": t1 = 5; break;
+          // if strict equal probably 0 so sort higher, otherwise probably NaN so sort lower than even null
+          default: t1 = (prop1 === prop1)?9:0; break;
         }
 
-        if (prop2 === undefined || prop2 === null || prop1 === true || prop2 === false) {
-          return equal;
+        switch (prop2) {
+          case undefined: t2 = 1; break;
+          case null: t2 = 1; break;
+          case false: t2 = 3; break;
+          case true: t2 = 4; break;
+          case "": t2 = 5; break;
+          default: t2 = (prop2 === prop2)?9:0; break;
         }
-        if (prop1 === undefined || prop1 === null || prop1 === false || prop2 === true) {
-          return true;
+
+        // one or both is edge case
+        if (t1 !== 9 || t2 !== 9) {
+          return (t1===t2)?equal:(t1<t2);
         }
       }
 
-      if (prop1 === prop2) {
+      // if both are numbers (string encoded or not), compare as numbers
+      cv1 = Number(prop1);
+      cv2 = Number(prop2);
+      
+      if (cv1 === cv1 && cv2 === cv2) {
+        if (cv1 < cv2) return true;
+        if (cv1 > cv2) return false;
         return equal;
       }
 
-      if (prop1 < prop2) {
+      if (cv1 === cv1 && cv2 !== cv2) {
         return true;
       }
-
-      if (prop1 > prop2) {
+      
+      if (cv2 === cv2 && cv1 !== cv1) {
         return false;
       }
+      
+      if (prop1 < prop2) return true;
+      if (prop1 > prop2) return false;
+      if (prop1 == prop2) return equal;
 
       // not strict equal nor less than nor gt so must be mixed types, convert to string and use that to compare
       cv1 = prop1.toString();
       cv2 = prop2.toString();
 
-      if (cv1 == cv2) {
-        return equal;
-      }
-
       if (cv1 < cv2) {
         return true;
+      }
+
+      if (cv1 == cv2) {
+        return equal;
       }
 
       return false;
     }
 
     function gtHelper(prop1, prop2, equal) {
-      var cv1, cv2;
+      var cv1, cv2, t1, t2;
 
       // 'falsy' and Boolean handling
-      if (!prop1 || !prop2 || prop1 === true || prop2 === true) {
-        if ((prop1 === true || prop1 === false) && (prop2 === true || prop2 === false)) {
-          if (equal) {
-            return prop1 === prop2;
-          } else {
-            if (prop1) {
-              return !prop2;
-            } else {
-              return false;
-            }
-          }
+      if (!prop1 || !prop2 || prop1 === true || prop2 === true || prop1 !== prop1 || prop2 !== prop2) {
+        switch (prop1) {
+          case undefined: t1 = 1; break;
+          case null: t1 = 1; break;
+          case false: t1 = 3; break;
+          case true: t1 = 4; break;
+          case "": t1 = 5; break;
+          // NaN 0
+          default: t1 = (prop1 === prop1)?9:0; break;
         }
 
-        if (prop1 === undefined || prop1 === null || prop1 === false || prop2 === true) {
-          return equal;
+        switch (prop2) {
+          case undefined: t2 = 1; break;
+          case null: t2 = 1; break;
+          case false: t2 = 3; break;
+          case true: t2 = 4; break;
+          case "": t2 = 5; break;
+          default: t2 = (prop2 === prop2)?9:0; break;
         }
-        if (prop2 === undefined || prop2 === null || prop1 === true || prop2 === false) {
-          return true;
+
+        // one or both is edge case
+        if (t1 !== 9 || t2 !== 9) {
+          return (t1===t2)?equal:(t1>t2);
         }
       }
 
-      if (prop1 === prop2) {
+      // if both are numbers (string encoded or not), compare as numbers
+      cv1 = Number(prop1);
+      cv2 = Number(prop2);
+      if (cv1 === cv1 && cv2 === cv2) {
+        if (cv1 > cv2) return true;
+        if (cv1 < cv2) return false;
         return equal;
       }
-
-      if (prop1 > prop2) {
+      
+      if (cv1 === cv1 && cv2 !== cv2) {
+        return false;
+      }
+      
+      if (cv2 === cv2 && cv1 !== cv1) {
         return true;
       }
 
-      if (prop1 < prop2) {
-        return false;
-      }
+      if (prop1 > prop2) return true;
+      if (prop1 < prop2) return false;
+      if (prop1 == prop2) return equal;
 
-      // not strict equal nor less than nor gt so must be mixed types, convert to string and use that to compare
+      // not strict equal nor less than nor gt so must be dates or mixed types
+      // convert to string and use that to compare
       cv1 = prop1.toString();
       cv2 = prop2.toString();
 
-      if (cv1 == cv2) {
-        return equal;
-      }
-
       if (cv1 > cv2) {
         return true;
+      }
+
+      if (cv1 == cv2) {
+        return equal;
       }
 
       return false;
     }
 
     function sortHelper(prop1, prop2, desc) {
-      if (prop1 === prop2) {
-        return 0;
-      }
+      if (aeqHelper(prop1, prop2)) return 0;
 
       if (ltHelper(prop1, prop2, false)) {
         return (desc) ? (1) : (-1);
@@ -300,12 +386,9 @@
 
         return a !== b;
       },
-
+      // date equality / loki abstract equality test
       $dteq: function (a, b) {
-        if (ltHelper(a, b, false)) {
-          return false;
-        }
-        return !gtHelper(a, b, false);
+        return aeqHelper(a, b);
       },
 
       $gt: function (a, b) {
@@ -394,6 +477,10 @@
         return (typeof b !== 'object') ? (type === b) : doQueryOp(type, b);
       },
 
+      $finite: function(a, b) {
+        return (b === isFinite(a));
+      },
+
       $size: function (a, b) {
         if (Array.isArray(a)) {
           return (typeof b !== 'object') ? (a.length === b) : doQueryOp(a.length, b);
@@ -439,8 +526,20 @@
       }
     };
 
-    // making indexing opt-in... our range function knows how to deal with these ops :
-    var indexedOpsList = ['$eq', '$aeq', '$dteq', '$gt', '$gte', '$lt', '$lte', '$in', '$between'];
+    // if an op is registered in this object, our 'calculateRange' can use it with our binary indices.
+    // if the op is registered to a function, we will run that function/op as a 2nd pass filter on results.
+    // those 2nd pass filter functions should be similar to LokiOps functions, accepting 2 vals to compare.
+    var indexedOps = {
+      $eq: LokiOps.$eq,
+      $aeq: true,
+      $dteq: true,
+      $gt: true,
+      $gte: true,
+      $lt: true,
+      $lte: true,
+      $in: true,
+      $between: true
+    };
 
     function clone(data, method) {
       if (data === null || data === undefined) {
@@ -458,10 +557,16 @@
         cloned = jQuery.extend(true, {}, data);
         break;
       case "shallow":
-        cloned = Object.create(data.prototype || null);
+        // more compatible method for older browsers
+        cloned = data.prototype?Object.create(data.prototype):{};
         Object.keys(data).map(function (i) {
           cloned[i] = data[i];
         });
+        break;
+      case "shallow-assign":
+        // should be supported by newer environments/browsers
+        cloned = data.prototype?Object.create(data.prototype):{};
+        Object.assign(cloned, data);
         break;
       default:
         break;
@@ -611,16 +716,16 @@
      * @param {string} filename - name of the file to be saved to
      * @param {object=} options - (Optional) config options object
      * @param {string} options.env - override environment detection as 'NODEJS', 'BROWSER', 'CORDOVA'
-     * @param {boolean} options.verbose - enable console output (default is 'false')
-     * @param {boolean} options.autosave - enables autosave
-     * @param {int} options.autosaveInterval - time interval (in milliseconds) between saves (if dirty)
-     * @param {boolean} options.autoload - enables autoload on loki instantiation
+     * @param {boolean} [options.verbose=false] - enable console output
+     * @param {boolean} [options.autosave=false] - enables autosave
+     * @param {int} [options.autosaveInterval=5000] - time interval (in milliseconds) between saves (if dirty)
+     * @param {boolean} [options.autoload=false] - enables autoload on loki instantiation
      * @param {function} options.autoloadCallback - user callback called after database load
      * @param {adapter} options.adapter - an instance of a loki persistence adapter
-     * @param {string} options.serializationMethod - ['normal', 'pretty', 'destructured']
+     * @param {string} [options.serializationMethod='normal'] - ['normal', 'pretty', 'destructured']
      * @param {string} options.destructureDelimiter - string delimiter used for destructured serialization
-     * @param {boolean} options.throttledSaves - if true, it batches multiple calls to to saveDatabase reducing number of disk I/O operations
-                                                and guaranteeing proper serialization of the calls. Default value is true.
+     * @param {boolean} [options.throttledSaves=true] - debounces multiple calls to to saveDatabase reducing number of disk I/O operations
+                                                and guaranteeing proper serialization of the calls.
      */
     function Loki(filename, options) {
       this.filename = filename || 'loki.db';
@@ -628,8 +733,8 @@
 
       // persist version of code which created the database to the database.
       // could use for upgrade scenarios
-      this.databaseVersion = 1.1;
-      this.engineVersion = 1.1;
+      this.databaseVersion = 1.5;
+      this.engineVersion = 1.5;
 
       // autosave support (disabled by default)
       // pass autosave: true, autosaveInterval: 6000 in options to set 6 second autosave
@@ -669,14 +774,14 @@
       };
 
       var getENV = function () {
-        // if (typeof global !== 'undefined' && (global.android || global.NSObject)) {
-        //   //If no adapter is set use the default nativescript adapter
-        //   if (!options.adapter) {
-        //     var LokiNativescriptAdapter = require('./loki-nativescript-adapter');
-        //     options.adapter=new LokiNativescriptAdapter();
-        //   }
-        //   return 'NATIVESCRIPT'; //nativescript
-        // }
+        if (typeof global !== 'undefined' && (global.android || global.NSObject)) {
+           // If no adapter is set use the default nativescript adapter
+           if (!options.adapter) {
+             //var LokiNativescriptAdapter = require('./loki-nativescript-adapter');
+             //options.adapter=new LokiNativescriptAdapter();
+           }
+           return 'NATIVESCRIPT'; //nativescript
+        }
 
         if (typeof window === 'undefined') {
           return 'NODEJS';
@@ -755,11 +860,13 @@
       var defaultPersistence = {
           'NODEJS': 'fs',
           'BROWSER': 'localStorage',
-          'CORDOVA': 'localStorage'
+          'CORDOVA': 'localStorage',
+          'MEMORY': 'memory'
         },
         persistenceMethods = {
           'fs': LokiFsAdapter,
-          'localStorage': LokiLocalStorageAdapter
+          'localStorage': LokiLocalStorageAdapter,
+          'memory': LokiMemoryAdapter
         };
 
       this.options = {};
@@ -848,7 +955,8 @@
      * @memberof Loki
      */
     Loki.prototype.copy = function(options) {
-      var databaseCopy = new Loki(this.filename);
+      // in case running in an environment without accurate environment detection, pass 'NA'
+      var databaseCopy = new Loki(this.filename, { env: "NA" });
       var clen, idx;
 
       options = options || {};
@@ -872,39 +980,17 @@
     };
 
     /**
-     * Shorthand method for quickly creating and populating an anonymous collection.
-     *    This collection is not referenced internally so upon losing scope it will be garbage collected.
-     *
-     * @example
-     * var results = new loki().anonym(myDocArray).find({'age': {'$gt': 30} });
-     *
-     * @param {Array} docs - document array to initialize the anonymous collection with
-     * @param {object} options - configuration object, see {@link Loki#addCollection} options
-     * @returns {Collection} New collection which you can query or chain
-     * @memberof Loki
-     */
-    Loki.prototype.anonym = function (docs, options) {
-      var collection = new Collection('anonym', options);
-      collection.insert(docs);
-
-      if (this.verbose)
-        collection.console = console;
-
-      return collection;
-    };
-
-    /**
      * Adds a collection to the database.
      * @param {string} name - name of collection to add
      * @param {object=} options - (optional) options to configure collection with.
-     * @param {array} options.unique - array of property names to define unique constraints for
-     * @param {array} options.exact - array of property names to define exact constraints for
-     * @param {array} options.indices - array property names to define binary indexes for
-     * @param {boolean} options.asyncListeners - default is false
-     * @param {boolean} options.disableChangesApi - default is true
-     * @param {boolean} options.autoupdate - use Object.observe to update objects automatically (default: false)
-     * @param {boolean} options.clone - specify whether inserts and queries clone to/from user
-     * @param {string} options.cloneMethod - 'parse-stringify' (default), 'jquery-extend-deep', 'shallow'
+     * @param {array=} [options.unique=[]] - array of property names to define unique constraints for
+     * @param {array=} [options.exact=[]] - array of property names to define exact constraints for
+     * @param {array=} [options.indices=[]] - array property names to define binary indexes for
+     * @param {boolean} [options.asyncListeners=false] - whether listeners are called asynchronously
+     * @param {boolean} [options.disableChangesApi=true] - set to false to enable Changes Api
+     * @param {boolean} [options.autoupdate=false] - use Object.observe to update objects automatically
+     * @param {boolean} [options.clone=false] - specify whether inserts and queries clone to/from user
+     * @param {string} [options.cloneMethod='parse-stringify'] - 'parse-stringify', 'jquery-extend-deep', 'shallow, 'shallow-assign'
      * @param {int} options.ttlInterval - time interval for clearing out 'aged' documents; not set by default.
      * @returns {Collection} a reference to the collection which was just added
      * @memberof Loki
@@ -1034,7 +1120,7 @@
     Loki.prototype.toJson = Loki.prototype.serialize;
 
     /**
-     * Destructured JSON serialization routine to allow alternate serialization methods.
+     * Database level destructured JSON serialization routine to allow alternate serialization methods.
      * Internally, Loki supports destructuring via loki "serializationMethod' option and 
      * the optional LokiPartitioningAdapter class. It is also available if you wish to do 
      * your own structured persistence or data exchange.
@@ -1171,11 +1257,11 @@
     };
 
     /**
-     * Utility method to serialize a collection in a 'destructured' format
+     * Collection level utility method to serialize a collection in a 'destructured' format
      *
-     * @param {object} options - used to determine output of method
-     * @param {int=} options.delimited - whether to return single delimited string or an array
-     * @param {string=} options.delimiter - (optional) if delimited, this is delimiter to use
+     * @param {object=} options - used to determine output of method
+     * @param {int} options.delimited - whether to return single delimited string or an array
+     * @param {string} options.delimiter - (optional) if delimited, this is delimiter to use
      * @param {int} options.collectionIndex -  specify which collection to serialize data for
      *
      * @returns {string|array} A custom, restructured aggregation of independent serializations for a single collection.
@@ -1218,16 +1304,16 @@
     };
 
     /**
-     * Destructured JSON deserialization routine to minimize memory overhead.
+     * Database level destructured JSON deserialization routine to minimize memory overhead.
      * Internally, Loki supports destructuring via loki "serializationMethod' option and 
      * the optional LokiPartitioningAdapter class. It is also available if you wish to do 
      * your own structured persistence or data exchange.
      *
      * @param {string|array} destructuredSource - destructured json or array to deserialize from
      * @param {object=} options - source format options
-     * @param {bool=} options.partitioned - (default: false) whether db and each collection are separate
+     * @param {bool=} [options.partitioned=false] - whether db and each collection are separate
      * @param {int=} options.partition - can be used to deserialize only a single partition
-     * @param {bool=} options.delimited - (default: true) whether subitems are delimited or subarrays
+     * @param {bool=} [options.delimited=true] - whether subitems are delimited or subarrays
      * @param {string=} options.delimiter - override default delimiter
      *
      * @returns {object|array} An object representation of the deserialized database, not yet applied to 'this' db or document array
@@ -1329,12 +1415,12 @@
     };
 
     /**
-     * Deserializes a destructured collection.
+     * Collection level utility function to deserializes a destructured collection.
      *
      * @param {string|array} destructuredSource - destructured representation of collection to inflate
-     * @param {object} options - used to describe format of destructuredSource input
-     * @param {int} options.delimited - whether source is delimited string or an array
-     * @param {string} options.delimiter - (optional) if delimited, this is delimiter to use
+     * @param {object=} options - used to describe format of destructuredSource input
+     * @param {int=} [options.delimited=false] - whether source is delimited string or an array
+     * @param {string=} options.delimiter - if delimited, this is delimiter to use (if other than default)
      *
      * @returns {array} an array of documents to attach to collection.data.
      * @memberof Loki
@@ -1377,7 +1463,8 @@
      * Inflates a loki database from a serialized JSON string
      *
      * @param {string} serializedDb - a serialized loki database string
-     * @param {object} options - apply or override collection level settings
+     * @param {object=} options - apply or override collection level settings
+     * @param {bool} options.retainDirtyFlags - whether collection dirty flags will be preserved
      * @memberof Loki
      */
     Loki.prototype.loadJSON = function (serializedDb, options) {
@@ -1401,8 +1488,8 @@
      * Inflates a loki database from a JS object
      *
      * @param {object} dbObject - a serialized loki database string
-     * @param {object} options - apply or override collection level settings
-     * @param {bool?} options.retainDirtyFlags - whether collection dirty flags will be preserved
+     * @param {object=} options - apply or override collection level settings
+     * @param {bool} options.retainDirtyFlags - whether collection dirty flags will be preserved
      * @memberof Loki
      */
     Loki.prototype.loadJSONObject = function (dbObject, options) {
@@ -1418,10 +1505,10 @@
       this.name = dbObject.name;
 
       // restore database version
-      this.databaseVersion = 1.0;
-      if (dbObject.hasOwnProperty('databaseVersion')) {
-        this.databaseVersion = dbObject.databaseVersion;
-      }
+      //this.databaseVersion = 1.0;
+      //if (dbObject.hasOwnProperty('databaseVersion')) {
+      //  this.databaseVersion = dbObject.databaseVersion;
+      //}
 
       // restore save throttled boolean only if not defined in options
       if (dbObject.hasOwnProperty('throttledSaves') && options && !options.hasOwnProperty('throttledSaves')) {
@@ -1505,7 +1592,7 @@
             copyColl.ensureUniqueIndex(copyColl.uniqueNames[j]);
           }
         }
-
+        
         // in case they are loading a database created before we added dynamic views, handle undefined
         if (typeof (coll.DynamicViews) === 'undefined') continue;
 
@@ -1523,12 +1610,18 @@
 
           dv.sortDirty = colldv.sortDirty;
           dv.resultset.filteredrows = colldv.resultset.filteredrows;
-          dv.resultset.searchIsChained = colldv.resultset.searchIsChained;
           dv.resultset.filterInitialized = colldv.resultset.filterInitialized;
 
           dv.rematerialize({
             removeWhereFilters: true
           });
+        }
+
+        // Upgrade Logic for binary index refactoring at version 1.5
+        if (dbObject.databaseVersion < 1.5) {
+            // rebuild all indices
+            copyColl.ensureAllIndexes(true);
+            copyColl.dirty = true;
         }
       }
     };
@@ -1627,8 +1720,8 @@
      * This simple 'key/value' adapter is intended for unit testing and diagnostics.
      *
      * @param {object=} options - memory adapter options
-     * @param {boolean} options.asyncResponses - whether callbacks are invoked asynchronously (default: false)
-     * @param {int} options.asyncTimeout - timeout in ms to queue callbacks (default: 50)
+     * @param {boolean} [options.asyncResponses=false] - whether callbacks are invoked asynchronously
+     * @param {int} [options.asyncTimeout=50] - timeout in ms to queue callbacks
      * @constructor LokiMemoryAdapter
      */
     function LokiMemoryAdapter(options) {
@@ -2297,10 +2390,12 @@
     };
 
     /**
-     * Handles loading from file system, local storage, or adapter (indexeddb)
+     * Handles manually loading from file system, local storage, or adapter (such as indexeddb)
      *    This method utilizes loki configuration options (if provided) to determine which
      *    persistence method to use, or environment detection (if configuration was not provided).
      *    To avoid contention with any throttledSaves, we will drain the save queue first.
+     *
+     * If you are configured with autosave, you do not need to call this method yourself.
      *
      * @param {object} options - if throttling saves and loads, this controls how we drain save queue before loading
      * @param {boolean} options.recursiveWait - (default: true) wait recursively until no saves are queued 
@@ -2308,6 +2403,15 @@
      * @param {int} options.recursiveWaitLimitDelay - (default: 2000) cutoff in ms to stop recursively re-draining
      * @param {function=} callback - (Optional) user supplied async callback / error handler
      * @memberof Loki
+     * @example
+     * db.loadDatabase({}, function(err) {
+     *   if (err) {
+     *     console.log("error : " + err);
+     *   }
+     *   else {
+     *     console.log("database loaded.");
+     *   }
+     * });
      */
     Loki.prototype.loadDatabase = function (options, callback) {
       var self=this;
@@ -2383,12 +2487,23 @@
     };
 
     /**
-     * Handles saving to file system, local storage, or adapter (indexeddb)
+     * Handles manually saving to file system, local storage, or adapter (such as indexeddb)
      *    This method utilizes loki configuration options (if provided) to determine which
      *    persistence method to use, or environment detection (if configuration was not provided).
      *
+     * If you are configured with autosave, you do not need to call this method yourself.
+     *
      * @param {function=} callback - (Optional) user supplied async callback / error handler
      * @memberof Loki
+     * @example
+     * db.saveDatabase(function(err) {
+     *   if (err) {
+     *     console.log("error : " + err);
+     *   }
+     *   else {
+     *     console.log("database saved.");
+     *   }
+     * });
      */
     Loki.prototype.saveDatabase = function (callback) {
       if (!this.throttledSaves) {
@@ -2434,7 +2549,6 @@
      *    This method utilizes loki configuration options (if provided) to determine which
      *    persistence method to use, or environment detection (if configuration was not provided).
      *
-     * @param {object} options - not currently used (remove or allow overrides?)
      * @param {function=} callback - (Optional) user supplied async callback / error handler
      * @memberof Loki
      */
@@ -2444,6 +2558,12 @@
           throw err;
         }
       };
+      
+      // we aren't even using options, so we will support syntax where
+      // callback is passed as first and only argument
+      if (typeof options === 'function' && !callback) {
+        cFun = options;
+      }
 
       // the persistenceAdapter should be present if all is ok, but check to be sure.
       if (this.persistenceAdapter !== null) {
@@ -2532,35 +2652,15 @@
      *
      * @constructor Resultset
      * @param {Collection} collection - The collection which this Resultset will query against.
-     * @param {Object=} options - Object containing one or more options.
-     * @param {string} options.queryObj - Optional mongo-style query object to initialize resultset with.
-     * @param {function} options.queryFunc - Optional javascript filter function to initialize resultset with.
-     * @param {bool} options.firstOnly - Optional boolean used by collection.findOne().
      */
     function Resultset(collection, options) {
       options = options || {};
 
-      options.queryObj = options.queryObj || null;
-      options.queryFunc = options.queryFunc || null;
-      options.firstOnly = options.firstOnly || false;
-
       // retain reference to collection we are querying against
       this.collection = collection;
-
-      // if chain() instantiates with null queryObj and queryFunc, so we will keep flag for later
-      this.searchIsChained = (!options.queryObj && !options.queryFunc);
       this.filteredrows = [];
       this.filterInitialized = false;
 
-      // if user supplied initial queryObj or queryFunc, apply it
-      if (typeof (options.queryObj) !== "undefined" && options.queryObj !== null) {
-        return this.find(options.queryObj, options.firstOnly);
-      }
-      if (typeof (options.queryFunc) !== "undefined" && options.queryFunc !== null) {
-        return this.where(options.queryFunc);
-      }
-
-      // otherwise return unfiltered Resultset for future filtering
       return this;
     }
 
@@ -2596,8 +2696,8 @@
      * @memberof Resultset
      */
     Resultset.prototype.limit = function (qty) {
-      // if this is chained resultset with no filters applied, we need to populate filteredrows first
-      if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
+      // if this has no filters applied, we need to populate filteredrows first
+      if (!this.filterInitialized && this.filteredrows.length === 0) {
         this.filteredrows = this.collection.prepareFullDocIndex();
       }
 
@@ -2615,8 +2715,8 @@
      * @memberof Resultset
      */
     Resultset.prototype.offset = function (pos) {
-      // if this is chained resultset with no filters applied, we need to populate filteredrows first
-      if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
+      // if this has no filters applied, we need to populate filteredrows first
+      if (!this.filterInitialized && this.filteredrows.length === 0) {
         this.filteredrows = this.collection.prepareFullDocIndex();
       }
 
@@ -2729,39 +2829,6 @@
     };
 
     /**
-     * Instances a new anonymous collection with the documents contained in the current resultset.
-     *
-     * @param {object} collectionOptions - Options to pass to new anonymous collection construction.
-     * @returns {Collection} A reference to an anonymous collection initialized with resultset data().
-     * @memberof Resultset
-     */
-    Resultset.prototype.instance = function(collectionOptions) {
-      var docs = this.data();
-      var idx,
-        doc;
-
-      collectionOptions = collectionOptions || {};
-
-      var instanceCollection = new Collection(collectionOptions);
-
-      for(idx=0; idx<docs.length; idx++) {
-        if (this.collection.cloneObjects) {
-          doc = docs[idx];
-        }
-        else {
-          doc = clone(docs[idx], this.collection.cloneMethod);
-        }
-
-        delete doc.$loki;
-        delete doc.meta;
-
-        instanceCollection.insert(doc);
-      }
-
-      return instanceCollection;
-    };
-
-    /**
      * User supplied compare function is provided two documents to compare. (chainable)
      * @example
      *    rslt.sort(function(obj1, obj2) {
@@ -2775,8 +2842,8 @@
      * @memberof Resultset
      */
     Resultset.prototype.sort = function (comparefun) {
-      // if this is chained resultset with no filters applied, just we need to populate filteredrows first
-      if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
+      // if this has no filters applied, just we need to populate filteredrows first
+      if (!this.filterInitialized && this.filteredrows.length === 0) {
         this.filteredrows = this.collection.prepareFullDocIndex();
       }
 
@@ -2802,14 +2869,23 @@
      * @memberof Resultset
      */
     Resultset.prototype.simplesort = function (propname, isdesc) {
-      // if this is chained resultset with no filters applied, just we need to populate filteredrows first
-      if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
+      if (typeof (isdesc) === 'undefined') {
+        isdesc = false;
+      }
+
+      // if this has no filters applied, just we need to populate filteredrows first
+      if (!this.filterInitialized && this.filteredrows.length === 0) {
         // if we have a binary index and no other filters applied, we can use that instead of sorting (again)
         if (this.collection.binaryIndices.hasOwnProperty(propname)) {
           // make sure index is up-to-date
           this.collection.ensureIndex(propname);
           // copy index values into filteredrows
           this.filteredrows = this.collection.binaryIndices[propname].values.slice(0);
+
+          if (isdesc) {
+            this.filteredrows.reverse();
+          }
+
           // we are done, return this (resultset) for further chain ops
           return this;
         }
@@ -2817,10 +2893,6 @@
         else {
           this.filteredrows = this.collection.prepareFullDocIndex();
         }
-      }
-
-      if (typeof (isdesc) === 'undefined') {
-        isdesc = false;
       }
 
       var wrappedComparer =
@@ -2869,8 +2941,8 @@
         }
       }
 
-      // if this is chained resultset with no filters applied, just we need to populate filteredrows first
-      if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
+      // if this has no filters applied, just we need to populate filteredrows first
+      if (!this.filterInitialized && this.filteredrows.length === 0) {
         this.filteredrows = this.collection.prepareFullDocIndex();
       }
 
@@ -2964,74 +3036,65 @@
      */
     Resultset.prototype.find = function (query, firstOnly) {
       if (this.collection.data.length === 0) {
-        if (this.searchIsChained) {
-          this.filteredrows = [];
-          this.filterInitialized = true;
-          return this;
-        }
-        return [];
+        this.filteredrows = [];
+        this.filterInitialized = true;
+        return this;
       }
 
       var queryObject = query || 'getAll',
         p,
         property,
         queryObjectOp,
+        obj,
         operator,
         value,
         key,
         searchByIndex = false,
         result = [],
+        filters = [],
         index = null;
 
-      // if this was note invoked via findOne()
+      // flag if this was invoked via findOne()
       firstOnly = firstOnly || false;
 
       if (typeof queryObject === 'object') {
         for (p in queryObject) {
+          obj = {};
+          obj[p] = queryObject[p];
+          filters.push(obj);
+
           if (hasOwnProperty.call(queryObject, p)) {
             property = p;
             queryObjectOp = queryObject[p];
-            break;
           }
+        }
+        // if more than one expression in single query object, 
+        // convert implicit $and to explicit $and
+        if (filters.length > 1) {
+          return this.find({ '$and': filters }, firstOnly);
         }
       }
 
       // apply no filters if they want all
       if (!property || queryObject === 'getAll') {
-        // coll.find(), coll.findOne(), coll.chain().find().data() all path here
-
         if (firstOnly) {
-          return (this.collection.data.length > 0)?this.collection.data[0]: null;
+          this.filteredrows = (this.collection.data.length > 0)?[0]: [];
+          this.filterInitialized = true;
         }
 
-        return (this.searchIsChained) ? (this) : (this.collection.data.slice());
+        return this;
       }
 
       // injecting $and and $or expression tree evaluation here.
       if (property === '$and' || property === '$or') {
-        if (this.searchIsChained) {
-          this[property](queryObjectOp);
+        this[property](queryObjectOp);
 
-          // for chained find with firstonly,
-          if (firstOnly && this.filteredrows.length > 1) {
-            this.filteredrows = this.filteredrows.slice(0, 1);
-          }
-
-          return this;
-        } else {
-          // our $and operation internally chains filters
-          result = this.collection.chain()[property](queryObjectOp).data();
-
-          // if this was coll.findOne() return first object or empty array if null
-          // since this is invoked from a constructor we can't return null, so we will
-          // make null in coll.findOne();
-          if (firstOnly) {
-            return (result.length === 0) ? ([]) : (result[0]);
-          }
-
-          // not first only return all results
-          return result;
+        // for chained find with firstonly,
+        if (firstOnly && this.filteredrows.length > 1) {
+          this.filteredrows = this.filteredrows.slice(0, 1);
         }
+
+        return this;
       }
 
       // see if query object is in shorthand mode (assuming eq operator)
@@ -3063,13 +3126,10 @@
       var usingDotNotation = (property.indexOf('.') !== -1);
 
       // if an index exists for the property being queried against, use it
-      // for now only enabling for non-chained query (who's set of docs matches index)
-      // or chained queries where it is the first filter applied and prop is indexed
-      var doIndexCheck = !usingDotNotation &&
-        (!this.searchIsChained || !this.filterInitialized);
+      // for now only enabling where it is the first filter applied and prop is indexed
+      var doIndexCheck = !usingDotNotation && !this.filterInitialized;
 
-      if (doIndexCheck && this.collection.binaryIndices[property] &&
-        indexedOpsList.indexOf(operator) !== -1) {
+      if (doIndexCheck && this.collection.binaryIndices[property] && indexedOps[operator]) {
         // this is where our lazy index rebuilding will take place
         // basically we will leave all indexes dirty until we need them
         // so here we will rebuild only the index tied to this property
@@ -3092,83 +3152,10 @@
         len = 0;
 
       // Query executed differently depending on :
-      //    - whether it is chained or not
       //    - whether the property being queried has an index defined
       //    - if chained, we handle first pass differently for initial filteredrows[] population
       //
       // For performance reasons, each case has its own if block to minimize in-loop calculations
-
-      // If not a chained query, bypass filteredrows and work directly against data
-      if (!this.searchIsChained) {
-        if (!searchByIndex) {
-          i = t.length;
-
-          if (firstOnly) {
-            if (usingDotNotation) {
-              property = property.split('.');
-              while (i--) {
-                if (dotSubScan(t[i], property, fun, value)) {
-                  return (t[i]);
-                }
-              }
-            } else {
-              while (i--) {
-                if (fun(t[i][property], value)) {
-                  return (t[i]);
-                }
-              }
-            }
-
-            return [];
-          }
-
-          // if using dot notation then treat property as keypath such as 'name.first'.
-          // currently supporting dot notation for non-indexed conditions only
-          if (usingDotNotation) {
-            property = property.split('.');
-            while (i--) {
-              if (dotSubScan(t[i], property, fun, value)) {
-                result.push(t[i]);
-              }
-            }
-          } else {
-            while (i--) {
-              if (fun(t[i][property], value)) {
-                result.push(t[i]);
-              }
-            }
-          }
-        } else {
-          // searching by binary index via calculateRange() utility method
-          var seg = this.collection.calculateRange(operator, property, value);
-
-          // not chained so this 'find' was designated in Resultset constructor
-          // so return object itself
-          if (firstOnly) {
-            if (seg[1] !== -1) {
-              return t[index.values[seg[0]]];
-            }
-            return [];
-          }
-
-          if (operator !== '$in') {
-            for (i = seg[0]; i <= seg[1]; i++) {
-              result.push(t[index.values[i]]);
-            }
-          } else {
-            for (i = 0, len = seg.length; i < len; i++) {
-              result.push(t[index.values[seg[i]]]);
-            }
-          }
-        }
-
-        // not a chained query so return result as data[]
-        return result;
-      }
-
-
-      // Otherwise this is a chained query
-      // Chained queries now preserve results ordering at expense on slightly reduced unindexed performance
 
       var filter, rowIdx = 0;
 
@@ -3206,12 +3193,22 @@
             for(i=0; i<len; i++) {
               if (dotSubScan(t[i], property, fun, value)) {
                 result.push(i);
+                if (firstOnly) {
+                  this.filteredrows = result;
+                  this.filterInitialized = true;
+                  return this;
+                }
               }
             }
           } else {
             for(i=0; i<len; i++) {
               if (fun(t[i][property], value)) {
                 result.push(i);
+                if (firstOnly) {
+                  this.filteredrows = result;
+                  this.filterInitialized = true;
+                  return this;
+                }
               }
             }
           }
@@ -3221,19 +3218,42 @@
 
           if (operator !== '$in') {
             for (i = segm[0]; i <= segm[1]; i++) {
-              result.push(index.values[i]);
+              if (indexedOps[operator] !== true) {
+                // must be a function, implying 2nd phase filtering of results from calculateRange
+                if (indexedOps[operator](t[index.values[i]][property], value)) {
+                  result.push(index.values[i]);
+                  if (firstOnly) {
+                    this.filteredrows = result;
+                    this.filterInitialized = true;
+                    return this;
+                  }
+                }
+              }
+              else {
+                  result.push(index.values[i]);
+                  if (firstOnly) {
+                    this.filteredrows = result;
+                    this.filterInitialized = true;
+                    return this;
+                  }
+              }
             }
           } else {
             for (i = 0, len = segm.length; i < len; i++) {
               result.push(index.values[segm[i]]);
+              if (firstOnly) {
+                this.filteredrows = result;
+                this.filterInitialized = true;
+                return this;
+              }
             }
           }
         }
 
-        this.filterInitialized = true; // next time work against filteredrows[]
       }
 
       this.filteredrows = result;
+      this.filterInitialized = true; // next time work against filteredrows[]
       return this;
     };
 
@@ -3255,50 +3275,34 @@
         throw new TypeError('Argument is not a stored view or a function');
       }
       try {
-        // if not a chained query then run directly against data[] and return object []
-        if (!this.searchIsChained) {
-          var i = this.collection.data.length;
+        // If the filteredrows[] is already initialized, use it
+        if (this.filterInitialized) {
+          var j = this.filteredrows.length;
 
-          while (i--) {
-            if (viewFunction(this.collection.data[i]) === true) {
-              result.push(this.collection.data[i]);
+          while (j--) {
+            if (viewFunction(this.collection.data[this.filteredrows[j]]) === true) {
+              result.push(this.filteredrows[j]);
             }
           }
 
-          // not a chained query so returning result as data[]
-          return result;
+          this.filteredrows = result;
+
+          return this;
         }
-        // else chained query, so run against filteredrows
+        // otherwise this is initial chained op, work against data, push into filteredrows[]
         else {
-          // If the filteredrows[] is already initialized, use it
-          if (this.filterInitialized) {
-            var j = this.filteredrows.length;
+          var k = this.collection.data.length;
 
-            while (j--) {
-              if (viewFunction(this.collection.data[this.filteredrows[j]]) === true) {
-                result.push(this.filteredrows[j]);
-              }
+          while (k--) {
+            if (viewFunction(this.collection.data[k]) === true) {
+              result.push(k);
             }
-
-            this.filteredrows = result;
-
-            return this;
           }
-          // otherwise this is initial chained op, work against data, push into filteredrows[]
-          else {
-            var k = this.collection.data.length;
 
-            while (k--) {
-              if (viewFunction(this.collection.data[k]) === true) {
-                result.push(k);
-              }
-            }
+          this.filteredrows = result;
+          this.filterInitialized = true;
 
-            this.filteredrows = result;
-            this.filterInitialized = true;
-
-            return this;
-          }
+          return this;
         }
       } catch (err) {
         throw err;
@@ -3312,7 +3316,7 @@
      * @memberof Resultset
      */
     Resultset.prototype.count = function () {
-      if (this.searchIsChained && this.filterInitialized) {
+      if (this.filterInitialized) {
         return this.filteredrows.length;
       }
       return this.collection.count();
@@ -3325,7 +3329,8 @@
      * @param {boolean} options.forceClones - Allows forcing the return of cloned objects even when
      *        the collection is not configured for clone object.
      * @param {string} options.forceCloneMethod - Allows overriding the default or collection specified cloning method.
-     *        Possible values include 'parse-stringify', 'jquery-extend-deep', and 'shallow'
+     *        Possible values include 'parse-stringify', 'jquery-extend-deep', 'shallow', 'shallow-assign'
+     * @param {bool} options.removeMeta - Will force clones and strip $loki and meta properties from documents
      *
      * @returns {array} Array of documents in the resultset
      * @memberof Resultset
@@ -3333,14 +3338,21 @@
     Resultset.prototype.data = function (options) {
       var result = [],
         data = this.collection.data,
+        obj,
         len,
         i,
         method;
 
       options = options || {};
 
-      // if this is chained resultset with no filters applied, just return collection.data
-      if (this.searchIsChained && !this.filterInitialized) {
+      // if user opts to strip meta, then force clones and use 'shallow' if 'force' options are not present
+      if (options.removeMeta && !options.forceClones) {
+        options.forceClones = true;
+        options.forceCloneMethod = options.forceCloneMethod || 'shallow';
+      }
+
+      // if this has no filters applied, just return collection.data
+      if (!this.filterInitialized) {
         if (this.filteredrows.length === 0) {
           // determine whether we need to clone objects or not
           if (this.collection.cloneObjects || options.forceClones) {
@@ -3348,7 +3360,12 @@
             method = options.forceCloneMethod || this.collection.cloneMethod;
 
             for (i = 0; i < len; i++) {
-              result.push(clone(data[i], method));
+              obj = clone(data[i], method);
+              if (options.removeMeta) {
+                delete obj.$loki;
+                delete obj.meta;
+              }
+              result.push(obj);
             }
             return result;
           }
@@ -3368,7 +3385,12 @@
       if (this.collection.cloneObjects || options.forceClones) {
         method = options.forceCloneMethod || this.collection.cloneMethod;
         for (i = 0; i < len; i++) {
-          result.push(clone(data[fr[i]], method));
+          obj = clone(data[fr[i]], method);
+          if (options.removeMeta) {
+            delete obj.$loki;
+            delete obj.meta;
+          }
+          result.push(obj);
         }
       } else {
         for (i = 0; i < len; i++) {
@@ -3391,8 +3413,8 @@
         throw new TypeError('Argument is not a function');
       }
 
-      // if this is chained resultset with no filters applied, we need to populate filteredrows first
-      if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
+      // if this has no filters applied, we need to populate filteredrows first
+      if (!this.filterInitialized && this.filteredrows.length === 0) {
         this.filteredrows = this.collection.prepareFullDocIndex();
       }
 
@@ -3418,8 +3440,8 @@
      */
     Resultset.prototype.remove = function () {
 
-      // if this is chained resultset with no filters applied, we need to populate filteredrows first
-      if (this.searchIsChained && !this.filterInitialized && this.filteredrows.length === 0) {
+      // if this has no filters applied, we need to populate filteredrows first
+      if (!this.filterInitialized && this.filteredrows.length === 0) {
         this.filteredrows = this.collection.prepareFullDocIndex();
       }
 
@@ -3540,8 +3562,8 @@
      * @param {Collection} collection - A reference to the collection to work against
      * @param {string} name - The name of this dynamic view
      * @param {object=} options - (Optional) Pass in object with 'persistent' and/or 'sortPriority' options.
-     * @param {boolean} options.persistent - indicates if view is to main internal results array in 'resultdata'
-     * @param {string} options.sortPriority - 'passive' (sorts performed on call to data) or 'active' (after updates)
+     * @param {boolean} [options.persistent=false] - indicates if view is to main internal results array in 'resultdata'
+     * @param {string} [options.sortPriority='passive'] - 'passive' (sorts performed on call to data) or 'active' (after updates)
      * @param {number} options.minRebuildInterval - minimum rebuild interval (need clarification to docs here)
      * @see {@link Collection#addDynamicView} to construct instances of DynamicView
      */
@@ -3593,7 +3615,7 @@
 
 
     /**
-     * rematerialize() - intended for use immediately after deserialization (loading)
+     * rematerialize() - internally used immediately after deserialization (loading)
      *    This will clear out and reapply filterPipeline ops, recreating the view.
      *    Since where filters do not persist correctly, this method allows
      *    restoring the view to state where user can re-apply those where filters.
@@ -3996,17 +4018,23 @@
     /**
      * data() - resolves and pending filtering and sorting, then returns document array as result.
      *
+     * @param {object=} options - optional parameters to pass to resultset.data() if non-persistent
+     * @param {boolean} options.forceClones - Allows forcing the return of cloned objects even when
+     *        the collection is not configured for clone object.
+     * @param {string} options.forceCloneMethod - Allows overriding the default or collection specified cloning method.
+     *        Possible values include 'parse-stringify', 'jquery-extend-deep', 'shallow', 'shallow-assign'
+     * @param {bool} options.removeMeta - Will force clones and strip $loki and meta properties from documents
      * @returns {array} An array of documents representing the current DynamicView contents.
      * @memberof DynamicView
      */
-    DynamicView.prototype.data = function () {
+    DynamicView.prototype.data = function (options) {
       // using final sort phase as 'catch all' for a few use cases which require full rebuild
       if (this.sortDirty || this.resultsdirty) {
         this.performSortPhase({
           suppressRebuildEvent: true
         });
       }
-      return (this.options.persistent) ? (this.resultdata) : (this.resultset.data());
+      return (this.options.persistent) ? (this.resultdata) : (this.resultset.data(options));
     };
 
     /**
@@ -4276,15 +4304,16 @@
      * @implements LokiEventEmitter
      * @param {string} name - collection name
      * @param {(array|object)=} options - (optional) array of property names to be indicized OR a configuration object
-     * @param {array} options.unique - array of property names to define unique constraints for
-     * @param {array} options.exact - array of property names to define exact constraints for
-     * @param {array} options.indices - array property names to define binary indexes for
-     * @param {boolean} options.adaptiveBinaryIndices - collection indices will be actively rebuilt rather than lazily (default: true)
-     * @param {boolean} options.asyncListeners - default is false
-     * @param {boolean} options.disableChangesApi - default is true
-     * @param {boolean} options.autoupdate - use Object.observe to update objects automatically (default: false)
-     * @param {boolean} options.clone - specify whether inserts and queries clone to/from user
-     * @param {string} options.cloneMethod - 'parse-stringify' (default), 'jquery-extend-deep', 'shallow'
+     * @param {array=} [options.unique=[]] - array of property names to define unique constraints for
+     * @param {array=} [options.exact=[]] - array of property names to define exact constraints for
+     * @param {array=} [options.indices=[]] - array property names to define binary indexes for
+     * @param {boolean} [options.adaptiveBinaryIndices=true] - collection indices will be actively rebuilt rather than lazily
+     * @param {boolean} [options.asyncListeners=false] - whether listeners are invoked asynchronously
+     * @param {boolean} [options.disableChangesApi=true] - set to false to enable Changes API
+     * @param {boolean} [options.autoupdate=false] - use Object.observe to update objects automatically
+     * @param {boolean} [options.clone=false] - specify whether inserts and queries clone to/from user
+     * @param {boolean} [options.serializableIndices=true[]] - converts date values on binary indexed properties to epoch time
+     * @param {string} [options.cloneMethod='parse-stringify' - 'parse-stringify', 'jquery-extend-deep', 'shallow', 'shallow-assign'
      * @param {int} options.ttlInterval - time interval for clearing out 'aged' documents; not set by default.
      * @see {@link Loki#addCollection} for normal creation of collections
      */
@@ -4365,6 +4394,11 @@
       // option to observe objects and update them automatically, ignored if Object.observe is not supported
       this.autoupdate = options.hasOwnProperty('autoupdate') ? options.autoupdate : false;
 
+      // by default, if you insert a document into a collection with binary indices, if those indexed properties contain
+      // a DateTime we will convert to epoch time format so that (across serializations) its value position will be the 
+      // same 'after' serialization as it was 'before'.
+      this.serializableIndices = options.hasOwnProperty('serializableIndices') ? options.serializableIndices : true;
+      
       //option to activate a cleaner daemon - clears "aged" documents at set intervals.
       this.ttl = {
         age: null,
@@ -4588,6 +4622,17 @@
      * @param {string} name - name to associate with transform
      * @param {array} transform - an array of transformation 'step' objects to save into the collection
      * @memberof Collection
+     * @example
+     * users.addTransform('progeny', [
+     *   {
+     *     type: 'find',
+     *     value: {
+     *       'age': {'$lte': 40}
+     *     }
+     *   }
+     * ]);
+     * 
+     * var results = users.chain('progeny').data();
      */
     Collection.prototype.addTransform = function (name, transform) {
       if (this.transforms.hasOwnProperty(name)) {
@@ -4595,6 +4640,15 @@
       }
 
       this.transforms[name] = transform;
+    };
+
+    /**
+     * Retrieves a named transform from the collection.
+     * @param {string} name - name of the transform to lookup.
+     * @memberof Collection
+     */
+    Collection.prototype.getTransform = function (name) {
+      return this.transforms[name];
     };
 
     /**
@@ -4845,12 +4899,18 @@
     /**
      * Add a dynamic view to the collection
      * @param {string} name - name of dynamic view to add
-     * @param {object=} options - (optional) options to configure dynamic view with
-     * @param {boolean} options.persistent - indicates if view is to main internal results array in 'resultdata'
-     * @param {string} options.sortPriority - 'passive' (sorts performed on call to data) or 'active' (after updates)
+     * @param {object=} options - options to configure dynamic view with
+     * @param {boolean} [options.persistent=false] - indicates if view is to main internal results array in 'resultdata'
+     * @param {string} [options.sortPriority='passive'] - 'passive' (sorts performed on call to data) or 'active' (after updates)
      * @param {number} options.minRebuildInterval - minimum rebuild interval (need clarification to docs here)
      * @returns {DynamicView} reference to the dynamic view added
      * @memberof Collection
+     * @example
+     * var pview = users.addDynamicView('progeny');
+     * pview.applyFind({'age': {'$lte': 40}});
+     * pview.applySimpleSort('name');
+     *
+     * var results = pview.data();
      **/
 
     Collection.prototype.addDynamicView = function (name, options) {
@@ -4921,6 +4981,15 @@
      * @param {(object|array)} doc - the document (or array of documents) to be inserted
      * @returns {(object|array)} document or documents inserted
      * @memberof Collection
+     * @example
+     * users.insert({
+     *     name: 'Odin',
+     *     age: 50,
+     *     address: 'Asgard'
+     * });
+     * 
+     * // alternatively, insert array of documents
+     * users.insert([{ name: 'Thor', age: 35}, { name: 'Loki', age: 30}]);
      */
     Collection.prototype.insert = function (doc) {
       if (!Array.isArray(doc)) {
@@ -4939,7 +5008,12 @@
         }
         results.push(obj);
       }
+      // at the 'batch' level, if clone option is true then emitted docs are clones
       this.emit('insert', results);
+
+      // if clone option is set, clone return values
+      results = this.cloneObjects ? clone(results, this.cloneMethod) : results;
+
       return results.length === 1 ? results[0] : results;
     };
 
@@ -4948,7 +5022,6 @@
      * @param {object} doc - the document to be inserted
      * @param {boolean} bulkInsert - quiet pre-insert and insert event emits
      * @returns {object} document or 'undefined' if there was a problem inserting it
-     * @memberof Collection
      */
     Collection.prototype.insertOne = function (doc, bulkInsert) {
       var err = null;
@@ -4975,7 +5048,8 @@
         };
       }
 
-      // allow pre-insert to modify actual collection reference even if cloning
+      // both 'pre-insert' and 'insert' events are passed internal data reference even when cloning
+      // insert needs internal reference because that is where loki itself listens to add meta
       if (!bulkInsert) {
         this.emit('pre-insert', obj);
       }
@@ -4983,13 +5057,13 @@
         return undefined;
       }
 
-      // if cloning, give user back clone of 'cloned' object with $loki and meta
-      returnObj = this.cloneObjects ? clone(obj, this.cloneMethod) : obj;
+      returnObj = obj;
+      if (!bulkInsert) {
+        this.emit('insert', obj);
+        returnObj = this.cloneObjects ? clone(obj, this.cloneMethod) : obj;
+      }
 
       this.addAutoUpdateObserver(returnObj);
-      if (!bulkInsert) {
-        this.emit('insert', returnObj);
-      }
       return returnObj;
     };
 
@@ -5409,8 +5483,14 @@
     Collection.prototype.adaptiveBinaryIndexInsert = function(dataPosition, binaryIndexName) {
       var index = this.binaryIndices[binaryIndexName].values;
       var val = this.data[dataPosition][binaryIndexName];
-      //var rs = new Resultset(this, null, null);
-      var idxPos = this.calculateRangeStart(binaryIndexName, val);
+
+      // If you are inserting a javascript Date value into a binary index, convert to epoch time
+      if (this.serializableIndices === true && val instanceof Date) {
+        this.data[dataPosition][binaryIndexName] = val.getTime();
+        val = this.data[dataPosition][binaryIndexName];
+      }
+
+      var idxPos = (index.length === 0)?0:this.calculateRangeStart(binaryIndexName, val, true);
 
       // insert new data index into our binary index at the proper sorted location for relevant property calculated by idxPos.
       // doing this after adjusting dataPositions so no clash with previous item at that position.
@@ -5476,18 +5556,28 @@
     };
 
     /**
-     * Internal method used for index maintenance.  Given a prop (index name), and a value
-     * (which may or may not yet exist) this will find the proper location where it can be added.
+     * Internal method used for index maintenance and indexed searching.  
+     * Calculates the beginning of an index range for a given value.
+     * For index maintainance (adaptive:true), we will return a valid index position to insert to.
+     * For querying (adaptive:false/undefined), we will :
+     *    return lower bound/index of range of that value (if found)
+     *    return next lower index position if not found (hole)
+     * If index is empty it is assumed to be handled at higher level, so
+     * this method assumes there is at least 1 document in index. 
+     *
+     * @param {string} prop - name of property which has binary index
+     * @param {any} val - value to find within index
+     * @param {bool?} adaptive - if true, we will return insert position
      */
-    Collection.prototype.calculateRangeStart = function (prop, val) {
+    Collection.prototype.calculateRangeStart = function (prop, val, adaptive) {
       var rcd = this.data;
       var index = this.binaryIndices[prop].values;
       var min = 0;
       var max = index.length - 1;
       var mid = 0;
-
+      
       if (index.length === 0) {
-        return 0;
+        return -1;
       }
 
       var minVal = rcd[index[min]][prop];
@@ -5506,12 +5596,18 @@
 
       var lbound = min;
 
-      if (ltHelper(rcd[index[lbound]][prop], val, false)) {
-        return lbound+1;
-      }
-      else {
+      // found it... return it
+      if (aeqHelper(val, rcd[index[lbound]][prop])) {
         return lbound;
       }
+
+      // if not in index and our value is less than the found one
+      if (ltHelper(val, rcd[index[lbound]][prop], false)) {
+        return adaptive?lbound:lbound-1;
+      }
+
+      // not in index and our value is greater than the found one
+      return adaptive?lbound+1:lbound;
     };
 
     /**
@@ -5526,7 +5622,7 @@
       var mid = 0;
 
       if (index.length === 0) {
-        return 0;
+        return -1;
       }
 
       var minVal = rcd[index[min]][prop];
@@ -5545,12 +5641,23 @@
 
       var ubound = max;
 
-      if (gtHelper(rcd[index[ubound]][prop], val, false)) {
-        return ubound-1;
-      }
-      else {
+      // only eq if last element in array is our val
+      if (aeqHelper(val, rcd[index[ubound]][prop])) {
         return ubound;
       }
+      
+       // if not in index and our value is less than the found one
+      if (gtHelper(val, rcd[index[ubound]][prop], false)) {
+        return ubound+1;
+      }
+      
+      // either hole or first nonmatch
+      if (aeqHelper(val, rcd[index[ubound-1]][prop])) {
+        return ubound-1;
+      }
+
+      // hole, so ubound if nearest gt than the val we were looking for
+      return ubound;
     };
 
     /**
@@ -5569,6 +5676,8 @@
       var min = 0;
       var max = index.length - 1;
       var mid = 0;
+      var lbound, lval;
+      var ubound, uval;
 
       // when no documents are in collection, return empty range condition
       if (rcd.length === 0) {
@@ -5592,33 +5701,67 @@
         }
         break;
       case '$gt':
+        // none are within range
         if (gtHelper(val, maxVal, true)) {
           return [0, -1];
         }
+        // all are within range
+        if (gtHelper(minVal, val, false)) {
+          return [min, max];
+        }
         break;
       case '$gte':
+        // none are within range
         if (gtHelper(val, maxVal, false)) {
           return [0, -1];
         }
+        // all are within range
+        if (gtHelper(minVal, val, true)) {
+            return [min, max];
+        }
         break;
       case '$lt':
+        // none are within range
         if (ltHelper(val, minVal, true)) {
           return [0, -1];
         }
+        // all are within range
         if (ltHelper(maxVal, val, false)) {
-          return [0, rcd.length - 1];
+          return [min, max];
         }
         break;
       case '$lte':
+        // none are within range
         if (ltHelper(val, minVal, false)) {
           return [0, -1];
         }
+        // all are within range
         if (ltHelper(maxVal, val, true)) {
-          return [0, rcd.length - 1];
+          return [min, max];
         }
         break;
       case '$between':
-        return ([this.calculateRangeStart(prop, val[0]), this.calculateRangeEnd(prop, val[1])]);
+        // none are within range (low range is greater)
+        if (gtHelper(val[0], maxVal, false)) {
+          return [0, -1];
+        }
+        // none are within range (high range lower)
+        if (ltHelper(val[1], minVal, false)) {
+          return [0, -1];
+        }
+        
+        lbound = this.calculateRangeStart(prop, val[0]);
+        ubound = this.calculateRangeEnd(prop, val[1]);
+
+        if (lbound < 0) lbound++;
+        if (ubound > max) ubound--;
+        
+        if (!gtHelper(rcd[index[lbound]][prop], val[0], true)) lbound++;
+        if (!ltHelper(rcd[index[ubound]][prop], val[1], true)) ubound--;
+        
+        if (ubound < lbound) return [0, -1];
+        
+        return ([lbound, ubound]);
       case '$in':
         var idxset = [],
           segResult = [];
@@ -5636,88 +5779,91 @@
         return segResult;
       }
 
-      // hone in on start position of value
-      while (min < max) {
-        mid = (min + max) >> 1;
-
-        if (ltHelper(rcd[index[mid]][prop], val, false)) {
-          min = mid + 1;
-        } else {
-          max = mid;
-        }
+      // determine lbound where needed
+      switch (op) {
+        case '$eq':
+        case '$aeq':
+        case '$dteq':
+        case '$gte':
+        case '$lt': 
+          lbound = this.calculateRangeStart(prop, val);
+          lval = rcd[index[lbound]][prop];
+          break;
+        default: break;
       }
 
-      var lbound = min;
-
-      // do not reset min, as the upper bound cannot be prior to the found low bound
-      max = index.length - 1;
-
-      // hone in on end position of value
-      while (min < max) {
-        mid = (min + max) >> 1;
-
-        if (ltHelper(val, rcd[index[mid]][prop], false)) {
-          max = mid;
-        } else {
-          min = mid + 1;
-        }
+      // determine ubound where needed
+      switch (op) {
+        case '$eq':
+        case '$aeq':
+        case '$dteq':
+        case '$lte':
+        case '$gt':
+          ubound = this.calculateRangeEnd(prop, val);
+          uval = rcd[index[ubound]][prop];
+          break;
+        default: break;
       }
-
-      var ubound = max;
-
-      var lval = rcd[index[lbound]][prop];
-      var uval = rcd[index[ubound]][prop];
-
+      
+      
       switch (op) {
       case '$eq':
-        if (lval !== val) {
-          return [0, -1];
-        }
-        if (uval !== val) {
-          ubound--;
-        }
-
-        return [lbound, ubound];
+      case '$aeq':
       case '$dteq':
-        if (lval > val || lval < val) {
+        // if hole (not found)
+        //if (ltHelper(lval, val, false) || gtHelper(lval, val, false)) {
+        //  return [0, -1];
+        //}
+        if (!aeqHelper(lval, val)) {
           return [0, -1];
         }
-        if (uval > val || uval < val) {
-          ubound--;
-        }
-
+        
         return [lbound, ubound];
 
+      //case '$dteq':
+        // if hole (not found)
+      //  if (lval > val || lval < val) {
+      //    return [0, -1];
+      //  }
+        
+      //  return [lbound, ubound];
 
       case '$gt':
-        if (ltHelper(uval, val, true)) {
-          return [0, -1];
+        // (an eqHelper would probably be better test)
+        // if hole (not found) ub position is already greater
+        if (!aeqHelper(rcd[index[ubound]][prop], val)) {
+        //if (gtHelper(rcd[index[ubound]][prop], val, false)) {
+          return [ubound, max];
         }
-
-        return [ubound, rcd.length - 1];
+        // otherwise (found) so ubound is still equal, get next
+        return [ubound+1, max];
 
       case '$gte':
-        if (ltHelper(lval, val, false)) {
-          return [0, -1];
+        // if hole (not found) lb position marks left outside of range
+        if (!aeqHelper(rcd[index[lbound]][prop], val)) {
+        //if (ltHelper(rcd[index[lbound]][prop], val, false)) {
+          return [lbound+1, max];
         }
-
-        return [lbound, rcd.length - 1];
+        // otherwise (found) so lb is first position where its equal
+        return [lbound, max];
 
       case '$lt':
-        if (lbound === 0 && ltHelper(lval, val, false)) {
-          return [0, 0];
+        // if hole (not found) position already is less than
+        if (!aeqHelper(rcd[index[lbound]][prop], val)) {
+        //if (ltHelper(rcd[index[lbound]][prop], val, false)) {
+          return [min, lbound];
         }
-        return [0, lbound - 1];
+        // otherwise (found) so lb marks left inside of eq range, get previous
+        return [min, lbound-1];
 
       case '$lte':
-        if (uval !== val) {
-          ubound--;
+        // if hole (not found) ub position marks right outside so get previous
+        if (!aeqHelper(rcd[index[ubound]][prop], val)) {
+        //if (gtHelper(rcd[index[ubound]][prop], val, false)) {
+          return [min, ubound-1];
         }
-
-        if (ubound === 0 && ltHelper(uval, val, false)) {
-          return [0, 0];
-        }
-        return [0, ubound];
+        // otherwise (found) so ub is last position where its still equal
+        return [min, ubound];
 
       default:
         return [0, rcd.length - 1];
@@ -5758,18 +5904,15 @@
       query = query || {};
 
       // Instantiate Resultset and exec find op passing firstOnly = true param
-      var result = new Resultset(this, {
-        queryObj: query,
-        firstOnly: true
-      });
+      var result = this.chain().find(query,true).data();
 
       if (Array.isArray(result) && result.length === 0) {
         return null;
       } else {
         if (!this.cloneObjects) {
-          return result;
+          return result[0];
         } else {
-          return clone(result, this.cloneMethod);
+          return clone(result[0], this.cloneMethod);
         }
       }
     };
@@ -5778,8 +5921,8 @@
      * Chain method, used for beginning a series of chained find() and/or view() operations
      * on a collection.
      *
-     * @param {array} transform - Ordered array of transform step objects similar to chain
-     * @param {object} parameters - Object containing properties representing parameters to substitute
+     * @param {array=} transform - Ordered array of transform step objects similar to chain
+     * @param {object=} parameters - Object containing properties representing parameters to substitute
      * @returns {Resultset} (this) resultset, or data array if any map or join functions where called
      * @memberof Collection
      */
@@ -5802,18 +5945,7 @@
      * @memberof Collection
      */
     Collection.prototype.find = function (query) {
-      if (typeof (query) === 'undefined') {
-        query = 'getAll';
-      }
-
-      var results = new Resultset(this, {
-        queryObj: query
-      });
-      if (!this.cloneObjects) {
-        return results;
-      } else {
-        return cloneObjectArray(results, this.cloneMethod);
-      }
+      return this.chain().find(query).data();
     };
 
     /**
@@ -5904,14 +6036,7 @@
      * @memberof Collection
      */
     Collection.prototype.where = function (fun) {
-      var results = new Resultset(this, {
-        queryFunc: fun
-      });
-      if (!this.cloneObjects) {
-        return results;
-      } else {
-        return cloneObjectArray(results, this.cloneMethod);
-      }
+      return this.chain().where(fun).data();
     };
 
     /**
@@ -6471,6 +6596,9 @@
       fs: LokiFsAdapter,
       localStorage: LokiLocalStorageAdapter
     };
+    Loki.aeq = aeqHelper;
+    Loki.lt = ltHelper;
+    Loki.gt = gtHelper;
     return Loki;
   }());
 
